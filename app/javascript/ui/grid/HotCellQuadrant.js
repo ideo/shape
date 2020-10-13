@@ -14,7 +14,7 @@ import ReportIcon from '~/ui/icons/htc/ReportIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
-import { SmallHelperText } from '~/ui/global/styled/typography'
+import { Heading3, SmallHelperText } from '~/ui/global/styled/typography'
 import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
 import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
 import TextIcon from '~/ui/icons/htc/TextIcon'
@@ -75,6 +75,10 @@ const More = styled.button`
   `}
 `
 More.displayName = 'More'
+
+const HeadingText = styled(Heading3)`
+  margin-bottom: 0;
+`
 
 const nameToIcon = {
   collection: CollectionIcon,
@@ -143,10 +147,13 @@ class HotCellQuadrant extends React.Component {
                   TypeIcon = PlusIcon
                 return {
                   name: subType.description,
-                  iconLeft: <TypeIcon />,
-                  onClick: () => {
-                    this.createContent(subType.name, subType.opts)
-                  },
+                  iconLeft: subType.name !== 'header' && <TypeIcon />,
+                  onClick:
+                    subType.name !== 'header' &&
+                    (() => {
+                      this.createContent(subType.name, subType.opts)
+                    }),
+                  TextComponent: subType.name !== 'header' && HeadingText,
                 }
               }),
           }
@@ -156,8 +163,9 @@ class HotCellQuadrant extends React.Component {
         if (description === 'Create New Template') TypeIcon = PlusIcon
         return {
           name: description,
-          iconLeft: <TypeIcon />,
-          onClick: () => this.createContent(name, opts),
+          iconLeft: name !== 'header' && <TypeIcon />,
+          onClick: name !== 'header' && (() => this.createContent(name, opts)),
+          TextComponent: name === 'header' && HeadingText,
         }
       }
     )
@@ -173,8 +181,7 @@ class HotCellQuadrant extends React.Component {
       uiStore,
       zoomLevel,
     } = this.props
-    let TypeIcon = nameToIcon[name]
-    if (name === 'template') TypeIcon = TemplateIcon
+    const TypeIcon = nameToIcon[name]
     return (
       <Quadrant
         moreMenuOpen={currentMenuOpen}

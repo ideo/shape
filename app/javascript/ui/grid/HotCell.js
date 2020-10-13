@@ -211,10 +211,12 @@ class HotCell extends React.Component {
           />
         ),
       },
+      { description: 'Recently used templates', name: 'header' },
     ]
     if (this.templateSearchResults.length > 0) {
       templates = [
-        ...templates,
+        templates[0],
+        templates[1],
         ...this.templateSearchResults.map(this.collectionIntoQudrant),
       ]
       return templates

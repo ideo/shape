@@ -227,6 +227,7 @@ const DefaultWrapper = styled.div`
 `
 
 export const StyledMenuButton = styled.button`
+  cursor: ${props => (props.linkCursor ? 'pointer' : 'auto')};
   font-family: ${v.fonts.sans};
   font-weight: 400;
   font-size: 1rem;
@@ -479,7 +480,7 @@ class PopoutMenu extends React.Component {
         key={`${name}-${id || i}`}
         borderColor={borderColor}
         noBorder={noBorder}
-        noHover={noHover}
+        noHover={noHover || !onClick}
         hasCheckbox={hasCheckbox}
         loading={loading}
         wrapperClassName={wrapperClassName}
@@ -533,6 +534,7 @@ class PopoutMenu extends React.Component {
               data-cy={`PopoutMenu_${_.camelCase(name)}`}
               className={className}
               wrapText={wrapText}
+              linkCursor={!!onClick}
             >
               {iconLeft && <span className="icon-left">{iconLeft}</span>}
               {this.renderName(item)}
