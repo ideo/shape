@@ -40,19 +40,22 @@ class Api::V1::UsersController < Api::V1::BaseController
     if user_signed_in? || current_api_token.present?
       update_user_last_active_at
 
-      render jsonapi: current_user, include: [
-        :groups,
-        :most_used_templates,
-        organizations: %i[primary_group most_used_templates],
-        current_organization: %i[primary_group guest_group admin_group terms_text_item],
-      ], class: {
-        User: SerializableCurrentUser,
-        Group: SerializableGroup,
-        Organization: SerializableOrganization,
-        # This is just for the most used templates which need name, id, cover
-        Collection: SerializableSimpleCollection,
-        'Item::TextItem': SerializableItem,
-      }
+      render jsonapi: current_user,
+             include: [
+               :groups,
+               :most_used_templates,
+               organizations: %i[primary_group most_used_templates],
+               current_organization: %i[primary_group guest_group admin_group terms_text_item],
+             ],
+             # use Firestoreable which includes all {CollectionType}: SerializableSimpleCollection mappings,
+             # needed for including templates
+             class: Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
+               User: SerializableCurrentUser,
+               Group: SerializableGroup,
+               Organization: SerializableOrganization,
+               # For org terms_text_item
+               'Item::TextItem': SerializableItem,
+             )
     else
       render jsonapi: User.new
     end
