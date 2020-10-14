@@ -317,8 +317,11 @@ class GridCardBlank extends React.Component {
       item.can_edit_content = true
       item.class_type = ITEM_TYPES.TEXT
       card.record = item
+      // Creates a temporary card for the user to edit
       parent.newTextCard = card
       uiStore.closeBlankContentTool({ force: true })
+      // For text cards to be available immediately, don't await this
+      // FIXME: For slow networks this will replace the edits from temporary newTextCard
       card.API_create()
       if (afterCreate) afterCreate(card)
       if (options.afterCreate) options.afterCreate(card)
@@ -341,7 +344,7 @@ class GridCardBlank extends React.Component {
     })
   }
 
-  createTextItem = item => {
+  createTextItem = () => {
     // prevent multiple clicks (or pressing enter) to create multiple items
     if (this.state.loading) {
       return

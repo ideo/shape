@@ -1013,6 +1013,7 @@ class FoamcoreGrid extends React.Component {
       'shouldHideFromUI'
     )
     if (newTextCard) {
+      // push the temporary card which was created to allow the user to edit right away
       cards.push(newTextCard)
     }
     cards = _.map(cards, this.renderCard)
