@@ -67,6 +67,7 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
+      margin-top: ${-18 / props.zoomLevel}px;
       top: ${-36 * props.zoomLevel}px;
     `};
 `
