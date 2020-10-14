@@ -287,7 +287,7 @@ export const StyledTopRightActions = styled.div`
   ${props =>
     props.smallCard &&
     `
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     right: 0;
     top: ${-2.4 * props.zoomLevel}rem;
 
@@ -300,6 +300,16 @@ export const StyledTopRightActions = styled.div`
       top: calc(100% - 1px);
       width: 100%;
     }
+  `}
+
+  ${props =>
+    props.forceOpen &&
+    `
+      opacity: 1 !important;
+
+      .show-on-hover {
+        opacity: 1 !important;
+      }
   `}
 
   .selected {

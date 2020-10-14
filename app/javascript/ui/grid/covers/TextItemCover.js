@@ -53,6 +53,8 @@ StyledReadMore.displayName = 'StyledReadMore'
 
 @observer
 class TextItemCover extends React.Component {
+  lastClickTimestamp = null
+
   constructor(props) {
     super(props)
     this.unmounted = false
@@ -95,6 +97,19 @@ class TextItemCover extends React.Component {
   }
 
   handleClick = e => {
+    const now = new Date().getTime()
+    const timeDiff = now - this.lastClickTimestamp
+    if (timeDiff < 600 && timeDiff > 0) {
+      return this.onOpenTextItem(e)
+    }
+    this.lastClickTimestamp = new Date().getTime()
+    if (uiStore.isTouchDevice) {
+      const { cardId } = this.props
+      uiStore.openTouchActionMenu(cardId)
+    }
+  }
+
+  onOpenTextItem(e) {
     if (this.props.handleClick) this.props.handleClick(e)
     e.stopPropagation()
     const { item, dragging, cardId, searchResult, uneditable } = this.props
@@ -104,7 +119,6 @@ class TextItemCover extends React.Component {
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
     }
-
     if (!item.can_view) {
       uiStore.showPermissionsAlert()
       return false
