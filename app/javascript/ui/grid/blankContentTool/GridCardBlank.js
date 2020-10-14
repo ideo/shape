@@ -20,6 +20,7 @@ import VideoIcon from '~/ui/icons/htc/VideoIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import Item from '~/stores/jsonApi/Item'
 import { DisplayText } from '~/ui/global/styled/typography'
 import FilestackUpload from '~/utils/FilestackUpload'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -149,6 +150,7 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
+    window.apiStore = this.props.apiStore
     if (this.props.preselected === 'text') {
       this.createTextItem()
     }
@@ -308,6 +310,22 @@ class GridCardBlank extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
+    if (
+      attrs.item_attributes &&
+      attrs.item_attributes.type === ITEM_TYPES.TEXT
+    ) {
+      const item = new Item(attrs.item_attributes, apiStore)
+      item.can_edit_content = true
+      item.class_type = ITEM_TYPES.TEXT
+      card.record = item
+      parent.newTextCard = card
+      uiStore.closeBlankContentTool({ force: true })
+      card.API_create()
+      if (afterCreate) afterCreate(card)
+      if (options.afterCreate) options.afterCreate(card)
+      return
+    }
+
     this.setState({ loading: true }, async () => {
       let newCard
       if (isReplacing) {
@@ -329,21 +347,19 @@ class GridCardBlank extends React.Component {
     if (this.state.loading) {
       return
     }
-    this.setState({ loading: true }, () => {
-      this.createCard(
-        {
-          item_attributes: {
-            name: 'Text',
-            content: '',
-            quill_data: { ops: [] },
-            type: ITEM_TYPES.TEXT,
-          },
+    this.createCard(
+      {
+        item_attributes: {
+          name: 'Text',
+          content: '',
+          quill_data: { ops: [] },
+          type: ITEM_TYPES.TEXT,
         },
-        {
-          afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
-        }
-      )
-    })
+      },
+      {
+        afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
+      }
+    )
   }
 
   closeBlankContentTool = () => {
