@@ -106,6 +106,8 @@ class TextItemCover extends React.Component {
     if (uiStore.isTouchDevice) {
       const { cardId } = this.props
       uiStore.openTouchActionMenu(cardId)
+    } else {
+      this.onOpenTextItem(e)
     }
   }
 

@@ -38,10 +38,12 @@ const DockedToolbar = styled.div`
   background: ${v.colors.commonLightest};
   border-radius: 4px;
   box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   height: 32px;
-  left: -16px;
+  left: ${props => (props.zoomLevel > 1 ? props.zoomLevel * 45 : -16)}px;
   margin-bottom: 20px;
   padding: 8px;
+  padding-bottom: 26px;
   position: absolute;
   transform: scale(${props => props.zoomLevel});
   width: 220px;
@@ -65,7 +67,7 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      top: -54px;
+      top: ${-36 * props.zoomLevel}px;
     `};
 `
 DockedToolbar.defaultProps = {
@@ -73,7 +75,6 @@ DockedToolbar.defaultProps = {
 }
 
 const StyledContainer = styled.div`
-  padding-top: 25px;
   position: relative;
 
   ${props =>
