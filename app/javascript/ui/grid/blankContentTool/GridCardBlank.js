@@ -177,15 +177,9 @@ class GridCardBlank extends React.Component {
     this.setState({ creating: type, bctMenuOpen: false })
   }
 
-  createCardWith = (file, idx = 0, options = {}) => {
+  createCardWith = (file, idx = 0) => {
     const { uiStore } = this.props
     let { row, col, order } = uiStore.blankContentToolState
-    if (options && options.row) {
-      row = options.row
-    }
-    if (options && options.col) {
-      col = options.col
-    }
     order += idx
     if (row !== null && col !== null) {
       col += idx % 4
@@ -249,9 +243,6 @@ class GridCardBlank extends React.Component {
   }
 
   pickImages = () => {
-    const { uiStore } = this.props
-    const { blankContentToolState } = uiStore
-    const { row, col } = blankContentToolState
     const { replacingId } = this
     const filestackMethod = !replacingId
       ? FilestackUpload.pickImages
@@ -266,7 +257,7 @@ class GridCardBlank extends React.Component {
       onSuccess: fileData => {
         const files = _.isArray(fileData) ? fileData : [fileData]
         _.each(files, (file, idx) => {
-          this.createCardWith(file, idx, { row, col })
+          this.createCardWith(file, idx)
         })
       },
     })
