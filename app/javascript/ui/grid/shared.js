@@ -280,7 +280,7 @@ export const StyledTopRightActions = styled.div`
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   height: 34px;
   right: 0.25rem;
-  top: ${props => 0.25 * props.zoomLevel}rem;
+  top: ${props => 2 * props.zoomLevel}px;
   transform: scale(${props => props.zoomLevel});
   transform-origin: top right;
 
@@ -289,7 +289,7 @@ export const StyledTopRightActions = styled.div`
     `
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     right: 0;
-    top: ${-2.4 * props.zoomLevel}rem;
+    top: ${-36 * props.zoomLevel}px;
 
     &:after {
       background: transparent;
