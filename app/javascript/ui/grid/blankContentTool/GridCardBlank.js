@@ -150,7 +150,6 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
-    window.apiStore = this.props.apiStore
     if (this.props.preselected === 'text') {
       this.createTextItem()
     }
