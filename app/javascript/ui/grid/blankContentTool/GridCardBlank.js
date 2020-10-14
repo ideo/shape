@@ -614,7 +614,7 @@ class GridCardBlank extends React.Component {
   render() {
     const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
+    const { creating, loading } = this.state
     const { isBoard } = parent
     const isReplacing = !!this.replacingId
     let { gridW, gridH } = gridSettings
@@ -626,7 +626,7 @@ class GridCardBlank extends React.Component {
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
     let zoomScale = 0
-    if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
+    if (!loading && uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
       <StyledGridCardBlank
         boxShadow={isBoard}
@@ -638,7 +638,7 @@ class GridCardBlank extends React.Component {
           gridW={gridW}
           gridH={gridH}
         >
-          {this.renderInner()}
+          {!loading && this.renderInner()}
           {isReplacing && !creating && (
             <DropzoneIconHolder>
               <CloudIcon />
@@ -652,7 +652,7 @@ class GridCardBlank extends React.Component {
             </DropzoneIconHolder>
           )}
         </StyledGridCardInner>
-        {this.state.loading && <InlineLoader />}
+        {loading && <InlineLoader />}
         {showCloseButton && (
           <CloseButton
             onClick={this.closeBlankContentTool}
