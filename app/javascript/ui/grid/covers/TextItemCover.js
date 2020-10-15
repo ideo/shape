@@ -140,8 +140,7 @@ class TextItemCover extends React.Component {
     runInAction(() => {
       uiStore.deselectCards()
       uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
-      uiStore.update('textEditingItem', item)
-      uiStore.update('textEditingCardId', cardId)
+      uiStore.openTextEditingItem(item, cardId)
     })
     this.setState({ loading: false })
   }
