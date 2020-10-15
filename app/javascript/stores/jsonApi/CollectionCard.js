@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import queryString from 'query-string'
 
 import {
@@ -199,15 +199,20 @@ class CollectionCard extends BaseRecord {
         data,
       })
       // unset this so it does not call placeholderCard.API_destroy() when closing BCT
-      uiStore.setBctPlaceholderCard(null)
-      // important to close BCT before adding the new card so that the grid reflows properly
-      uiStore.closeBlankContentTool({ force: true })
-      const { record } = res.data
-      if ((!record.name && record.isLink) || record.isData) {
-        uiStore.addNewCard(res.data.record.id)
-      }
-      this.parentCollection.addCard(res.data)
-      uiStore.trackEvent('create', this.parentCollection)
+      runInAction(() => {
+        uiStore.setBctPlaceholderCard(null)
+        // important to close BCT before adding the new card so that the grid reflows properly
+        uiStore.closeBlankContentTool({ force: true })
+        const { record } = res.data
+        if ((!record.name && record.isLink) || record.isData) {
+          uiStore.addNewCard(res.data.record.id)
+        }
+        this.parentCollection.newTextCard = null
+        this.parentCollection.addCard(res.data)
+        uiStore.update('textEditingItem', record)
+        uiStore.update('textEditingCardId', res.data.id)
+        uiStore.trackEvent('create', this.parentCollection)
+      })
       return res.data
     } catch (e) {
       uiStore.closeBlankContentTool({ force: true })
