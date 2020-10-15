@@ -171,7 +171,13 @@ class PageBreadcrumb extends React.Component {
   }
 
   render() {
-    const { containerWidth, record, isHomepage, maxDepth } = this.props
+    const {
+      record,
+      containerWidth,
+      isHomepage,
+      maxDepth,
+      offsetPosition,
+    } = this.props
     const { breadcrumb } = record
     const renderItems = !isHomepage && breadcrumb && breadcrumb.length > 0
 
@@ -189,6 +195,7 @@ class PageBreadcrumb extends React.Component {
         containerWidth={containerWidth}
         isTouchDevice={uiStore.isTouchDevice}
         isSmallScreen={uiStore.isMobileXs}
+        offsetPosition={offsetPosition}
       />
     )
   }
@@ -196,19 +203,24 @@ class PageBreadcrumb extends React.Component {
 
 PageBreadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
-  containerWidth: PropTypes.number,
-  maxDepth: PropTypes.number,
   backButton: PropTypes.bool,
+  containerWidth: PropTypes.number,
+  isHomepage: PropTypes.bool,
+  maxDepth: PropTypes.number,
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   useLinkedBreadcrumb: PropTypes.bool,
   windowWidth: PropTypes.number,
 }
 
 PageBreadcrumb.defaultProps = {
-  isHomepage: false,
-  containerWidth: null,
-  maxDepth: 6,
   backButton: false,
+  containerWidth: null,
+  isHomepage: false,
+  maxDepth: 6,
+  offsetPosition: null,
   useLinkedBreadcrumb: true,
   windowWidth: 1024,
 }

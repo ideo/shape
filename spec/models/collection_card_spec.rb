@@ -684,6 +684,17 @@ RSpec.describe CollectionCard, type: :model do
         expect(collection.collection_cards).to eq []
       end
 
+      it 'should mark all cards as archived with archive_batch identifiers' do
+        card_ids = collection.collection_cards.pluck(:id)
+        collection_cards.archive_all!(ids: card_ids, user_id: user.id)
+
+        archived_cards = CollectionCard.where(id: card_ids)
+        expect(collection.all_collection_cards.archived).to match_array archived_cards
+        expect(collection.all_collection_cards.archived.map(&:archive_batch)).to match_array(
+          archived_cards.map(&:archive_batch_identifier),
+        )
+      end
+
       it 'should call the CollectionCardArchiveWorker' do
         card_ids = collection.collection_cards.pluck(:id)
         expect(CollectionCardArchiveWorker).to receive(:perform_async).with(

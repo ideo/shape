@@ -111,7 +111,7 @@ class ChartGroup extends React.Component {
     })
     // If there's one single value, and the secondary datasets are only
     // the percentitles (with no dates), then spread the domain out.
-    const uniqDates = _.uniqBy(_.map(allValues, 'date'), _.isEqual)
+    const uniqDates = _.uniqWith(_.map(allValues, 'date'), _.isEqual)
     if (allValues.length === 1 || uniqDates.length === 1) {
       domain.x = domainXForSingleValue(allValues[0].date)
     }

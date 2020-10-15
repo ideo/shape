@@ -562,6 +562,7 @@ class FoamcoreInteractionLayer extends React.Component {
         'resize'
       )
     }
+    return null
   }
 
   cardWithinViewPlusPage = card => {
