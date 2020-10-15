@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import RolesDialogActions from '~/ui/roles/RolesDialogActions'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 
 import Modal from '~/ui/global/modals/Modal'
 import RolesMenu from '~/ui/roles/RolesMenu'
@@ -22,7 +22,7 @@ class RolesModal extends React.Component {
   get dialogActions() {
     const { record } = this.props
 
-    return <RolesDialogActions record={record} />
+    return <RolesMenuDialogActions record={record} />
   }
 
   render() {

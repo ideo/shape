@@ -1,12 +1,12 @@
 import { clone } from 'lodash'
 
-import RolesDialogActions from '~/ui/roles/RolesDialogActions'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeUser } from '#/mocks/data'
 
 let props, wrapper, rerender, component
-describe('RolesDialogActions', () => {
+describe('RolesMenuDialogActions', () => {
   beforeEach(() => {
     const uiStore = fakeUiStore
     uiStore.createRoles = jest.fn()
@@ -18,7 +18,7 @@ describe('RolesDialogActions', () => {
     }
 
     rerender = () => {
-      wrapper = shallow(<RolesDialogActions.wrappedComponent {...props} />)
+      wrapper = shallow(<RolesMenuDialogActions.wrappedComponent {...props} />)
       component = wrapper.instance()
     }
 

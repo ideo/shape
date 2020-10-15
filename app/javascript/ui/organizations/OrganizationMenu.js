@@ -1,11 +1,14 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
-import RolesDialogActions from '~/ui/roles/RolesDialogActions'
+import GroupModifyDialogActions from '~/ui/groups/GroupModifyDialogActions'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Loader from '~/ui/layout/Loader'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
@@ -22,6 +25,16 @@ class OrganizationMenu extends React.Component {
   editGroup = {}
   @observable
   isLoading = false
+  @observable
+  groupFormDisabled = true
+  defaultGroupFormFields = {
+    name: '',
+    handle: '',
+    filestack_file_url: '',
+    filestack_file_attributes: null,
+  }
+  @observable
+  groupFormFields = { ...this.defaultGroupFormFields }
 
   get currentPage() {
     return this.props.uiStore.organizationMenuPage
@@ -39,6 +52,7 @@ class OrganizationMenu extends React.Component {
     this.editGroup = group
   }
 
+  @action
   goToAddGroup = ev => {
     this.changePage('addGroup')
   }
@@ -54,6 +68,30 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
     this.isLoading = false
     this.editGroup = {}
+  }
+
+  @action
+  changeGroupFormName(name) {
+    this.groupFormFields.name = name
+  }
+
+  @action
+  changeGroupFormHandle(handle) {
+    // limit to 30
+    this.groupFormFields.handle = handle.slice(0, 30)
+    const first = _.first(_.slice(handle, 0, 1))
+    // disable form if the handle starts with a number
+    if (!first || parseInt(first).toString() === first) {
+      this.groupFormDisabled = true
+    } else {
+      this.groupFormDisabled = false
+    }
+  }
+
+  @action
+  changeGroupFormFileAttrs(fileAttrs) {
+    this.groupFormFields.filestack_file_url = fileAttrs.url
+    this.groupFormFields.filestack_file_attributes = fileAttrs
   }
 
   saveOrganization = primaryGroup => {
@@ -127,6 +165,7 @@ class OrganizationMenu extends React.Component {
     this.props.onClose()
     this.isLoading = false
     this.editGroup = {}
+    this.groupFormFields = { ...this.defaultGroupFormFields }
   }
 
   handleLogout = ev => {
@@ -143,35 +182,55 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupModify
         group={{}}
-        isLoading={this.isLoading}
-        onSave={this.createGroup}
+        formDisabled={this.groupFormDisabled}
+        groupFormFields={this.groupFormFields}
+        changeGroupFormName={name => {
+          this.changeGroupFormName(name)
+        }}
+        changeGroupFormHandle={handle => {
+          this.changeGroupFormHandle(handle)
+        }}
+        changeGroupFormFileAttrs={fileAttrs => {
+          this.changeGroupFormFileAttrs(fileAttrs)
+        }}
       />
     )
   }
 
   renderCreateOrganization() {
     return (
-      <div>
+      <Fragment>
         {this.isLoading && <InlineLoader />}
         <GroupModify
           group={{}}
-          isLoading={this.isLoading}
-          onSave={this.createOrganization}
           onCancel={this.handleLogout}
           groupType="Organization"
           creatingOrg
+          formDisabled={this.groupFormDisabled}
+          groupFormFields={this.groupFormFields}
+          changeGroupFormName={name => {
+            this.changeGroupFormName(name)
+          }}
+          changeGroupFormHandle={handle => {
+            this.changeGroupFormHandle(handle)
+          }}
+          changeGroupFormFileAttrs={fileAttrs => {
+            this.changeGroupFormFileAttrs(fileAttrs)
+          }}
         />
-      </div>
+      </Fragment>
     )
   }
 
   renderEditOrganization() {
+    /*FIXME this may not be used*/
     const { organization } = this.props
     const editGroup = organization.primary_group
     return (
       <GroupModify
         onGroupRoles={this.onGroupRoles(editGroup)}
         group={editGroup}
+        groupFormFields={this.groupFormFields}
         isLoading={this.isLoading}
         onSave={group => {
           this.saveOrganization(group)
@@ -184,6 +243,8 @@ class OrganizationMenu extends React.Component {
   }
 
   renderEditRoles() {
+    const { uiStore } = this.props
+
     return (
       <RolesMenu
         record={this.editGroup}
@@ -191,6 +252,7 @@ class OrganizationMenu extends React.Component {
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
+        addedNewRole={uiStore.addedNewRole}
       />
     )
   }
@@ -220,19 +282,54 @@ class OrganizationMenu extends React.Component {
     )
   }
 
-  renderDialogActions() {
+  renderGroupModifyDialogActions(dialogType) {
+    if (this.isLoading) return null
+
+    if (dialogType === 'group') {
+      return (
+        <GroupModifyDialogActions
+          isLoading={this.isLoading}
+          onSave={() => {
+            this.createGroup(this.groupFormFields)
+          }}
+          formDisabled={this.groupFormDisabled}
+        />
+      )
+    } else if (dialogType === 'organization') {
+      return (
+        <GroupModifyDialogActions
+          isLoading={this.isLoading}
+          onSave={() => {
+            this.createOrganization(this.groupFormFields)
+          }}
+          onCancel={this.handleLogout}
+          groupType="Organization"
+          creatingOrg
+          formDisabled={this.groupFormDisabled}
+          groupFormFields={this.groupFormFields}
+        />
+      )
+    }
+
+    return null
+  }
+
+  renderRolesModifyDialogActions() {
+    if (this.isLoading) return null
+
     let fixedRole = null
     if (this.editGroup.is_guest) {
       fixedRole = 'member'
     } else if (this.editGroup.is_admin) {
       fixedRole = 'admin'
     }
+
     if (!this.editGroup.id) {
       return null
     }
 
     return (
-      <RolesDialogActions
+      <RolesMenuDialogActions
         record={this.editGroup}
         setDidAddNewRole={this.setDidAddNewRole}
         fixedRole={fixedRole}
@@ -249,13 +346,18 @@ class OrganizationMenu extends React.Component {
         content = this.renderAddGroup()
         title = 'New Group'
         onBack = this.goBack
+        dialogActions = this.renderGroupModifyDialogActions('group')
+        noScroll = true
         break
       case 'newOrganization':
         title = 'New Organization'
         onBack = locked ? null : this.goBack
         content = this.renderCreateOrganization()
+        dialogActions = this.renderGroupModifyDialogActions('organization')
+        noScroll = true
         break
       case 'editOrganization':
+        // FIXME: this is no longer reachable
         title = 'Your Organization'
         onBack = this.goBack
         content = this.renderEditOrganization()
@@ -274,7 +376,7 @@ class OrganizationMenu extends React.Component {
             })
           }
           content = this.renderEditRoles()
-          dialogActions = this.renderDialogActions()
+          dialogActions = this.renderRolesModifyDialogActions()
           noScroll = true
         }
         if (this.editGroup.can_edit) {

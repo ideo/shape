@@ -6,7 +6,7 @@ import RolesAdd from '~/ui/roles/RolesAdd'
 
 @inject('uiStore', 'apiStore')
 @observer
-class RolesDialogActions extends React.Component {
+class RolesMenuDialogActions extends React.Component {
   createUsers = async emails => {
     const { apiStore, uiStore } = this.props
     return await apiStore
@@ -48,11 +48,12 @@ class RolesDialogActions extends React.Component {
     // e.g. "admin" is the only selection for Org Admins group
     const addRoleTypes = fixedRole ? [fixedRole] : roleTypes(ownerType)
 
-    // const editableGroups = groups.filter(group => group.can_edit)
+    // get editable groups within record roles
     const editableGroups = record.roles.map(role => {
-      return role.groups.filter(group => {
-        return group.can_edit
-      })
+      if (role && role.groups) {
+        return role.groups.filter(group => group.can_edit)
+      }
+      return []
     })
 
     return (
@@ -62,29 +63,31 @@ class RolesDialogActions extends React.Component {
         onCreateUsers={this.createUsers}
         onCreateRoles={uiStore.createRoles}
         ownerType={ownerType}
-        addableGroups={_.flatten(editableGroups)}
+        addableGroups={
+          editableGroups.length > 0 ? _.flatten(editableGroups) : []
+        }
       />
     )
   }
 }
 
-RolesDialogActions.wrappedComponent.propTypes = {
+RolesMenuDialogActions.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-RolesDialogActions.propTypes = {
+RolesMenuDialogActions.propTypes = {
   record: MobxPropTypes.objectOrObservableObject,
   fixedRole: PropTypes.string,
   context: PropTypes.string,
 }
 
-RolesDialogActions.defaultProps = {
+RolesMenuDialogActions.defaultProps = {
   record: null,
   fixedRole: null,
   context: '',
 }
 
-RolesDialogActions.displayName = 'RolesDialogActions'
+RolesMenuDialogActions.displayName = 'RolesMenuDialogActions'
 
-export default RolesDialogActions
+export default RolesMenuDialogActions

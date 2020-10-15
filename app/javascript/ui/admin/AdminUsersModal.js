@@ -5,7 +5,7 @@ import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Modal from '~/ui/global/modals/Modal'
 import Panel from '~/ui/global/Panel'
-import RolesDialogActions from '~/ui/roles/RolesDialogActions'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 import Tooltip from '~/ui/global/Tooltip'
 import { Heading3 } from '~/ui/global/styled/typography'
 import {
@@ -109,7 +109,7 @@ class AdminUsersModal extends React.Component {
   }
 
   get dialogActions() {
-    return <RolesDialogActions context={'admin'} />
+    return <RolesMenuDialogActions context={'admin'} />
   }
 
   render() {

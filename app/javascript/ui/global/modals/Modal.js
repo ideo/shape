@@ -71,7 +71,7 @@ const StyledDialogActions = styled(DialogActions)`
   padding: 0 24px 24px 45px !important;
 `
 
-const RolesAddContainer = styled.div`
+const DialogActionsContainer = styled.div`
   flex: 1 1 auto;
   padding-top: 24px;
   padding-bottom: 30px;
@@ -233,7 +233,9 @@ class Modal extends React.Component {
           </StyledDialogContent>
           {this.props.dialogActions && (
             <StyledDialogActions>
-              <RolesAddContainer>{this.props.dialogActions}</RolesAddContainer>
+              <DialogActionsContainer>
+                {this.props.dialogActions}
+              </DialogActionsContainer>
             </StyledDialogActions>
           )}
         </StyledDialog>
@@ -279,7 +281,7 @@ Modal.defaultProps = {
   disableBackdropClick: false,
   noScroll: false,
   scrollVisible: false,
-  dialogActions: <div />,
+  dialogActions: null,
 }
 
 export default Modal

@@ -101,7 +101,7 @@ describe('AdminUsersModal', () => {
     })
   })
 
-  describe('renders RolesDialogActions with admin context', () => {
+  describe('renders RolesMenuDialogActions with admin context', () => {
     it('makes a call to add Shape admim users', () => {
       expect(component.dialogActions.props.context).toEqual('admin')
     })

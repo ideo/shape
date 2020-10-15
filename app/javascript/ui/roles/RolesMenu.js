@@ -318,7 +318,7 @@ RolesMenu.propTypes = {
   ownerType: PropTypes.string.isRequired,
   title: PropTypes.string,
   submissionBox: PropTypes.bool,
-  addedNewRole: PropTypes.bool.isRequired,
+  addedNewRole: PropTypes.bool,
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -328,6 +328,8 @@ RolesMenu.defaultProps = {
   canEdit: false,
   title: 'Shared with',
   submissionBox: false,
+  addedNewRole: false,
 }
+RolesMenu.displayName = 'RolesMenu'
 
 export default RolesMenu
