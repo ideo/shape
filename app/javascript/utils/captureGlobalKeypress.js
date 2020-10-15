@@ -41,6 +41,7 @@ export const handleMouseDownSelection = e => {
     uiStore.closeBlankContentTool()
     uiStore.closeCardMenu()
     uiStore.setEditingCardCover(null)
+    this.closeTouchActionMenu()
     return 'emptySpace'
   }
   if (onHotCell) {
