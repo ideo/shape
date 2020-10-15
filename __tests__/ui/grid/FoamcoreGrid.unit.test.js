@@ -3,7 +3,7 @@ import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollectionCard, fakeCollection, fakeItemCard } from '#/mocks/data'
+import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 import v from '~/utils/variables'
 
 // because of mdlPlaceholder... without this mock it blows up
@@ -509,18 +509,6 @@ describe('FoamcoreGrid', () => {
       expect(props.uiStore.determineZoomLevels).toHaveBeenCalledWith(
         props.collection
       )
-    })
-  })
-
-  describe('with newTextCard', () => {
-    beforeEach(() => {
-      props.collection.newTextCard = fakeItemCard
-      rerender()
-    })
-
-    it('renders MovableGridCards', () => {
-      expect(component.renderVisibleCards().length).toEqual(4)
-      expect(wrapper.find('MovableGridCard').length).toEqual(4)
     })
   })
 })
