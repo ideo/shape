@@ -25,4 +25,9 @@ class ExternalRecord < ApplicationRecord
   amoeba do
     enable
   end
+
+  def external_id_to_integer
+    return nil if external_id.nil?
+    external_id.match(/\d+/).to_s.to_i
+  end
 end

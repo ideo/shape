@@ -9,10 +9,9 @@ import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '../global/AvatarGroup'
 import Avatar from '../global/Avatar'
 import { AddButton } from '../global/styled/buttons'
 import Tooltip from '../global/Tooltip'
-import RolesAdd from '../roles/RolesAdd'
-import AdminUsersModal from '../admin/AdminUsersModal'
 // import OrganizationMenu from '~/ui/organizations'
-
+import _ from 'lodash'
+import AdminUsersModal from '../admin/AdminUsersModal'
 // TODO: load groups/BUs and their roles?
 // OrganizationMenu gets its roles from /users/me
 // Will need to rework that for this
@@ -26,8 +25,8 @@ class OrgSettingsUserSummary extends React.Component {
   componentDidMount() {
     // replace with fetching specific group members
     // Make this dumber and just have Team/Org Tab pass in the data?
-    this.props.apiStore.fetchShapeAdminUsers()
-    // need to fetch roles for prim        ary_group before rendering
+    // this.props.apiStore.fetchShapeAdminUsers()
+    // need to fetch roles for primary_group before rendering
     // /users/me doesn't get the roles for all groups
   }
 
@@ -36,20 +35,34 @@ class OrgSettingsUserSummary extends React.Component {
     uiStore.update('rolesMenuOpen', 'OrgSettingsUserSummary')
   }
 
+  usersAndGroupsForRole = roleName => {
+    const { roles } = this.props.group
+    const role = _.find(roles, {
+      name: roleName,
+    })
+    if (!role) return []
+    const sortedUsers = _.sortBy(role.users, 'name')
+    const sortedGroups = _.sortBy(role.groups, 'name')
+
+    return [...sortedUsers, ...sortedGroups]
+  }
+
   render() {
+    const maxAvatars = this.props.roleName === 'admin' ? 2 : 5
     // Replace with specific users (members/admins of groups)
-    const users = this.props.apiStore.shapeAdminUsers.slice(
+    const users = this.usersAndGroupsForRole(this.props.roleName).slice(
       0,
-      MAX_AVATARS_TO_SHOW
+      maxAvatars // MAX_AVATARS_TO_SHOW
     )
     const userCount = users.length
     const toolTipText = 'Do it now Gohan!'
-
+    console.log('simpleUserSummary: ', this.props.group)
+    console.log(users)
     return (
       <Fragment>
         <AvatarGroup
           avatarCount={userCount}
-          placeholderTitle={`...and more ${this.props.userType}s`}
+          placeholderTitle={`...and more ${this.props.roleName}s`}
         >
           {users.map(user => (
             <Avatar
@@ -74,7 +87,8 @@ class OrgSettingsUserSummary extends React.Component {
 
 OrgSettingsUserSummary.propTypes = {
   handleClick: PropTypes.func.isRequired,
-  userType: PropTypes.oneOf(['admin', 'member']),
+  roleName: PropTypes.string.isRequired,
+  group: MobxPropTypes.objectOrObservableObject,
 }
 
 OrgSettingsUserSummary.wrappedComponent.propTypes = {

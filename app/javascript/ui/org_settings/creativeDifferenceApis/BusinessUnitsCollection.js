@@ -10,15 +10,15 @@ class BusinessUnitModel extends Model {
   url() {
     // Do this conditionally because otherwise it tries to use the /:id for creating
     return this.id && !this.isNew
-      ? `/api/v3/business_units/${this.id}`
-      : `/api/v3/business_units`
+      ? `/api/v1/creative_difference/business_units/${this.id}`
+      : `/api/v1/creative_difference/business_units`
   }
 }
 
 class BusinessUnitsCollection extends Collection {
   // use .rpc({ endpoint: /api/v3/users/me }) for non-rest calls
   url() {
-    return `/api/v3/business_units`
+    return `/api/v1/creative_difference/business_units`
   }
   model() {
     return BusinessUnitModel

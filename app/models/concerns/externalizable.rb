@@ -12,6 +12,11 @@ module Externalizable
         .where(ExternalRecord.arel_table[:external_id].in(external_id))
         .where(ExternalRecord.arel_table[:application_id].eq(application_id))
     end
+
+    def where_application_id(application_id)
+      joins(:external_records)
+        .where(ExternalRecord.arel_table[:application_id].eq(application_id))
+    end
   end
 
   def add_external_id(external_id, application_id)

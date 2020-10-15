@@ -10,7 +10,7 @@ import {
   PropTypes as MobxPropTypes,
   PropTypes,
 } from 'mobx-react'
-import OrganizationRoles from './SimpleUserSummary'
+import SimpleUserSummary from './SimpleUserSummary'
 import DropdownSelect from './DropdownSelect'
 import Loader from '../layout/Loader'
 
@@ -34,11 +34,11 @@ class BusinessUnitRow extends React.Component {
 
     this.textInput = null
 
-    props.apiStore.fetch(
-      'groups',
-      props.apiStore.currentUserOrganization.primary_group.id,
-      true
-    )
+    // props.apiStore.fetch(
+    //   'groups',
+    //   props.apiStore.currentUserOrganization.primary_group.id,
+    //   true
+    // )
   }
 
   componentDidMount() {
@@ -306,35 +306,27 @@ class BusinessUnitRow extends React.Component {
           {/* Admins */}
           <div
             style={{
-              width: '80px',
+              width: '120px',
               marginTop: '-10px',
             }}
           >
-            <OrganizationRoles
-              roles={
-                this.props.apiStore.currentUserOrganization.primary_group.roles
-              }
-              canEdit={
-                this.props.apiStore.currentUserOrganization.primary_group
-                  .can_edit
-              }
+            <SimpleUserSummary
+              group={this.props.adminGroup}
+              roleName={'admin'}
+              handleClick={() => console.log('click adminGroup button')}
             />
           </div>
           {/* Members */}
           <div
             style={{
-              width: '80px',
+              width: '120px',
               marginTop: '-10px',
             }}
           >
-            <OrganizationRoles
-              roles={
-                this.props.apiStore.currentUserOrganization.primary_group.roles
-              }
-              canEdit={
-                this.props.apiStore.currentUserOrganization.primary_group
-                  .can_edit
-              }
+            <SimpleUserSummary
+              group={this.props.memberGroup}
+              roleName={'member'}
+              handleClick={() => console.log('click memberGroup button')}
             />
           </div>
         </form>
@@ -359,6 +351,8 @@ BusinessUnitRow.propTypes = {
   // updateBusinessUnit: PropTypes.func,
   // updateBusinessUnitDeployment: PropTypes.func,
   businessUnit: MobxPropTypes.objectOrObservableObject.isRequired,
+  adminGroup: MobxPropTypes.objectOrObservableObject.isRequired,
+  memberGroup: MobxPropTypes.objectOrObservableObject.isRequired,
   contentVersions: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
   ),

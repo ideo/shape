@@ -1,7 +1,8 @@
 import styled from 'styled-components'
 import { observable, runInAction, action } from 'mobx'
-import { observer } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 import { v4 as uuidv4 } from 'uuid'
+import _ from 'lodash'
 import {
   businessUnitsStore,
   industrySubcategoriesStore,
@@ -15,7 +16,6 @@ import InfoIconXs from '~/ui/icons/InfoIconXs'
 import BusinessUnitRow from './BusinessUnitRow'
 import AddTeamButton from './AddTeamButton'
 import BusinessUnitRowHeadings from './BusinessUnitRowHeadings'
-import TestComponent from './TestComponent'
 
 const StyledIconWrapper = styled.span`
   margin-left: 8px;
@@ -24,6 +24,7 @@ const StyledIconWrapper = styled.span`
   width: ${props => (props.width ? props.width : 10)}px;
 `
 
+@inject('apiStore')
 @observer
 class TeamsTab extends React.Component {
   @observable
@@ -50,7 +51,8 @@ class TeamsTab extends React.Component {
       const responses = await Promise.all([
         industrySubcategoriesStore.fetch(),
         contentVersionsStore.fetch(),
-        businessUnitsStore.fetch(),
+        this.props.apiStore.fetchCreativeDifferenceGroups(),
+        // businessUnitsStore.fetch(),
         // This only works right now because I'm logged into C∆
         // The C∆ controller uses current_user
         orgModelInstance.fetch(),
@@ -59,8 +61,15 @@ class TeamsTab extends React.Component {
       runInAction(() => {
         this.industrySubcategories = responses[0]
         this.contentVersions = responses[1]
-        this.businessUnits = responses[2]
+        this.businessUnitGroups = responses[2].data
         this.organization = responses[3]
+        // extract BUs from Groups
+        console.log('bu groups: ', this.businessUnitGroups)
+        const businessUnits = _.map(this.businessUnitGroups, group => ({
+          ...group.business_unit,
+        }))
+        console.log(businessUnits)
+        businessUnitsStore.set(businessUnits)
       })
 
       this.setIsLoading(false)
@@ -83,11 +92,6 @@ class TeamsTab extends React.Component {
   @action
   setBusinessUnitErrors = err => {
     this.businessUnitErrors = err
-  }
-
-  @action
-  setBusinessUnits(businessUnits) {
-    this.businessUnits = businessUnits
   }
 
   initialNewTeamValues = () => {
@@ -182,6 +186,12 @@ class TeamsTab extends React.Component {
               <BusinessUnitRow
                 justCreated={newBusinessUnitId == businessUnit.id}
                 key={uuidv4()}
+                adminGroup={_.find(this.businessUnitGroups, {
+                  external_id: `BusinessUnit_${businessUnit.id}_Admins`,
+                })}
+                memberGroup={_.find(this.businessUnitGroups, {
+                  external_id: `BusinessUnit_${businessUnit.id}_Members`,
+                })}
                 businessUnit={businessUnit}
                 contentVersions={contentVersions}
                 industrySubcategories={industrySubcategories}

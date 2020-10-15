@@ -41,6 +41,8 @@ class Group < ApplicationRecord
 
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
+  attr_accessor :business_unit
+
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to
   # This method must be above rolify method

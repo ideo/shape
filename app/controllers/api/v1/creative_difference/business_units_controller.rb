@@ -1,4 +1,4 @@
-class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifference::BaseController
+class Api::V1::CreativeDifference::BusinessUnitsController < Api::V1::CreativeDifference::BaseController
   # how to load and authorize shape groups?
   before_action :authorize_shape_group # ?
 
@@ -10,8 +10,7 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
               where_application_id(1).
               where(
                 ExternalRecord.arel_table[:external_id].matches('BusinessUnit%')
-              ).
-              includes(:roles)
+              )
 
     groups.each do |group|
       business_unit_id = group.external_records.first.external_id_to_integer
@@ -22,7 +21,7 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
       end
     end
 
-    render jsonapi: groups, include: [roles: %i[users groups]]
+    render jsonapi: groups
   end
 
   private
