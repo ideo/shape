@@ -145,6 +145,7 @@ class GridCardBlank extends React.Component {
       loading: false,
       bctMenuOpen: false,
       bctMenuOffsetPosition: null,
+      uploaded: false,
     }
   }
 
@@ -247,7 +248,12 @@ class GridCardBlank extends React.Component {
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
-      onClose: () => setTimeout(() => this.closeBlankContentTool(), 150),
+      onClose: () => {
+        if (!this.state.uploaded) this.closeBlankContentTool()
+      },
+      onFileUploadFinished: () => {
+        this.setState({ uploaded: true })
+      },
       onSuccess: fileData => {
         const files = _.isArray(fileData) ? fileData : [fileData]
         _.each(files, (file, idx) => {
@@ -308,7 +314,7 @@ class GridCardBlank extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
-    this.setState({ loading: true }, async () => {
+    this.setState({ loading: true, uploaded: false }, async () => {
       let newCard
       if (isReplacing) {
         newCard = await card.API_replace({ replacingId })
