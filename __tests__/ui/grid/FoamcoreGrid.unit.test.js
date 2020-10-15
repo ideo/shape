@@ -514,13 +514,70 @@ describe('FoamcoreGrid', () => {
 
   describe('with tempTextCard', () => {
     beforeEach(() => {
-      props.collection.tempTextCard = fakeItemCard
+      props.collection.tempTextCard = { ...fakeItemCard, id: -5 }
       rerender()
     })
 
-    it('renders MovableGridCards', () => {
+    it('renders an extra MovableGridCard', () => {
       expect(component.renderVisibleCards().length).toEqual(4)
       expect(wrapper.find('MovableGridCard').length).toEqual(4)
+      expect(wrapper.find('MovableGridCard').get(3).props.card.id).toEqual(-5)
+    })
+  })
+
+  describe('totalGridSize', () => {
+    beforeEach(() => {
+      props.collection.isSplitLevel = false
+      props.collection.max_row_index = 0
+      props.uiStore.visibleRows = { min: 0, max: 5, num: 5 }
+      rerender()
+    })
+    it('should calculate the right height for non-split level collections', () => {
+      const { height } = component.totalGridSize
+      const { relativeZoomLevel } = component
+      const { gridSettings } = component
+      const { gridH, gutter } = gridSettings
+      const maxRows =
+        props.collection.max_row_index + 1 + props.uiStore.visibleRows.num * 2
+      const calculatedHeight = ((gridH + gutter) * maxRows) / relativeZoomLevel
+      expect(height).toEqual(calculatedHeight)
+    })
+
+    describe('for split-level collections', () => {
+      beforeEach(() => {
+        props.collection.isSplitLevel = true
+        rerender()
+      })
+
+      it('should calculate the right height for non-split level collections', () => {
+        const { height } = component.totalGridSize
+        const { relativeZoomLevel } = component
+        const { gridSettings } = component
+        const { gridH, gutter } = gridSettings
+        const maxRows = props.collection.max_row_index + 1
+        const calculatedHeight =
+          ((gridH + gutter) * maxRows) / relativeZoomLevel
+        expect(height).toEqual(calculatedHeight)
+      })
+    })
+
+    describe('for split-level bottom collections', () => {
+      beforeEach(() => {
+        props.collection.isSplitLevelBottom = true
+        props.collection.calculateRowsCols = jest.fn()
+        rerender()
+      })
+
+      it('should calculate the right height for non-split level collections', () => {
+        const { height } = component.totalGridSize
+        const { relativeZoomLevel } = component
+        const { gridSettings } = component
+        const { gridH, gutter } = gridSettings
+        const maxRows = props.collection.max_row_index + 2
+        const calculatedHeight =
+          ((gridH + gutter) * maxRows) / relativeZoomLevel
+        expect(height).toEqual(calculatedHeight)
+      })
     })
   })
 })

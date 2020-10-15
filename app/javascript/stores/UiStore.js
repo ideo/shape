@@ -293,6 +293,8 @@ export default class UiStore {
     num: 0,
   }
   @observable
+  addedNewRole = false
+  @observable
   touchActionMenuOpenId = null
 
   get routingStore() {
@@ -1830,5 +1832,31 @@ export default class UiStore {
       width: pos.w,
       height: pos.h,
     }
+  }
+
+  createRoles = (entities, roleName, opts = {}, record) => {
+    let { id, internalType } = record
+    const userIds = entities
+      .filter(entity => entity.internalType === 'users')
+      .map(user => user.id)
+    const groupIds = entities
+      .filter(entity => entity.internalType === 'groups')
+      .map(group => group.id)
+    const data = {
+      role: { name: roleName },
+      group_ids: groupIds,
+      user_ids: userIds,
+      is_switching: opts.isSwitching,
+      send_invites: opts.sendInvites,
+    }
+    if (opts.addToGroupId) {
+      id = opts.addToGroupId
+      internalType = 'groups'
+    }
+    return this.apiStore
+      .request(`${internalType}/${id}/roles`, 'POST', data)
+      .catch(err => {
+        this.alert(err.error[0])
+      })
   }
 }

@@ -223,7 +223,7 @@ class FoamcoreGrid extends React.Component {
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
-    const visRows = _.get('visibleRows.num', uiStore) || 1
+    const visRows = _.get(uiStore, 'visibleRows.num', 1)
     let maxRows = collection.max_row_index + 1
     if (collection.isSplitLevelBottom) {
       maxRows += 1

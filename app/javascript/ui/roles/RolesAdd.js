@@ -66,7 +66,7 @@ class RolesAdd extends React.Component {
     uiStore.autocompleteMenuClosed()
     runInAction(() => {
       this.syncedRoleTypes = props.roleTypes
-      this.selectedGroupId = props.defaultGroupId
+      this.selectedGroupId = _.get(props, 'record.default_group_id', '')
       if (this.selectedGroupId) {
         this.syncedRoleTypes = ['admin', 'member']
         this.selectedRole = 'member'
@@ -210,6 +210,7 @@ class RolesAdd extends React.Component {
   }
 
   handleSave = async () => {
+    const { record } = this.props
     const {
       sendInvites,
       selectedUsers,
@@ -316,11 +317,19 @@ class RolesAdd extends React.Component {
       roles = await this.props.onCreateRoles(
         [...created.data, ...fullUsers],
         selectedRole,
-        { sendInvites, addToGroupId: this.selectedGroupId }
+        { sendInvites, addToGroupId: this.selectedGroupId },
+        record
       )
+      // toggle addedNewRole to rerender RolesMenu roles
+      runInAction(() => {
+        uiStore.addedNewRole = true
+      })
     }
     setLoading(false)
     resetSelectedUsers()
+    runInAction(() => {
+      uiStore.addedNewRole = false
+    })
     return roles
   }
 
@@ -373,9 +382,12 @@ class RolesAdd extends React.Component {
     })
 
   labelFor = roleType => {
-    const { roleLabels } = this.props
+    const { record } = this.props
     // either return the override label (if present) or just the passed in name
     // e.g. for labeling "Viewer" as "Participant"
+
+    const roleLabels =
+      record && record.isSubmissionBox ? { viewer: 'participant' } : {}
     return _.startCase(roleLabels[roleType] || roleType)
   }
 
@@ -500,24 +512,17 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  roleLabels: PropTypes.shape({
-    editor: PropTypes.string,
-    viewer: PropTypes.string,
-    admin: PropTypes.string,
-    member: PropTypes.string,
-  }),
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   ownerType: PropTypes.string.isRequired,
   addableGroups: MobxPropTypes.arrayOrObservableArray,
   title: PropTypes.string,
-  defaultGroupId: PropTypes.string,
 }
 RolesAdd.defaultProps = {
-  roleLabels: {},
+  record: null,
   addableGroups: [],
-  defaultGroupId: '',
   title: 'Add groups or people:',
 }
 
