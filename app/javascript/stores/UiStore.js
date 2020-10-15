@@ -1020,6 +1020,13 @@ export default class UiStore {
   }
 
   @action
+  openTextEditingItem(item, cardId) {
+    this.textEditingItem = item
+    this.textEditingCardId = cardId
+    this.closeTouchActionMenu()
+  }
+
+  @action
   clearTextEditingItem() {
     this.textEditingItem = null
     this.textEditingCardId = null

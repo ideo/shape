@@ -99,12 +99,8 @@ describe('TextItemCover', () => {
       })
       const result = await component.handleClick(e)
       expect(result).toBe(null)
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'textEditingItem',
-        expect.any(Object)
-      )
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'textEditingCardId',
+      expect(uiStore.openTextEditingItem).toHaveBeenCalledWith(
+        expect.any(Object),
         props.cardId
       )
       expect(uiStore.update).toHaveBeenCalledWith(
