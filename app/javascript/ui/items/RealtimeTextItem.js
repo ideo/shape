@@ -35,16 +35,17 @@ const CHANNEL_DISCONNECTED_MESSAGE = 'Connection lost, unable to edit.'
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
-  background: white;
-  box-sizing: border-box;
   height: 32px;
-  left: 0;
   margin-bottom: 20px;
-  padding: 5px 10px 0;
+  padding: 8px;
+  padding-bottom: 26px;
   position: absolute;
-  width: 100%;
   z-index: ${v.zIndex.gridCardTop};
-  opacity: 0.95;
+
+  .ql-toolbar {
+    width: auto !important;
+  }
+
   ${props =>
     props.fullPageView &&
     `
@@ -59,12 +60,23 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      top: 5px;
+      width: 220px;
+      left: ${props.leftAdjust}px;
+      transform: scale(${props.zoomLevel});
+      background: ${v.colors.commonLightest};
+      border-radius: 4px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin-top: ${-18 / props.zoomLevel}px;
+      top: ${-36 * props.zoomLevel}px;
     `};
 `
+DockedToolbar.defaultProps = {
+  zoomLevel: 1,
+}
 
 const StyledContainer = styled.div`
-  padding-top: 25px;
+  position: relative;
 
   ${props =>
     props.fullPageView &&
@@ -694,7 +706,7 @@ class RealtimeTextItem extends React.Component {
 
   render() {
     const { item, uiStore, onExpand, fullPageView, containerRef } = this.props
-    const { textEditingItemHasTitleText } = uiStore
+    const { textEditingItemHasTitleText, relativeZoomLevel } = uiStore
     const { canEdit } = this.state
     // item is not fully loaded yet, e.g. from a CommentThread
     if (!item.quill_data) {
@@ -738,13 +750,25 @@ class RealtimeTextItem extends React.Component {
       },
     }
 
+    // this is for adjusting where the fully scaled toolbar appears above the card
+    let leftAdjustToolbar = -16
+    if (relativeZoomLevel > 2) {
+      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 36
+    } else if (relativeZoomLevel > 1) {
+      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 24
+    }
+
     return (
       <StyledContainer
         ref={c => (containerRef ? containerRef(c) : null)}
         className="no-drag"
         fullPageView={fullPageView}
       >
-        <DockedToolbar fullPageView={fullPageView}>
+        <DockedToolbar
+          fullPageView={fullPageView}
+          zoomLevel={!fullPageView ? uiStore.relativeZoomLevel : 1}
+          leftAdjust={leftAdjustToolbar}
+        >
           {canEdit && (
             <TextItemToolbar
               onExpand={onExpand}
@@ -759,6 +783,7 @@ class RealtimeTextItem extends React.Component {
             className="ql-close"
             onClick={this.cancel}
             size={fullPageView ? 'lg' : 'sm'}
+            style={{ right: '8px', top: '11px' }}
           />
         </DockedToolbar>
         <QuillStyleWrapper

@@ -68,7 +68,7 @@ module Archivable
     end
 
     run_callbacks :archive do
-      archive_with_relations!(batch: "#{self.class}_#{id}")
+      archive_with_relations!(batch: archive_batch_identifier)
     end
   end
 
@@ -88,7 +88,12 @@ module Archivable
     end
   end
 
+  def archive_batch_identifier
+    "#{self.class}_#{id}"
+  end
+
   # will first archive all of the `archive_with` relations, and then archive the model itself
+  # the batch identifies a collection and all children that were archived as part of this operation
   def archive_with_relations!(batch:)
     archive_relations!(batch)
     archive_self!(batch)

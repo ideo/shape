@@ -30,6 +30,8 @@ StyledSearchResult.displayName = 'StyledSearchResult'
 const StyledBreadcrumb = styled.div`
   margin-top: 16px;
   margin-bottom: 1px;
+  position: relative;
+  z-index: ${v.zIndex.gridCardTop};
 `
 
 const StyledScrollIndicator = styled.div`
@@ -120,15 +122,16 @@ class SearchResultsInfinite extends React.Component {
             <StyledCardWrapper>
               <StyledBreadcrumb>
                 <PageBreadcrumb
-                  maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
                   record={record}
-                  isHomepage={false}
-                  useLinkedBreadcrumb={false}
+                  containerWidth={this.maxBreadcrumbContainerWidth}
                   // re-mount every time the record / breadcrumb changes
                   key={`${record.identifier}_${record.breadcrumbSize}`}
+                  isHomepage={false}
+                  maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
+                  offsetPosition={{ y: -10 }}
+                  useLinkedBreadcrumb={false}
                   // force props update if windowWidth changes
                   windowWidth={uiStore.windowWidth}
-                  containerWidth={this.maxBreadcrumbContainerWidth}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult

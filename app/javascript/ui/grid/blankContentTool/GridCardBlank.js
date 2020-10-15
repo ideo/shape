@@ -145,6 +145,7 @@ class GridCardBlank extends React.Component {
       loading: false,
       bctMenuOpen: false,
       bctMenuOffsetPosition: null,
+      uploaded: false,
     }
   }
 
@@ -247,7 +248,12 @@ class GridCardBlank extends React.Component {
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
-      onClose: () => setTimeout(() => this.closeBlankContentTool(), 150),
+      onClose: () => {
+        if (!this.state.uploaded) this.closeBlankContentTool()
+      },
+      onFileUploadFinished: () => {
+        this.setState({ uploaded: true })
+      },
       onSuccess: fileData => {
         const files = _.isArray(fileData) ? fileData : [fileData]
         _.each(files, (file, idx) => {
@@ -308,7 +314,7 @@ class GridCardBlank extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
-    this.setState({ loading: true }, async () => {
+    this.setState({ loading: true, uploaded: false }, async () => {
       let newCard
       if (isReplacing) {
         newCard = await card.API_replace({ replacingId })
@@ -614,7 +620,7 @@ class GridCardBlank extends React.Component {
   render() {
     const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
+    const { creating, loading } = this.state
     const { isBoard } = parent
     const isReplacing = !!this.replacingId
     let { gridW, gridH } = gridSettings
@@ -626,7 +632,7 @@ class GridCardBlank extends React.Component {
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
     let zoomScale = 0
-    if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
+    if (!loading && uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
       <StyledGridCardBlank
         boxShadow={isBoard}
@@ -638,7 +644,7 @@ class GridCardBlank extends React.Component {
           gridW={gridW}
           gridH={gridH}
         >
-          {this.renderInner()}
+          {!loading && this.renderInner()}
           {isReplacing && !creating && (
             <DropzoneIconHolder>
               <CloudIcon />
@@ -652,7 +658,7 @@ class GridCardBlank extends React.Component {
             </DropzoneIconHolder>
           )}
         </StyledGridCardInner>
-        {this.state.loading && <InlineLoader />}
+        {loading && <InlineLoader />}
         {showCloseButton && (
           <CloseButton
             onClick={this.closeBlankContentTool}
