@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import styled, { ThemeProvider } from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogActions from '@material-ui/core/DialogActions'
 import Fade from '@material-ui/core/Fade'
 
 import { Heading2 } from '~/ui/global/styled/typography'
@@ -63,6 +64,17 @@ const StyledDialogTitle = styled(DialogTitle)`
     padding-top: 14px !important;
     min-height: 30px;
   }
+`
+
+const StyledDialogActions = styled(DialogActions)`
+  justify-content: normal !important;
+  padding: 0 24px 24px 45px !important;
+`
+
+const DialogActionsContainer = styled.div`
+  flex: 1 1 auto;
+  padding-top: 24px;
+  padding-bottom: 30px;
 `
 
 export const ModalCloseButton = styled.button`
@@ -185,6 +197,7 @@ class Modal extends React.Component {
           onClose={this.handleclose}
           onBackdropClick={disableBackdropClick ? null : this.handleClose}
           BackdropProps={{ invisible: true }}
+          scroll={'paper'}
           {...labeledBy}
         >
           {/*
@@ -218,6 +231,13 @@ class Modal extends React.Component {
           >
             {children}
           </StyledDialogContent>
+          {this.props.dialogActions && (
+            <StyledDialogActions>
+              <DialogActionsContainer>
+                {this.props.dialogActions}
+              </DialogActionsContainer>
+            </StyledDialogActions>
+          )}
         </StyledDialog>
       </ThemeProvider>
     )
@@ -249,6 +269,8 @@ Modal.propTypes = {
   noScroll: PropTypes.bool,
   /** Sets a class to make the scrolling visible at all times */
   scrollVisible: PropTypes.bool,
+  /** The actions that appear at the bottom */
+  dialogActions: PropTypes.node,
 }
 
 Modal.defaultProps = {
@@ -259,6 +281,7 @@ Modal.defaultProps = {
   disableBackdropClick: false,
   noScroll: false,
   scrollVisible: false,
+  dialogActions: null,
 }
 
 export default Modal

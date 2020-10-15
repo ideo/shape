@@ -8,7 +8,6 @@ import { fakeUser, fakeRole, fakeCollection } from '#/mocks/data'
 const apiStore = observable({
   request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
   searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
-  fetchAll: jest.fn(),
   find: jest.fn().mockReturnValue(Promise.resolve({ roles: [] })),
   remove: jest.fn(),
   add: jest.fn(),
@@ -18,7 +17,7 @@ const apiStore = observable({
 })
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
-let props, wrapper, component
+let props, wrapper, component, rerender
 
 describe('RolesMenu', () => {
   beforeEach(() => {
@@ -37,10 +36,30 @@ describe('RolesMenu', () => {
       apiStore,
       routingStore,
       canEdit: false,
+      addedNewRole: false,
     }
     apiStore.searchRoles.mockClear()
-    wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+
+    rerender()
+  })
+
+  describe('componentDidUpdate', () => {
+    beforeEach(() => {
+      component.initializeRolesAndGroups = jest.fn()
+    })
+
+    it('should call initializeRolesAndGroups', () => {
+      wrapper.setProps({ addedNewRole: true })
+      expect(component.initializeRolesAndGroups).toHaveBeenCalledWith({
+        reset: true,
+        page: 1,
+      })
+      expect(apiStore.searchRoles).toHaveBeenCalled()
+    })
   })
 
   describe('deleteRoles', () => {
@@ -72,74 +91,6 @@ describe('RolesMenu', () => {
 
       it('should call apiStore.searchRoles after the request is done', () => {
         expect(apiStore.searchRoles).toHaveBeenCalled()
-      })
-    })
-  })
-
-  describe('createRoles', () => {
-    describe('with users', () => {
-      let users
-      let opts
-
-      beforeEach(async () => {
-        users = [
-          { id: 3, internalType: 'users' },
-          { id: 5, internalType: 'users' },
-        ]
-        opts = { isSwitching: true }
-        apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
-        apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
-        component.filterSearchableItems = jest.fn()
-        await component.createRoles(users, 'editor', opts)
-      })
-
-      it('should send a request to create roles with role and user ids', () => {
-        expect(apiStore.request).toHaveBeenCalledWith(
-          'collections/1/roles',
-          'POST',
-          {
-            role: { name: 'editor' },
-            user_ids: [3, 5],
-            group_ids: [],
-            is_switching: true,
-          }
-        )
-      })
-
-      it('should call apiStore.searchRoles after the request is done', () => {
-        expect(apiStore.searchRoles).toHaveBeenCalled()
-      })
-
-      describe('when not switching roles', () => {
-        beforeEach(async () => {
-          opts.isSwitching = false
-          apiStore.request.mockClear()
-          await component.createRoles(users, 'editor', opts)
-        })
-
-        it('should pass is switching as false', () => {
-          expect(apiStore.request.mock.calls[0][2].is_switching).toBeFalsy()
-        })
-      })
-
-      describe('when assigning to a group', () => {
-        beforeEach(async () => {
-          opts.addToGroupId = 4
-          await component.createRoles(users, 'member', opts)
-        })
-
-        it('should request the groups endpoint with the group id', () => {
-          expect(apiStore.request).toHaveBeenCalledWith(
-            'groups/4/roles',
-            'POST',
-            {
-              role: { name: 'member' },
-              user_ids: [3, 5],
-              group_ids: [],
-              is_switching: true,
-            }
-          )
-        })
       })
     })
   })
@@ -176,7 +127,7 @@ describe('RolesMenu', () => {
       props.record.roles[0].users = [
         { id: 5, internalType: 'users', name: 'Real Person' },
       ]
-      wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('does not show user in list', async () => {

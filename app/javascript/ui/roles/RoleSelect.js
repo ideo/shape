@@ -92,9 +92,10 @@ class RoleSelect extends React.Component {
     return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
-  createRole(roleName, isSwitching = true) {
-    const { onCreate, entity } = this.props
-    onCreate([entity], roleName, { isSwitching })
+  async createRole(roleName, isSwitching = true) {
+    const { record, entity, afterSwitchRoles } = this.props
+    await uiStore.createRoles([entity], roleName, { isSwitching }, record)
+    afterSwitchRoles()
   }
 
   deleteRole = ({ isSwitching = true, becomesPrivate = false } = {}) => {
@@ -189,8 +190,8 @@ RoleSelect.propTypes = {
     viewer: PropTypes.string,
   }),
   onDelete: PropTypes.func.isRequired,
-  onCreate: PropTypes.func.isRequired,
   enabled: PropTypes.bool,
+  afterSwitchRoles: PropTypes.func.isRequired,
 }
 RoleSelect.defaultProps = {
   enabled: true,
