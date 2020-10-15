@@ -511,4 +511,60 @@ describe('FoamcoreGrid', () => {
       )
     })
   })
+
+  describe('totalGridSize', () => {
+    beforeEach(() => {
+      props.collection.isSplitLevel = false
+      props.collection.max_row_index = 0
+      props.uiStore.visibleRows = { min: 0, max: 5, num: 5 }
+      rerender()
+    })
+    it('should calculate the right height for non-split level collections', () => {
+      const { height } = component.totalGridSize
+      const { relativeZoomLevel } = component
+      const { gridSettings } = component
+      const { gridH, gutter } = gridSettings
+      const maxRows =
+        props.collection.max_row_index + 1 + props.uiStore.visibleRows.num * 2
+      const calculatedHeight = ((gridH + gutter) * maxRows) / relativeZoomLevel
+      expect(height).toEqual(calculatedHeight)
+    })
+
+    describe('for split-level collections', () => {
+      beforeEach(() => {
+        props.collection.isSplitLevel = true
+        rerender()
+      })
+
+      it('should calculate the right height for non-split level collections', () => {
+        const { height } = component.totalGridSize
+        const { relativeZoomLevel } = component
+        const { gridSettings } = component
+        const { gridH, gutter } = gridSettings
+        const maxRows = props.collection.max_row_index + 1
+        const calculatedHeight =
+          ((gridH + gutter) * maxRows) / relativeZoomLevel
+        expect(height).toEqual(calculatedHeight)
+      })
+    })
+
+    describe('for split-level bottom collections', () => {
+      beforeEach(() => {
+        props.collection.isSplitLevelBottom = true
+        props.collection.calculateRowsCols = jest.fn()
+        rerender()
+      })
+
+      it('should calculate the right height for non-split level collections', () => {
+        const { height } = component.totalGridSize
+        const { relativeZoomLevel } = component
+        const { gridSettings } = component
+        const { gridH, gutter } = gridSettings
+        const maxRows = props.collection.max_row_index + 2
+        const calculatedHeight =
+          ((gridH + gutter) * maxRows) / relativeZoomLevel
+        expect(height).toEqual(calculatedHeight)
+      })
+    })
+  })
 })
