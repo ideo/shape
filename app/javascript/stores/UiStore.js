@@ -294,6 +294,7 @@ export default class UiStore {
   }
   @observable
   addedNewRole = false
+  touchActionMenuOpenId = null
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -350,6 +351,16 @@ export default class UiStore {
       this.dragTargets,
       target => target.item.identifier === item.identifier
     )
+  }
+
+  @action
+  openTouchActionMenu(cardId) {
+    this.touchActionMenuOpenId = cardId
+  }
+
+  @action
+  closeTouchActionMenu() {
+    this.touchActionMenuOpenId = null
   }
 
   @action
@@ -1177,6 +1188,7 @@ export default class UiStore {
   captureKeyboardGridClick = (e, cardId) => {
     const ctrlClick = e.metaKey || e.ctrlKey
     const shiftClick = e.shiftKey
+    this.closeTouchActionMenu()
     if (ctrlClick || shiftClick) {
       if (ctrlClick) {
         // individually select

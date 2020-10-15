@@ -13,6 +13,7 @@ class CollectionCardArchiveWorker
       # Check if we should notify before archiving,
       # because afterwards the collection's cards will be archived
       notify = notify?(card)
+      # this fully archives the card and its children and sets the archived_at
       card.archive!
       create_notification(card) if notify
     end

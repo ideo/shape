@@ -17,6 +17,11 @@ export default class ScrollNearPageBoundsService {
     this.speed = speed
     this.setScrolling(false)
 
+    let topScrollTriggerDyn = v.topScrollTrigger
+    if (window.innerHeight < 800) {
+      topScrollTriggerDyn = window.innerHeight / 8
+    }
+
     // NOTE: these hide so that we can fully control the page scroll
     // otherwise the browser will *also* try to scroll when you hit the edges;
     // however, there is some UI helpfulness lost if you can't see the scrollbars :(
@@ -28,16 +33,16 @@ export default class ScrollNearPageBoundsService {
     const changedTouch = e.changedTouches ? e.changedTouches[0] : {}
     // Vertical Scroll
     if (
-      e.clientY < v.topScrollTrigger ||
-      (uiStore.isTouchDevice && changedTouch.clientY < v.topScrollTrigger)
+      e.clientY < topScrollTriggerDyn ||
+      (uiStore.isTouchDevice && changedTouch.clientY < topScrollTriggerDyn)
     ) {
       // At top of viewport
       this.scrolling = true
       this.scrollUp(null, e.clientY)
     } else if (
-      e.clientY > window.innerHeight - v.topScrollTrigger ||
+      e.clientY > window.innerHeight - topScrollTriggerDyn ||
       (uiStore.isTouchDevice &&
-        changedTouch.clientY > window.innerHeight - v.topScrollTrigger)
+        changedTouch.clientY > window.innerHeight - v.topScrollTriggerDyn)
     ) {
       // At bottom of viewport
       this.scrolling = true

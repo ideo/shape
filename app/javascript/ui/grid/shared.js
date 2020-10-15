@@ -277,11 +277,40 @@ export const StyledTopRightActions = styled.div`
   ${TopActions};
   background-color: ${v.colors.commonLightest};
   border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   height: 34px;
   right: 0.25rem;
-  top: ${props => 0.25 * props.zoomLevel}rem;
+  top: ${props => 2 * props.zoomLevel}px;
   transform: scale(${props => props.zoomLevel});
   transform-origin: top right;
+
+  ${props =>
+    props.smallCard &&
+    `
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    right: 0;
+    top: ${-36 * props.zoomLevel}px;
+
+    &:after {
+      background: transparent;
+      content: ' ';
+      display: block;
+      height: 6px;
+      position: absolute;
+      top: calc(100% - 1px);
+      width: 100%;
+    }
+  `}
+
+  ${props =>
+    props.forceOpen &&
+    `
+      opacity: 1 !important;
+
+      .show-on-hover {
+        opacity: 1 !important;
+      }
+  `}
 
   .selected {
     border-color: ${props => props.color};
