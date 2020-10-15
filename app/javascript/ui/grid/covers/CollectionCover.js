@@ -354,7 +354,24 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
-    // TODO is this being used?
+    const { uiStore } = this.props
+    const now = new Date().getTime()
+    const timeDiff = now - this.lastClickTimestamp
+    if (timeDiff < 600 && timeDiff > 0) {
+      return this.onOpenCollection(e)
+    }
+    this.lastClickTimestamp = new Date().getTime()
+    if (uiStore.isTouchDevice) {
+      const { cardId } = this.props
+      e.preventDefault()
+      e.stopPropagation()
+      uiStore.openTouchActionMenu(cardId)
+    } else {
+      return this.onOpenCollection(e)
+    }
+  }
+
+  onOpenCollection = e => {
     const { searchResult, dragging, uiStore, collection } = this.props
     const { movingCardIds } = uiStore
     const movingCard =
