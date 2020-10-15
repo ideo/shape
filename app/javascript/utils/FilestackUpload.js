@@ -82,11 +82,15 @@ class FilestackUpload {
       .picker({
         ...config,
         onFileUploadFinished: () => {
-          onFileUploadFinished()
+          if (onFileUploadFinished) onFileUploadFinished()
         },
         onUploadDone: async resp => {
           const filesAttrs = await this.processFiles(resp.filesUploaded)
           if (onSuccess) onSuccess(multiple ? filesAttrs : filesAttrs[0])
+        },
+        onFileUploadFailed: resp => {
+          const { filename } = resp
+          if (onFailure) onFailure(filename)
         },
         onClose,
       })
