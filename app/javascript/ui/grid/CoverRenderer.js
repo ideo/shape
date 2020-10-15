@@ -40,10 +40,12 @@ class CoverRenderer extends React.Component {
       textItemUneditable,
     } = this.props
 
+    const { viewingCollection } = uiStore
+
     const isLargeBoard =
       isBoardCollection &&
-      uiStore.viewingCollection &&
-      !uiStore.viewingCollection.isFourWideBoard
+      viewingCollection &&
+      !viewingCollection.isFourWideBoard
 
     if (this.isItem) {
       switch (record.type) {

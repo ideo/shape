@@ -86,14 +86,29 @@ class TextItemCover extends React.Component {
 
   componentWillUnmount() {
     this.unmounted = true
+    if (this.interval) {
+      window.clearInterval(this.interval)
+    }
   }
 
   @computed
   get isEditing() {
-    const { item, cardId } = this.props
-    return (
-      uiStore.textEditingItem === item && uiStore.textEditingCardId === cardId
-    )
+    const { item } = this.state
+    const { cardId } = this.props
+    const { textEditingItem, textEditingCardId } = uiStore
+
+    if (!item || textEditingCardId !== cardId) {
+      return false
+    }
+
+    console.log({
+      cardId,
+      itemId: item.id,
+      textEditingCardId,
+      tEItemId: textEditingItem ? textEditingItem.id : null,
+    })
+
+    return textEditingItem === item || textEditingCardId < 0
   }
 
   handleClick = e => {
@@ -134,14 +149,13 @@ class TextItemCover extends React.Component {
   }
 
   loadItem = async () => {
-    const { item, cardId } = this.props
+    const { item } = this.props
+    const { card, hasTitleText } = this
     await apiStore.fetch('items', item.id, true)
-    // entering edit mode should deselect all cards
     runInAction(() => {
+      // entering edit mode should deselect all cards
       uiStore.deselectCards()
-      uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
-      uiStore.update('textEditingItem', item)
-      uiStore.update('textEditingCardId', cardId)
+      uiStore.setTextEditingCard(card, { hasTitleText })
     })
     this.setState({ loading: false })
   }
@@ -151,9 +165,13 @@ class TextItemCover extends React.Component {
     routingStore.routeTo('items', item.id)
   }
 
-  clearTextEditingItem = () => {
+  clearTextEditingCard = () => {
     if (!this.isEditing) return
-    uiStore.clearTextEditingItem()
+    uiStore.clearTextEditingCard()
+  }
+
+  get card() {
+    return apiStore.find('collection_cards', this.props.cardId)
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
@@ -162,11 +180,14 @@ class TextItemCover extends React.Component {
       return
     }
     if (ev && ev.stopPropagation) ev.stopPropagation()
-    this.clearTextEditingItem()
+    this.clearTextEditingCard()
+    if (!item.persisted) {
+      return
+    }
     const hasContent = stripTags(item.content).length
     if (!hasContent && item.version === 1) {
       // archive empty text item when you hit "X"
-      const card = apiStore.find('collection_cards', this.props.cardId)
+      const { card } = this
       if (card) card.API_archiveSelf({ undoable: false })
       return
     }
@@ -218,7 +239,7 @@ class TextItemCover extends React.Component {
         cardId={cardId}
         item={item}
         currentUserId={apiStore.currentUser.id}
-        onExpand={item.id ? this.expand : null}
+        onExpand={item.persisted ? this.expand : null}
         onCancel={this.cancel}
         initialSize={initialSize}
         // if we are rendering editing then the item has been fetched

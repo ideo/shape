@@ -887,7 +887,7 @@ export default class UiStore {
     runInAction(() => {
       this.deselectCards()
       this.closeCardMenu()
-      this.clearTextEditingItem()
+      this.clearTextEditingCard()
       this.blankContentToolState = {
         ...this.defaultBCTState,
         order: 0,
@@ -1018,10 +1018,22 @@ export default class UiStore {
   }
 
   @action
-  clearTextEditingItem() {
+  clearTextEditingCard() {
     this.textEditingItem = null
     this.textEditingCardId = null
     this.textEditingItemHasTitleText = false
+    const { viewingCollection } = this
+    if (viewingCollection && viewingCollection.tempTextCard) {
+      viewingCollection.tempTextCard = null
+      viewingCollection.newPersistedTextCard = null
+    }
+  }
+
+  @action
+  setTextEditingCard(card, { hasTitleText = false } = {}) {
+    this.textEditingItem = card.record
+    this.textEditingCardId = card.id
+    this.textEditingItemHasTitleText = hasTitleText
   }
 
   get isEditingText() {

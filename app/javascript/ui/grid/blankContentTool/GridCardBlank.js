@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
@@ -218,9 +219,7 @@ class GridCardBlank extends React.Component {
 
       if (type === ITEM_TYPES.TEXT) {
         const { uiStore } = this.props
-        uiStore.update('textEditingItemHasTitleText', false)
-        uiStore.update('textEditingItem', card.record)
-        uiStore.update('textEditingCardId', card.id)
+        uiStore.setTextEditingCard(card)
       }
     }
   }
@@ -320,14 +319,15 @@ class GridCardBlank extends React.Component {
       attrs.item_attributes.type === ITEM_TYPES.TEXT
     ) {
       const item = new Item(attrs.item_attributes, apiStore)
-      item.can_edit_content = true
-      item.class_type = ITEM_TYPES.TEXT
-      card.record = item
-      // Creates a temporary card for the user to edit
-      parent.newTextCard = card
-      uiStore.closeBlankContentTool({ force: true })
+      runInAction(() => {
+        item.can_edit_content = true
+        item.class_type = ITEM_TYPES.TEXT
+        card.record = item
+        // Creates a temporary card for the user to edit
+        parent.tempTextCard = card
+        uiStore.closeBlankContentTool({ force: true })
+      })
       // For text cards to be available immediately, don't await this
-      // FIXME: For slow networks this will replace the edits from temporary newTextCard
       card.API_create()
       if (afterCreate) afterCreate(card)
       if (options.afterCreate) options.afterCreate(card)

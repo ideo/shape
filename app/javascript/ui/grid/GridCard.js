@@ -478,6 +478,17 @@ class GridCard extends React.Component {
       cardType = 'items'
     }
 
+    const { viewingCollection } = uiStore
+    if (
+      !card.persisted &&
+      viewingCollection &&
+      viewingCollection.newPersistedTextCard
+    ) {
+      // special case, the new text item has just finished getting created
+      // so we want to swap the card.record (unpersisted fake item) with the real one
+      record = viewingCollection.newPersistedTextCard.record
+    }
+
     return (
       <CoverRenderer
         card={card}

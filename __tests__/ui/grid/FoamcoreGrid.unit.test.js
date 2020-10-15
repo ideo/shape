@@ -512,9 +512,9 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('with newTextCard', () => {
+  describe('with tempTextCard', () => {
     beforeEach(() => {
-      props.collection.newTextCard = fakeItemCard
+      props.collection.tempTextCard = fakeItemCard
       rerender()
     })
 

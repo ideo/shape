@@ -92,24 +92,15 @@ describe('TextItemCover', () => {
       expect(result).toBe(false)
     })
 
-    it('calls uiStore.update textEditingItem if can_edit_content', async () => {
+    it('calls uiStore.setTextEditingCard if can_edit_content', async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, can_edit_content: true },
       })
       const result = await component.handleClick(e)
       expect(result).toBe(null)
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'textEditingItem',
+      expect(uiStore.setTextEditingCard).toHaveBeenCalledWith(
         expect.any(Object)
-      )
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'textEditingCardId',
-        props.cardId
-      )
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'textEditingItemHasTitleText',
-        false
       )
     })
 
