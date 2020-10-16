@@ -357,6 +357,7 @@ export default class UiStore {
   @action
   openTouchActionMenu(cardId) {
     this.touchActionMenuOpenId = cardId
+    this.clearTextEditingItem()
   }
 
   @action
