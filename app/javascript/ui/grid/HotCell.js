@@ -17,7 +17,7 @@ const Container = styled.div`
   width: 100%;
 
   ${props =>
-    (props.isMobileXs || props.isTouchDevice) &&
+    props.isTouchDevice &&
     `
     bottom: 0;
     height: 209px;
@@ -37,7 +37,6 @@ const Container = styled.div`
 
   ${props =>
     props.smallCardWidth &&
-    !props.isMobileXs &&
     !props.isTouchDevice &&
     `
     ${Quadrant} {
@@ -224,7 +223,7 @@ class HotCell extends React.Component {
         subTypes: () => this.templateTypes,
       },
     ]
-    if (this.isSmallCard && !uiStore.isMobileXs) {
+    if (this.isSmallCard) {
       primaryTypes = [
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
@@ -243,12 +242,11 @@ class HotCell extends React.Component {
         },
       ]
     }
-    const PositionWrapper =
-      uiStore.isMobileXs || uiStore.isTouchDevice
-        ? CornerPositioned
-        : styled.div`
-            height: 100%;
-          `
+    const PositionWrapper = uiStore.isTouchDevice
+      ? CornerPositioned
+      : styled.div`
+          height: 100%;
+        `
 
     return (
       <PositionWrapper>
@@ -256,11 +254,10 @@ class HotCell extends React.Component {
           // used by emptySpaceClick
           className="HotCellContainer"
           animated={this.animated}
-          isMobileXs={uiStore.isMobileXs}
           isTouchDevice={uiStore.isTouchDevice}
           smallCardWidth={this.isSmallCard}
         >
-          {(uiStore.isMobileXs || uiStore.isTouchDevice) && (
+          {uiStore.isTouchDevice && (
             <CloseButton onClick={this.handleClose}>
               <CloseIcon />
             </CloseButton>

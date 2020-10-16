@@ -142,6 +142,7 @@ const fakeUiStore = {
   maxCols: jest.fn(),
   maxGridWidth: jest.fn().mockReturnValue(1384),
   pageMargins: jest.fn().mockReturnValue({ left: 100, top: 50 }),
+  openTextEditingItem: jest.fn(),
   relativeZoomLevel: 2,
   zoomLevels: [],
   isSelected: jest.fn(),
