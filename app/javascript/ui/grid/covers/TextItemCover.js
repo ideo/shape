@@ -159,7 +159,12 @@ class TextItemCover extends React.Component {
   }
 
   clearTextEditingCard = () => {
-    if (!this.isEditing) return
+    if (!this.isEditing) {
+      // e.g. if you switched off of this card, we don't want to unset textEditingCardId
+      // but we do want to clear the temp items
+      uiStore.clearTempTextCardItems()
+      return
+    }
     uiStore.clearTextEditingCard()
   }
 

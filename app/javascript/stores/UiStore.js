@@ -1026,8 +1026,13 @@ export default class UiStore {
     this.textEditingItem = null
     this.textEditingCardId = null
     this.textEditingItemHasTitleText = false
+    this.clearTempTextCardItems()
+  }
+
+  @action
+  clearTempTextCardItems() {
     const { viewingCollection } = this
-    if (viewingCollection && viewingCollection.tempTextCard) {
+    if (viewingCollection) {
       viewingCollection.tempTextCard = null
       viewingCollection.newPersistedTextCard = null
     }
