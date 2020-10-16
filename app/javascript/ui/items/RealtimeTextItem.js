@@ -61,12 +61,12 @@ const DockedToolbar = styled.div`
     `
       width: 220px;
       padding-bottom: 26px;
-      left: ${props.leftAdjust}px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
       border-radius: 4px;
       box-sizing: border-box;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      left: ${props.leftAdjust}px;
       top: ${props.topAdjust}px;
     `};
 `
@@ -778,12 +778,9 @@ class RealtimeTextItem extends React.Component {
     // this is for adjusting where the fully scaled toolbar appears above the card
     let leftAdjustToolbar = -16
     let topAdjustToolbar = -52
-    if (relativeZoomLevel > 2) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 33
-      topAdjustToolbar = -52 - Math.pow(relativeZoomLevel, 1.3) * 9
-    } else if (relativeZoomLevel > 1) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 24
-      topAdjustToolbar = Math.pow(relativeZoomLevel, 1.3) * -36
+    if (relativeZoomLevel > 1) {
+      leftAdjustToolbar = -186 + Math.pow(relativeZoomLevel, 0.8) * 164
+      topAdjustToolbar = -6 + Math.pow(relativeZoomLevel, 0.63) * -43
     }
 
     return (
