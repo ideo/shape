@@ -82,6 +82,8 @@ describe('GridCardBlank', () => {
       it('synchronously calls API_create with TextItem onClick handler', () => {
         component.createTextItem()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
+        // should clear this out before closing
+        expect(props.uiStore.setBctPlaceholderCard).toHaveBeenCalledWith(null)
         expect(props.uiStore.closeBlankContentTool).toHaveBeenCalled()
       })
 

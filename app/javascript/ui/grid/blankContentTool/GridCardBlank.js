@@ -325,6 +325,8 @@ class GridCardBlank extends React.Component {
         card.record = item
         // Creates a temporary card for the user to edit
         parent.tempTextCard = card
+        // unset this so it does not call placeholderCard.API_destroy() when closing BCT
+        uiStore.setBctPlaceholderCard(null)
         uiStore.closeBlankContentTool({ force: true })
       })
       // For text cards to be available immediately, don't await this
