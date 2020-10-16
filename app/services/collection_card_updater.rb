@@ -6,6 +6,9 @@ class CollectionCardUpdater < SimpleService
 
   def call
     assign_attributes
+    if @attributes['cover_card_id'].present?
+      @collection_card.cache_cover
+    end
     @collection_card.save
   end
 

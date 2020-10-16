@@ -5,12 +5,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     update
     replace
     update_card_filter
+    clear_collection_card_cover
   ]
   load_and_authorize_resource except: %i[
     index
     move
     replace
     update_card_filter
+    clear_collection_card_cover
   ]
   # this is skipped to enable viewable_by_anyone public capability, permissions are still checked via cancan
   skip_before_action :check_api_authentication!, only: %i[
@@ -21,6 +23,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     create_bct
     replace
     update_card_filter
+    clear_collection_card_cover
   ]
   before_action :load_and_authorize_parent_collection_for_index, only: %i[
     index
@@ -42,6 +45,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     reviewer_statuses
     roles
   ]
+  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter clear_collection_card_cover]
 
   def index
     render_collection_cards
@@ -199,7 +203,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   def update_card_filter
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
@@ -353,6 +356,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder.delete if placeholder.present?
 
     head :no_content
+  end
+
+  def clear_collection_card_cover
+    @collection_card.clear_collection_card_cover
+    @collection_card
   end
 
   private
@@ -664,6 +672,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :section_type,
       :font_color,
       :font_background,
+      :cover_card_id,
     )
   end
 

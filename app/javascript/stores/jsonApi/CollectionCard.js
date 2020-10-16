@@ -34,6 +34,8 @@ class CollectionCard extends BaseRecord {
     'hidden',
     'filter',
     'section_type',
+    'cover_card_id',
+    'cover',
   ]
 
   batchUpdateAttributes = [
@@ -559,6 +561,15 @@ class CollectionCard extends BaseRecord {
 
     await this.apiStore.request(
       `collection_cards/${this.id}/update_card_filter`,
+      'PATCH',
+      { data: this.toJsonApi() }
+    )
+  }
+
+  @action
+  async API_clearCollectionCardCover() {
+    await this.apiStore.request(
+      `collection_cards/${this.id}/clear_collection_card_cover`,
       'PATCH',
       { data: this.toJsonApi() }
     )

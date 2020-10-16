@@ -23,6 +23,7 @@ class SerializableCollectionCard < BaseJsonSerializer
     :section_type,
     :font_color,
     :font_background,
+    :cover_card_id,
   )
 
   stringified_attributes(

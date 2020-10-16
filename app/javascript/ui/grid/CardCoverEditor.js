@@ -17,7 +17,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, COLLECTION_CARD_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -403,10 +403,20 @@ class CardCoverEditor extends React.Component {
   onImageOptionSelect = async option => {
     const { apiStore, card } = this.props
     const { recordIsCollection } = this
+    // if card's cover is already set, then edit its own
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
+      if (card.type === COLLECTION_CARD_TYPES.LINK) {
+        card.cover_card_id = option.cardId
+        card.save()
+        return
+      }
       await selectedCard.patch({ attributes: { is_cover: true } })
     } else if (option.type === 'remove') {
+      if (card.cover) {
+        await card.API_clearCollectionCardCover()
+        return
+      }
       await this.clearCover()
     } else if (option.type === 'upload') {
       const afterPickAction = recordIsCollection
