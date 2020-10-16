@@ -50,4 +50,9 @@ class SerializableCollectionCard < BaseJsonSerializer
   attribute :can_edit_parent, if: -> { @current_ability } do
     @current_ability.can?(:edit_content, (@parent || @object.try(:parent)))
   end
+
+  attribute :cover do
+    # @object.cached_cover || DefaultCollectionCover.defaults
+    @object.cached_cover
+  end
 end

@@ -6,6 +6,7 @@
 #  archive_batch     :string
 #  archived          :boolean          default(FALSE)
 #  archived_at       :datetime
+#  cached_attributes :jsonb
 #  col               :integer
 #  filter            :integer          default("transparent_gray")
 #  font_background   :boolean          default(FALSE)
@@ -28,6 +29,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  collection_id     :bigint(8)
+#  cover_card_id     :integer
 #  item_id           :bigint(8)
 #  parent_id         :bigint(8)
 #  templated_from_id :integer

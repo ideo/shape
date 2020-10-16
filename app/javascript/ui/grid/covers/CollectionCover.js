@@ -339,7 +339,13 @@ class CollectionCover extends React.Component {
   }
 
   get coverImageUrl() {
-    const { cover } = this.props.collection
+    const { cover: cardCover, collection } = this.props
+    const { cover: linkedCollectionCover } = collection
+
+    // Either get the cover from the collection card itself, or get it from the collection it links to
+
+    const cover = cardCover ? cardCover : linkedCollectionCover
+
     if (cover.image_handle) {
       return FilestackUpload.imageUrl({
         handle: cover.image_handle,
@@ -551,6 +557,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
+  cover: MobxPropTypes.objectOrObservableObject,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -563,6 +570,7 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
+  cover: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

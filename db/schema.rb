@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_11_165028) do
+ActiveRecord::Schema.define(version: 2020_10_16_211257) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -138,6 +138,8 @@ ActiveRecord::Schema.define(version: 2020_08_11_165028) do
     t.boolean "font_background", default: false
     t.jsonb "parent_snapshot"
     t.boolean "is_background", default: false
+    t.jsonb "cached_attributes", default: {}
+    t.integer "cover_card_id"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
@@ -556,6 +558,7 @@ ActiveRecord::Schema.define(version: 2020_08_11_165028) do
     t.string "default_locale", default: "en"
     t.boolean "shell", default: false
     t.boolean "billable", default: false
+    t.jsonb "cached_attributes", default: {}
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end

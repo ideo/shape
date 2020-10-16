@@ -6,6 +6,7 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  billable                              :boolean          default(FALSE)
+#  cached_attributes                     :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb

@@ -6,6 +6,7 @@
 #  archive_batch     :string
 #  archived          :boolean          default(FALSE)
 #  archived_at       :datetime
+#  cached_attributes :jsonb
 #  col               :integer
 #  filter            :integer          default("transparent_gray")
 #  font_background   :boolean          default(FALSE)
@@ -28,6 +29,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  collection_id     :bigint(8)
+#  cover_card_id     :integer
 #  item_id           :bigint(8)
 #  parent_id         :bigint(8)
 #  templated_from_id :integer
@@ -54,6 +56,7 @@ class CollectionCard < ApplicationRecord
   belongs_to :collection, optional: true
   belongs_to :item, optional: true
   belongs_to :templated_from, class_name: 'CollectionCard', optional: true
+  belongs_to :cover_card, class_name: 'CollectionCard', optional: true
 
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
@@ -73,6 +76,9 @@ class CollectionCard < ApplicationRecord
   after_save :update_collection_background, if: :saved_change_to_is_background?
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
+
+  store_accessor :cached_attributes,
+                 :cached_cover
 
   validates :parent, presence: true
   validate :single_item_or_collection_is_present
@@ -149,7 +155,7 @@ class CollectionCard < ApplicationRecord
 
   def self.default_includes_for_api
     {
-      collection: [:collection_cover_items, :tagged_users],
+      collection: %i[collection_cover_items tagged_users],
       item: [
         :filestack_file,
         :tagged_users,
@@ -482,7 +488,7 @@ class CollectionCard < ApplicationRecord
       cover['card_ids'].include?(id) ||
       cover['card_order'].nil? ||
       card_order <= cover['card_order']
-      # ^^^ TODO: remove notion of card_order, as it's not applicable
+    # ^^^ TODO: remove notion of card_order, as it's not applicable
   end
 
   def card_order
@@ -587,6 +593,21 @@ class CollectionCard < ApplicationRecord
       ENV['HEROKU_RELEASE_VERSION'],
     ].join('--')
     "CollectionCardCache::#{key}"
+  end
+
+  def cache_cover
+    # self.cached_cover = DefaultCollectionCover.call(self)
+  end
+
+  def cache_cover!
+    cover = {
+      # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
+      image_url: cover_card.item.image_url,
+      # image items use handle so that they can generate a secure filestack URL
+      image_handle: cover_card.item.filestack_file_handle,
+    }
+    self.cached_cover = cover
+    save
   end
 
   private
