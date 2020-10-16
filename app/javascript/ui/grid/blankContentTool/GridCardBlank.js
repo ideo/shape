@@ -315,6 +315,8 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     if (
+      // don't use this behavior for text item submissions as it behaves oddly
+      !parent.isSubmissionsCollection &&
       attrs.item_attributes &&
       attrs.item_attributes.type === ITEM_TYPES.TEXT
     ) {
