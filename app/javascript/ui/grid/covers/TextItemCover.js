@@ -101,13 +101,6 @@ class TextItemCover extends React.Component {
       return false
     }
 
-    console.log({
-      cardId,
-      itemId: item.id,
-      textEditingCardId,
-      tEItemId: textEditingItem ? textEditingItem.id : null,
-    })
-
     return textEditingItem === item || textEditingCardId < 0
   }
 

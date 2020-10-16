@@ -63,6 +63,12 @@ describe('TextItemCover', () => {
   })
 
   describe('handleClick', () => {
+    let fakeCard
+    beforeEach(() => {
+      fakeCard = { id: '1', record: {} }
+      apiStore.find = jest.fn().mockReturnValue(fakeCard)
+    })
+
     it('calls props handleClick if it exists', () => {
       component.handleClick(e)
       expect(props.handleClick).toHaveBeenCalled()
@@ -99,9 +105,9 @@ describe('TextItemCover', () => {
       })
       const result = await component.handleClick(e)
       expect(result).toBe(null)
-      expect(uiStore.setTextEditingCard).toHaveBeenCalledWith(
-        expect.any(Object)
-      )
+      expect(uiStore.setTextEditingCard).toHaveBeenCalledWith(fakeCard, {
+        hasTitleText: false,
+      })
     })
 
     it('calls apiStore.fetch item if can_edit_content', async () => {
@@ -126,6 +132,7 @@ describe('TextItemCover', () => {
   describe('cancel', () => {
     beforeEach(() => {
       item.content = '<p></p>'
+      item.persisted = true
       item.API_updateWithoutSync = jest.fn()
     })
 
@@ -133,10 +140,22 @@ describe('TextItemCover', () => {
       beforeEach(() => {
         item.content = '<p>some content</p>'
       })
+
       describe('with num_viewers === 1', () => {
-        it('should call API_updateWithoutSync', () => {
-          component.cancel({ item, ev: e })
-          expect(item.API_updateWithoutSync).toHaveBeenCalled()
+        describe('with unpersisted item (for quick text creation)', () => {
+          it('should not call API_updateWithoutSync', () => {
+            item.persisted = false
+            component.cancel({ item, ev: e })
+            expect(item.API_updateWithoutSync).not.toHaveBeenCalled()
+          })
+        })
+
+        describe('with item.persisted', () => {
+          it('should call API_updateWithoutSync', () => {
+            item.persisted = true
+            component.cancel({ item, ev: e })
+            expect(item.API_updateWithoutSync).toHaveBeenCalled()
+          })
         })
       })
 

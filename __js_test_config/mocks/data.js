@@ -48,6 +48,7 @@ export const fakeTextItemAttrs = {
   inherited_tag_list: [],
   internalType: 'items',
   fullyLoaded: true,
+  persisted: true,
   parent_collection_card: { ...fakeCollectionCard },
   API_fetchDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
   roles: [],

@@ -541,7 +541,6 @@ class RealtimeTextItem extends React.Component {
 
   _sendCombinedDelta = () => {
     if (!this.isPersisted) {
-      console.log('do not sendCombinedDelta!')
       return
     }
 
@@ -599,7 +598,6 @@ class RealtimeTextItem extends React.Component {
 
   socketSend = (method, data) => {
     if (!this.isPersisted) {
-      console.log('do not send!')
       return
     }
 
