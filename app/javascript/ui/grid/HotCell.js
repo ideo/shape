@@ -67,6 +67,10 @@ const CloseButton = styled.button`
   z-index: ${v.zIndex.gridCard};
 `
 
+const DefaultWrapper = styled.div`
+  height: 100%;
+`
+
 const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
 const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
@@ -242,11 +246,10 @@ class HotCell extends React.Component {
         },
       ]
     }
+
     const PositionWrapper = uiStore.isTouchDevice
       ? CornerPositioned
-      : styled.div`
-          height: 100%;
-        `
+      : DefaultWrapper
 
     return (
       <PositionWrapper>
