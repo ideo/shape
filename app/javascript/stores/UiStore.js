@@ -434,6 +434,7 @@ export default class UiStore {
     }
 
     const scrollTop = window.pageYOffset
+    const scrollLeft = window.pageXOffset
 
     newSelectedCardIds = _.map(
       _.filter(this.cardPositions, pos => {
@@ -443,8 +444,8 @@ export default class UiStore {
           return false
         }
         return !(
-          right < minX ||
-          left > maxX ||
+          right + scrollLeft < minX ||
+          left + scrollLeft > maxX ||
           bottom + scrollTop < minY ||
           top + scrollTop > maxY
         )

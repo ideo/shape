@@ -125,8 +125,8 @@ class GridCard extends React.Component {
     }
 
     let className = 'show-on-hover'
-    if (this.isEditingCardCover) {
-      className = 'hide-on-cover-edit'
+    if (this.isEditingCardCover || uiStore.selectedArea.minX) {
+      className = 'hidden-actions'
     }
 
     const cardWidth = uiStore.gridSettings.gridW / zoomLevel

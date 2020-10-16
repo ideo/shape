@@ -114,9 +114,12 @@ export const StyledGridCard = styled.div`
 StyledGridCard.displayName = 'StyledGridCard'
 
 export const showOnHoverCss = css`
-  .hide-on-cover-edit {
-    /* don't show hover items while editing a title */
+  .hidden-actions {
+    /* don't show hover items while editing a title or dragging selection square */
     visibility: hidden;
+    .show-on-hover {
+      visibility: hidden !important;
+    }
   }
   .show-on-hover {
     visibility: hidden;

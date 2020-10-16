@@ -608,6 +608,15 @@ class MovableGridCard extends React.Component {
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
 
+    const enableResizing =
+      canEditCollection &&
+      uiStore.selectedArea.minX === null &&
+      (isSuperAdmin || !card.isPinnedAndLocked) &&
+      card.record &&
+      !card.record.isChart &&
+      !card.record.isGenericFile &&
+      !card.record.isCarousel
+
     const rndProps = {
       ref: c => {
         this.rnd = c
@@ -635,13 +644,7 @@ class MovableGridCard extends React.Component {
       default: defaultPosition,
       disableDragging,
       enableResizing: {
-        bottomRight:
-          canEditCollection &&
-          (isSuperAdmin || !card.isPinnedAndLocked) &&
-          card.record &&
-          !card.record.isChart &&
-          !card.record.isGenericFile &&
-          !card.record.isCarousel,
+        bottomRight: enableResizing,
         bottom: false,
         bottomLeft: false,
         left: false,
