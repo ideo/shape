@@ -38,7 +38,6 @@ const DockedToolbar = styled.div`
   height: 32px;
   margin-bottom: 20px;
   padding: 8px;
-  padding-bottom: 26px;
   position: absolute;
   z-index: ${v.zIndex.gridCardTop};
 
@@ -61,14 +60,14 @@ const DockedToolbar = styled.div`
     !props.fullPageView &&
     `
       width: 220px;
+      padding-bottom: 26px;
       left: ${props.leftAdjust}px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
       border-radius: 4px;
       box-sizing: border-box;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-      margin-top: ${-18 / props.zoomLevel}px;
-      top: ${-36 * props.zoomLevel}px;
+      top: ${props.topAdjust}px;
     `};
 `
 DockedToolbar.defaultProps = {
@@ -752,10 +751,13 @@ class RealtimeTextItem extends React.Component {
 
     // this is for adjusting where the fully scaled toolbar appears above the card
     let leftAdjustToolbar = -16
+    let topAdjustToolbar = -52
     if (relativeZoomLevel > 2) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 36
+      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 33
+      topAdjustToolbar = -52 - Math.pow(relativeZoomLevel, 1.3) * 9
     } else if (relativeZoomLevel > 1) {
       leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 24
+      topAdjustToolbar = Math.pow(relativeZoomLevel, 1.3) * -36
     }
 
     return (
@@ -768,6 +770,7 @@ class RealtimeTextItem extends React.Component {
           fullPageView={fullPageView}
           zoomLevel={!fullPageView ? uiStore.relativeZoomLevel : 1}
           leftAdjust={leftAdjustToolbar}
+          topAdjust={topAdjustToolbar}
         >
           {canEdit && (
             <TextItemToolbar
