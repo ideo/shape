@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import queryString from 'query-string'
 
 import {
@@ -195,19 +195,29 @@ class CollectionCard extends BaseRecord {
       if (placeholderCard) {
         data.placeholder_card_id = placeholderCard.id
       }
+      // NOTE: this intentionally does not use BaseRecord.create
+      // so that we can deal with "hot-swapping" unpersisted text items
       const res = await this.apiStore.request('collection_cards', 'POST', {
         data,
       })
-      // unset this so it does not call placeholderCard.API_destroy() when closing BCT
-      uiStore.setBctPlaceholderCard(null)
-      // important to close BCT before adding the new card so that the grid reflows properly
-      uiStore.closeBlankContentTool({ force: true })
-      const { record } = res.data
-      if ((!record.name && record.isLink) || record.isData) {
-        uiStore.addNewCard(res.data.record.id)
-      }
-      this.parentCollection.addCard(res.data)
-      uiStore.trackEvent('create', this.parentCollection)
+      const card = res.data
+      runInAction(() => {
+        // unset this so it does not call placeholderCard.API_destroy() when closing BCT
+        uiStore.setBctPlaceholderCard(null)
+        // important to close BCT before adding the new card so that the grid reflows properly
+        uiStore.closeBlankContentTool({ force: true })
+        const { record } = card
+        if ((!record.name && record.isLink) || record.isData) {
+          uiStore.addNewCard(card.record.id)
+        }
+        this.parentCollection.addCard(card)
+        if (record.isText) {
+          // now that create has finished, mark the newPersistedTextCard;
+          // this will get picked up in GridCard#renderCover
+          this.parentCollection.newPersistedTextCard = card
+        }
+        uiStore.trackEvent('create', this.parentCollection)
+      })
       return res.data
     } catch (e) {
       uiStore.closeBlankContentTool({ force: true })

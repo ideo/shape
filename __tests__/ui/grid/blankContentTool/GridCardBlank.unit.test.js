@@ -5,6 +5,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { fakeCollectionCard } from '#/mocks/data'
 import googleTagManager from '~/vendor/googleTagManager'
+import { ITEM_TYPES } from '~/utils/variables'
 
 jest.mock('../../../../app/javascript/vendor/googleTagManager')
 
@@ -17,6 +18,9 @@ const mockCardMethods = {
 jest.mock('../../../../app/javascript/utils/FilestackUpload')
 // in order to mock our way past `new CollectionCard(attrs, apiStore)`
 jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard', () =>
+  jest.fn().mockImplementation(() => mockCardMethods)
+)
+jest.mock('../../../../app/javascript/stores/jsonApi/Item', () =>
   jest.fn().mockImplementation(() => mockCardMethods)
 )
 
@@ -75,13 +79,14 @@ describe('GridCardBlank', () => {
     })
 
     describe('when creating a card', () => {
-      it('calls API_create with TextItem onClick handler', async () => {
-        await wrapper.instance().createTextItem()
+      it('synchronously calls API_create with TextItem onClick handler', () => {
+        component.createTextItem()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
+        expect(props.uiStore.closeBlankContentTool).toHaveBeenCalled()
       })
 
       it('calls API_create when creating', async () => {
-        await wrapper.instance().createCard()
+        await component.createCard()
         expect(wrapper.state().loading).toBeTruthy()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
       })
@@ -175,12 +180,12 @@ describe('GridCardBlank', () => {
   describe('afterCreate', () => {
     describe('when creating a TextItem', () => {
       it('pushes an event to google tag manager', () => {
-        const afterCreate = component.afterCreate('Item::TextItem')
+        const afterCreate = component.afterCreate(ITEM_TYPES.TEXT)
         afterCreate({ record: {} })
 
         expect(googleTagManager.push).toHaveBeenCalledWith({
           event: 'formSubmission',
-          formType: `Create Item::TextItem`,
+          formType: `Create ${ITEM_TYPES.TEXT}`,
           parentType: 'anywhere',
         })
       })

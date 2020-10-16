@@ -42,7 +42,7 @@ beforeEach(() => {
 describe('PageWithApiWrapper', () => {
   it('clears some of the uiStore state on mount', () => {
     expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
-    expect(uiStore.clearTextEditingItem).toHaveBeenCalled()
+    expect(uiStore.clearTextEditingCard).toHaveBeenCalled()
   })
 
   describe('componentDidUpdate', () => {
