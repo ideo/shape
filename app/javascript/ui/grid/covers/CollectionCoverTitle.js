@@ -1,11 +1,14 @@
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
-import styled from 'styled-components'
-import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
+import Hypher from 'hypher'
+import ReactMarkdown from 'react-markdown'
+import styled from 'styled-components'
 import { some } from 'lodash'
+
+import Button from '~/ui/global/Button'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { TextWithBackground } from './CollectionCover'
 
 function namePartTooLong(fullName) {
@@ -87,6 +90,22 @@ class CollectionCoverTitle extends React.Component {
     } = this.props
     if (!this.hasIcon) return name
 
+    // Check if theres any markdown in the name
+    if (name.match(/\[[^\[]+\]\(.*\)/)) {
+      return (
+        <Fragment>
+          {this.leftIcon && <IconHolder>{this.leftIcon}</IconHolder>}
+          <ReactMarkdown
+            source={name}
+            allowedTypes={['link', 'linkReference']}
+            renderers={{
+              link: Button,
+            }}
+          />
+          {this.rightIcon && <IconHolder>{this.rightIcon}</IconHolder>}
+        </Fragment>
+      )
+    }
     const nameParts = splitName(name)
     if (!nameParts) return name
 
