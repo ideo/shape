@@ -63,6 +63,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   challengeReviewerGroup = null
+  // when you pop open a text item it immediately creates a temp text card to hold
+  // the text editor while you await the actual API response where the item is created
+  @observable
+  tempTextCard = null
+  @observable
+  newPersistedTextCard = null
 
   attributesForAPI = [
     'name',

@@ -11,11 +11,9 @@ import {
   ScrollArea,
   StyledHeaderRow,
   FooterBreak,
-  FooterArea,
 } from '~/ui/global/styled/layout'
 import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 import Panel from '~/ui/global/Panel'
-import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
 
@@ -57,6 +55,12 @@ class RolesMenu extends React.Component {
       record: { anyone_can_view },
     } = this.props
     this.setState({ anyoneCanView: anyone_can_view })
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.addedNewRole && this.props.addedNewRole) {
+      this.initializeRolesAndGroups({ reset: true, page: 1 })
+    }
   }
 
   async initializeRolesAndGroups({
@@ -206,57 +210,12 @@ class RolesMenu extends React.Component {
     })
   }
 
-  createRoles = (entities, roleName, opts = {}) => {
-    const {
-      apiStore,
-      apiStore: { uiStore },
-    } = this.props
-    let { ownerId, ownerType } = this.props
-    const userIds = entities
-      .filter(entity => entity.internalType === 'users')
-      .map(user => user.id)
-    const groupIds = entities
-      .filter(entity => entity.internalType === 'groups')
-      .map(group => group.id)
-    const data = {
-      role: { name: roleName },
-      group_ids: groupIds,
-      user_ids: userIds,
-      is_switching: opts.isSwitching,
-      send_invites: opts.sendInvites,
-    }
-    if (opts.addToGroupId) {
-      ownerId = opts.addToGroupId
-      ownerType = 'groups'
-    }
-    return apiStore
-      .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(res => {
-        this.initializeRolesAndGroups({ reset: true, page: 1 })
-      })
-      .catch(err => {
-        uiStore.alert(err.error[0])
-      })
-  }
-
   nextPage = status => () => {
     const page = this.state.page[status]
     this.initializeRolesAndGroups({
       status,
       page: page + 1,
     })
-  }
-
-  onCreateUsers = emails => {
-    const {
-      apiStore,
-      apiStore: { uiStore },
-    } = this.props
-    return apiStore
-      .request(`users/create_from_emails`, 'POST', { emails })
-      .catch(err => {
-        uiStore.alert(err.error[0])
-      })
   }
 
   notCurrentUser(entity) {
@@ -302,7 +261,9 @@ class RolesMenu extends React.Component {
                     roleLabels={submissionBox ? { viewer: 'participant' } : {}}
                     entity={combined.entity}
                     onDelete={this.deleteRoles}
-                    onCreate={this.createRoles}
+                    afterSwitchRoles={() => {
+                      this.initializeRolesAndGroups({ reset: true, page: 1 })
+                    }}
                   />
                 )
             )}
@@ -321,23 +282,7 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const {
-      record,
-      canEdit,
-      ownerType,
-      title,
-      fixedRole,
-      submissionBox,
-    } = this.props
-
-    const { groups } = this.state
-
-    // ability to restrict the selection to only one role type
-    // e.g. "admin" is the only selection for Org Admins group
-    const addRoleTypes = fixedRole ? [fixedRole] : roleTypes(ownerType)
-
-    const editableGroups = groups.filter(group => group.can_edit)
-
+    const { record, canEdit, title } = this.props
     return (
       <Fragment>
         <PublicSharingOptions
@@ -359,17 +304,6 @@ class RolesMenu extends React.Component {
             <Row>
               <FooterBreak />
             </Row>
-            <FooterArea>
-              <RolesAdd
-                roleTypes={addRoleTypes}
-                roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-                onCreateRoles={this.createRoles}
-                onCreateUsers={this.onCreateUsers}
-                ownerType={ownerType}
-                addableGroups={editableGroups}
-                defaultGroupId={record.default_group_id}
-              />
-            </FooterArea>
           </Fragment>
         )}
       </Fragment>
@@ -382,9 +316,9 @@ RolesMenu.propTypes = {
   canEdit: PropTypes.bool,
   ownerId: PropTypes.string.isRequired,
   ownerType: PropTypes.string.isRequired,
-  fixedRole: PropTypes.string,
   title: PropTypes.string,
   submissionBox: PropTypes.bool,
+  addedNewRole: PropTypes.bool,
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -392,9 +326,10 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   canEdit: false,
-  fixedRole: null,
   title: 'Shared with',
   submissionBox: false,
+  addedNewRole: false,
 }
+RolesMenu.displayName = 'RolesMenu'
 
 export default RolesMenu

@@ -43,6 +43,7 @@ import { openContextMenu } from '~/utils/clickUtils'
 
 @observer
 class GridCard extends React.Component {
+  lastClickTimestamp = null
   @observable
   menuItemCount = 1
   get canEditCard() {
@@ -106,12 +107,12 @@ class GridCard extends React.Component {
   renderTopRightActions() {
     const { menuOpen } = this
     const {
-      record,
-      zoomLevel,
       card,
       canEditCollection,
-      testCollectionCard,
+      record,
       searchResult,
+      testCollectionCard,
+      zoomLevel,
     } = this.props
 
     if (
@@ -124,14 +125,19 @@ class GridCard extends React.Component {
     }
 
     let className = 'show-on-hover'
-    if (this.isEditingCardCover) {
-      className = 'hide-on-cover-edit'
+    if (this.isEditingCardCover || uiStore.selectedArea.minX) {
+      className = 'hidden-actions'
     }
+
+    const cardWidth = uiStore.gridSettings.gridW / zoomLevel
+    const smallCard = cardWidth < 160
 
     return (
       <StyledTopRightActions
         color={this.actionsColor}
         className={className}
+        forceOpen={this.touchActionMenuOpen}
+        smallCard={smallCard}
         zoomLevel={zoomLevel}
       >
         {this.downloadableRecord && (
@@ -282,6 +288,12 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
+  @computed
+  get touchActionMenuOpen() {
+    const { card } = this.props
+    return uiStore.touchActionMenuOpenId === card.id
+  }
+
   defaultHandleClick = ev => {
     pageBoundsScroller.setScrolling(false)
     const { cardType, record } = this.props
@@ -328,14 +340,9 @@ class GridCard extends React.Component {
     })
   }
 
-  handleClick = ev => {
-    const { card, dragging, record } = this.props
-    if (dragging || card.isLoadingPlaceholder) {
-      return false
-    }
-    if (uiStore.captureKeyboardGridClick(ev, card.id)) {
-      return
-    }
+  onMainClickAction(ev) {
+    const { card, record } = this.props
+    uiStore.closeTouchActionMenu()
     if (record.isLink) {
       this.linkOffsite(record)
       return
@@ -363,6 +370,35 @@ class GridCard extends React.Component {
       this.storeLinkedBreadcrumb(card)
     }
     this.defaultHandleClick(ev)
+  }
+
+  handleClick = ev => {
+    const { card, dragging } = this.props
+    // Check for double click
+    const now = new Date().getTime()
+    const timeDiff = now - this.lastClickTimestamp
+    if (timeDiff < 600 && timeDiff > 0) {
+      return this.handleDoubleClick(ev)
+    }
+    this.lastClickTimestamp = new Date().getTime()
+
+    if (dragging || card.isLoadingPlaceholder) {
+      return false
+    }
+    if (uiStore.captureKeyboardGridClick(ev, card.id)) {
+      return
+    }
+    if (uiStore.isTouchDevice) {
+      uiStore.openTouchActionMenu(card.id)
+      return
+    }
+    this.onMainClickAction(ev)
+  }
+
+  handleDoubleClick = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    this.onMainClickAction(ev)
   }
 
   handleRestore = ev => {
@@ -440,6 +476,17 @@ class GridCard extends React.Component {
       // Instead use the item for the cover rather than the collection
       record = coverItem
       cardType = 'items'
+    }
+
+    const { viewingCollection } = uiStore
+    if (
+      !card.persisted &&
+      viewingCollection &&
+      viewingCollection.newPersistedTextCard
+    ) {
+      // special case, the new text item has just finished getting created
+      // so we want to swap the card.record (unpersisted fake item) with the real one
+      record = viewingCollection.newPersistedTextCard.record
     }
 
     return (

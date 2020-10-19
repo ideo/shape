@@ -121,7 +121,7 @@ Cypress.Commands.add(
         cy.selectBctType({ type: 'text', row, col, empty })
         cy.wait('@apiCreateCollectionCard')
         cy.wait(150)
-        cy.get('.ql-editor')
+        cy.get('.ql-editor[contenteditable="true"]')
           .first()
           .type(content)
         cy.wait(300)

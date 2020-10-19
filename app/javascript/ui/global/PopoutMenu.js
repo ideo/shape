@@ -225,7 +225,6 @@ const DefaultWrapper = styled.div`
   position: relative;
   z-index: ${v.zIndex.aboveClickWrapper};
 `
-
 export const StyledMenuButton = styled.button`
   cursor: ${props => (props.linkCursor ? 'pointer' : 'auto')};
   font-family: ${v.fonts.sans};

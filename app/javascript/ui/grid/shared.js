@@ -114,20 +114,21 @@ export const StyledGridCard = styled.div`
 StyledGridCard.displayName = 'StyledGridCard'
 
 export const showOnHoverCss = css`
-  .hide-on-cover-edit {
-    /* don't show hover items while editing a title */
-    opacity: 0;
-    z-index: 1;
+  .hidden-actions {
+    /* don't show hover items while editing a title or dragging selection square */
+    visibility: hidden;
+    .show-on-hover {
+      visibility: hidden !important;
+    }
   }
   .show-on-hover {
-    opacity: 0;
-    transition: opacity 0.25s;
+    visibility: hidden;
   }
   &:hover,
   &.touch-device {
     .show-on-hover {
       /* don't show hover items while dragging */
-      opacity: ${props => (props.dragging ? 0 : 1)};
+      visibility: ${props => (props.dragging ? 'hidden' : 'visible')};
     }
   }
 `
@@ -277,11 +278,42 @@ export const StyledTopRightActions = styled.div`
   ${TopActions};
   background-color: ${v.colors.commonLightest};
   border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   height: 34px;
   right: 0.25rem;
-  top: ${props => 0.25 * props.zoomLevel}rem;
+  top: ${props => 2 * props.zoomLevel}px;
   transform: scale(${props => props.zoomLevel});
   transform-origin: top right;
+
+  ${props =>
+    props.smallCard &&
+    `
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    right: 0;
+    top: ${-36 * props.zoomLevel}px;
+
+    &:after {
+      background: transparent;
+      content: ' ';
+      display: block;
+      height: 6px;
+      position: absolute;
+      top: calc(100% - 1px);
+      width: 100%;
+    }
+  `}
+
+  ${props =>
+    props.forceOpen &&
+    `
+      visibility: visible !important;
+      z-index: ${v.zIndex.popoutMenu};
+
+      .show-on-hover {
+        visibility: visible !important;
+        z-index: ${v.zIndex.popoutMenu};
+      }
+  `}
 
   .selected {
     border-color: ${props => props.color};

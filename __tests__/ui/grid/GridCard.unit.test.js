@@ -401,9 +401,23 @@ describe('GridCard', () => {
         uiStore.editingCardCover = props.card.id
         rerender()
       })
-      it('uses hide-on-cover-edit class', () => {
+
+      it('uses hidden-actions class', () => {
         const topRight = wrapper.find('StyledTopRightActions').last()
-        expect(topRight.props().className).toEqual('hide-on-cover-edit')
+        expect(topRight.props().className).toEqual('hidden-actions')
+      })
+    })
+
+    describe('dragging selection square', () => {
+      beforeEach(() => {
+        uiStore.editingCardCover = null
+        uiStore.selectedArea.minX = 10
+        rerender()
+      })
+
+      it('uses hidden-actions class', () => {
+        const topRight = wrapper.find('StyledTopRightActions').last()
+        expect(topRight.props().className).toEqual('hidden-actions')
       })
     })
 

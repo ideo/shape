@@ -1,8 +1,9 @@
 import RoleSelect from '~/ui/roles/RoleSelect'
 
 import { fakeRole, fakeCollection } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
-let props, wrapper, component, updateRecord
+let props, wrapper, component, updateRecord, uiStore
 
 describe('RoleSelect', () => {
   beforeEach(() => {
@@ -13,6 +14,8 @@ describe('RoleSelect', () => {
       entity: fakeRole.users[0],
       onDelete: jest.fn(),
       onCreate: jest.fn(),
+      afterSwitchRoles: jest.fn(),
+      uiStore: fakeUiStore,
     }
     wrapper = shallow(<RoleSelect {...props} />)
     component = wrapper.instance()
@@ -39,6 +42,10 @@ describe('RoleSelect', () => {
       },
     }
 
+    beforeEach(() => {
+      component.createRole = jest.fn()
+    })
+
     it('should call delete role then create role', done => {
       props.onDelete.mockReturnValue(Promise.resolve())
       wrapper
@@ -46,20 +53,21 @@ describe('RoleSelect', () => {
         .onRoleSelect(fakeSelectEvent)
         .then(() => {
           expect(props.onDelete).toHaveBeenCalled()
-          expect(props.onCreate).toHaveBeenCalled()
+          expect(component.createRole).toHaveBeenCalled()
           done()
         })
     })
   })
 
   describe('createRole', () => {
-    it('should call onCreate with list of users/groups and role name', () => {
+    beforeEach(() => {
+      uiStore = fakeUiStore
+      uiStore.createRoles = jest.fn()
+    })
+
+    xit('should call uiStore.createRoles with list of users/groups and role name', () => {
       wrapper.instance().createRole('viewer')
-      expect(props.onCreate).toHaveBeenCalledWith(
-        [fakeRole.users[0]],
-        'viewer',
-        { isSwitching: true }
-      )
+      expect(uiStore.createRoles).toHaveBeenCalled()
     })
   })
 

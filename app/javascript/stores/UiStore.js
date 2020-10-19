@@ -292,6 +292,10 @@ export default class UiStore {
     max: 0,
     num: 0,
   }
+  @observable
+  addedNewRole = false
+  @observable
+  touchActionMenuOpenId = null
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -348,6 +352,17 @@ export default class UiStore {
       this.dragTargets,
       target => target.item.identifier === item.identifier
     )
+  }
+
+  @action
+  openTouchActionMenu(cardId) {
+    this.touchActionMenuOpenId = cardId
+    this.clearTextEditingItem()
+  }
+
+  @action
+  closeTouchActionMenu() {
+    this.touchActionMenuOpenId = null
   }
 
   @action
@@ -419,6 +434,7 @@ export default class UiStore {
     }
 
     const scrollTop = window.pageYOffset
+    const scrollLeft = window.pageXOffset
 
     newSelectedCardIds = _.map(
       _.filter(this.cardPositions, pos => {
@@ -428,8 +444,8 @@ export default class UiStore {
           return false
         }
         return !(
-          right < minX ||
-          left > maxX ||
+          right + scrollLeft < minX ||
+          left + scrollLeft > maxX ||
           bottom + scrollTop < minY ||
           top + scrollTop > maxY
         )
@@ -875,7 +891,7 @@ export default class UiStore {
     runInAction(() => {
       this.deselectCards()
       this.closeCardMenu()
-      this.clearTextEditingItem()
+      this.clearTextEditingCard()
       this.blankContentToolState = {
         ...this.defaultBCTState,
         order: 0,
@@ -1006,10 +1022,27 @@ export default class UiStore {
   }
 
   @action
-  clearTextEditingItem() {
+  clearTextEditingCard() {
     this.textEditingItem = null
     this.textEditingCardId = null
     this.textEditingItemHasTitleText = false
+    this.clearTempTextCardItems()
+  }
+
+  @action
+  clearTempTextCardItems() {
+    const { viewingCollection } = this
+    if (viewingCollection) {
+      viewingCollection.tempTextCard = null
+      viewingCollection.newPersistedTextCard = null
+    }
+  }
+
+  @action
+  setTextEditingCard(card, { hasTitleText = false } = {}) {
+    this.textEditingItem = card.record
+    this.textEditingCardId = card.id
+    this.textEditingItemHasTitleText = hasTitleText
   }
 
   get isEditingText() {
@@ -1175,6 +1208,7 @@ export default class UiStore {
   captureKeyboardGridClick = (e, cardId) => {
     const ctrlClick = e.metaKey || e.ctrlKey
     const shiftClick = e.shiftKey
+    this.closeTouchActionMenu()
     if (ctrlClick || shiftClick) {
       if (ctrlClick) {
         // individually select
@@ -1805,5 +1839,31 @@ export default class UiStore {
       width: pos.w,
       height: pos.h,
     }
+  }
+
+  createRoles = (entities, roleName, opts = {}, record) => {
+    let { id, internalType } = record
+    const userIds = entities
+      .filter(entity => entity.internalType === 'users')
+      .map(user => user.id)
+    const groupIds = entities
+      .filter(entity => entity.internalType === 'groups')
+      .map(group => group.id)
+    const data = {
+      role: { name: roleName },
+      group_ids: groupIds,
+      user_ids: userIds,
+      is_switching: opts.isSwitching,
+      send_invites: opts.sendInvites,
+    }
+    if (opts.addToGroupId) {
+      id = opts.addToGroupId
+      internalType = 'groups'
+    }
+    return this.apiStore
+      .request(`${internalType}/${id}/roles`, 'POST', data)
+      .catch(err => {
+        this.alert(err.error[0])
+      })
   }
 }

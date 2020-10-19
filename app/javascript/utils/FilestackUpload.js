@@ -70,14 +70,27 @@ class FilestackUpload {
     return FilestackUpload.pickOneOrMore({ multiple: true, ...opts })
   }
 
-  static async pickOneOrMore({ onSuccess, onFailure, multiple, onClose } = {}) {
+  static async pickOneOrMore({
+    onSuccess,
+    onFailure,
+    multiple,
+    onClose,
+    onFileUploadFinished,
+  } = {}) {
     const config = multiple ? multiImageUploadConfig : imageUploadConfig
     await this.client
       .picker({
         ...config,
+        onFileUploadFinished: () => {
+          if (onFileUploadFinished) onFileUploadFinished()
+        },
         onUploadDone: async resp => {
           const filesAttrs = await this.processFiles(resp.filesUploaded)
           if (onSuccess) onSuccess(multiple ? filesAttrs : filesAttrs[0])
+        },
+        onFileUploadFailed: resp => {
+          const { filename } = resp
+          if (onFailure) onFailure(filename)
         },
         onClose,
       })

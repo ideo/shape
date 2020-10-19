@@ -144,6 +144,12 @@ class Routes extends React.Component {
     // Return if mouse is only scrolling, not click-dragging
     if (!this.mouseDownAt.x) return
 
+    // End selection if the mouse button isn't down. for when you drag
+    // out of browser screen.
+    if (e.buttons === 0) {
+      this.handleMouseUpSelection(e)
+    }
+
     // Stop propagation if dragging so it doesn't trigger other events
     e.stopPropagation()
     e.preventDefault()

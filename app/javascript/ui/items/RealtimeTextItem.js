@@ -35,16 +35,16 @@ const CHANNEL_DISCONNECTED_MESSAGE = 'Connection lost, unable to edit.'
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
-  background: white;
-  box-sizing: border-box;
   height: 32px;
-  left: 0;
   margin-bottom: 20px;
-  padding: 5px 10px 0;
+  padding: 8px;
   position: absolute;
-  width: 100%;
   z-index: ${v.zIndex.gridCardTop};
-  opacity: 0.95;
+
+  .ql-toolbar {
+    width: auto !important;
+  }
+
   ${props =>
     props.fullPageView &&
     `
@@ -59,12 +59,23 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      top: 5px;
+      width: 220px;
+      padding-bottom: 26px;
+      transform: scale(${props.zoomLevel});
+      background: ${v.colors.commonLightest};
+      border-radius: 4px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      left: ${props.leftAdjust}px;
+      top: ${props.topAdjust}px;
     `};
 `
+DockedToolbar.defaultProps = {
+  zoomLevel: 1,
+}
 
 const StyledContainer = styled.div`
-  padding-top: 25px;
+  position: relative;
 
   ${props =>
     props.fullPageView &&
@@ -169,6 +180,11 @@ class RealtimeTextItem extends React.Component {
     if (initSnapshot || prevState.disconnected !== this.state.disconnected) {
       this.calculateCanEdit()
     }
+    if (!prevProps.item.persisted && this.props.item.persisted) {
+      // set the version now that it is persisted
+      this.version = this.props.item.version
+      this.subscribeToItemRealtimeChannel()
+    }
   }
 
   componentWillUnmount() {
@@ -184,6 +200,10 @@ class RealtimeTextItem extends React.Component {
     if (routingToSameItem) return
     ChannelManager.unsubscribe(ITEM_CHANNEL_NAME, item.id)
     item.setCollaborators([])
+  }
+
+  get isPersisted() {
+    return this.props.item.persisted
   }
 
   clearQuillClipboardHistory() {
@@ -228,6 +248,10 @@ class RealtimeTextItem extends React.Component {
 
   subscribeToItemRealtimeChannel() {
     const { item } = this.props
+    if (!this.isPersisted) {
+      return
+    }
+
     this.channel = ChannelManager.subscribe(ITEM_CHANNEL_NAME, item.id, {
       channelConnected: this.channelConnected,
       channelDisconnected: this.channelDisconnected,
@@ -394,6 +418,7 @@ class RealtimeTextItem extends React.Component {
     return quillData
   }
 
+  @action
   cancel = (ev, { route = true } = {}) => {
     if (this.canceled) return
     const { onCancel } = this.props
@@ -407,12 +432,16 @@ class RealtimeTextItem extends React.Component {
 
     const item = this.setItemQuillData()
     this.pushTextUndo()
+
     // tell the TextItemCover about number of viewers so it can know whether to perform an additional save
     return onCancel({ item, ev, route, num_viewers: this.num_viewers })
   }
 
   pushTextUndo() {
     const { item, uiStore } = this.props
+    if (!item.persisted) {
+      return
+    }
     const collection = uiStore.viewingCollection || item.parent
     const redirectTo = collection
     const previousData = this.quillData
@@ -510,6 +539,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCombinedDelta = () => {
+    if (!this.isPersisted) {
+      return
+    }
+
     if (!this.combinedDelta.length() || this.currentlySending) {
       if (this.currentlySending && !this.currentlySendingCheck) {
         this.currentlySendingCheck = setTimeout(() => {
@@ -563,6 +596,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   socketSend = (method, data) => {
+    if (!this.isPersisted) {
+      return
+    }
+
     const channel = ChannelManager.getChannel(
       ITEM_CHANNEL_NAME,
       this.props.item.id
@@ -694,7 +731,7 @@ class RealtimeTextItem extends React.Component {
 
   render() {
     const { item, uiStore, onExpand, fullPageView, containerRef } = this.props
-    const { textEditingItemHasTitleText } = uiStore
+    const { textEditingItemHasTitleText, relativeZoomLevel } = uiStore
     const { canEdit } = this.state
     // item is not fully loaded yet, e.g. from a CommentThread
     if (!item.quill_data) {
@@ -738,13 +775,26 @@ class RealtimeTextItem extends React.Component {
       },
     }
 
+    // this is for adjusting where the fully scaled toolbar appears above the card
+    let leftAdjustToolbar = -16
+    let topAdjustToolbar = -52
+    if (relativeZoomLevel > 1) {
+      leftAdjustToolbar = -186 + Math.pow(relativeZoomLevel, 0.8) * 164
+      topAdjustToolbar = -6 + Math.pow(relativeZoomLevel, 0.63) * -43
+    }
+
     return (
       <StyledContainer
         ref={c => (containerRef ? containerRef(c) : null)}
         className="no-drag"
         fullPageView={fullPageView}
       >
-        <DockedToolbar fullPageView={fullPageView}>
+        <DockedToolbar
+          fullPageView={fullPageView}
+          zoomLevel={!fullPageView ? uiStore.relativeZoomLevel : 1}
+          leftAdjust={leftAdjustToolbar}
+          topAdjust={topAdjustToolbar}
+        >
           {canEdit && (
             <TextItemToolbar
               onExpand={onExpand}
@@ -759,6 +809,7 @@ class RealtimeTextItem extends React.Component {
             className="ql-close"
             onClick={this.cancel}
             size={fullPageView ? 'lg' : 'sm'}
+            style={{ right: '8px', top: '11px' }}
           />
         </DockedToolbar>
         <QuillStyleWrapper
