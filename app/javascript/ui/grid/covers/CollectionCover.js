@@ -83,7 +83,7 @@ const MarkdownStyling = styled.span`
 
 const PositionedButton = styled(Button)`
   display: block;
-  left: calc(50% - 95px);
+  left: calc(50% - 85px);
   margin-top: 10px;
   position: absolute;
 `
