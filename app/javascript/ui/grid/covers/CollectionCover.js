@@ -69,11 +69,15 @@ const MarkdownStyling = styled.span`
   }
 
   button:nth-of-type(2) {
-    top: 84px;
+    top: 50px;
   }
 
   button:nth-of-type(3) {
-    top: 134px;
+    top: 100px;
+  }
+
+  button:nth-of-type(4) {
+    top: 150px;
   }
 `
 
@@ -399,6 +403,17 @@ class CollectionCover extends React.Component {
     } else {
       return this.onOpenCollection(e)
     }
+  }
+
+  handleButtonClick = (href, ev) => {
+    // Call the parent on click handler
+    if (href.length < 6) {
+      return true
+    }
+    ev.stopPropagation()
+    ev.preventDefault()
+    window.location = href
+    return false
   }
 
   onOpenCollection = e => {

@@ -38,18 +38,6 @@ export const IconHolder = styled.span`
 
 @observer
 class CollectionCoverTitle extends React.Component {
-  handleButtonClick = (href, ev) => {
-    // Call the parent on click handler
-    if (href.length < 6) {
-      this.props.onCollectionClick(ev)
-      return
-    }
-    ev.stopPropagation()
-    ev.preventDefault()
-    window.location = href
-    return false
-  }
-
   get hasIcon() {
     const { collection } = this.props
 
