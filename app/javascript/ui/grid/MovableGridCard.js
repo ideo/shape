@@ -547,7 +547,6 @@ class MovableGridCard extends React.Component {
     let disableDragging =
       !canEditCollection ||
       card.isPinnedAndLocked ||
-      !card.persisted ||
       textEditingCardId === card.id
     const { currentUser } = uiStore.apiStore
     const isSuperAdmin = currentUser && currentUser.is_super_admin
