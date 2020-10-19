@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import ReactMarkdown from 'react-markdown'
 
 import FilestackUpload from '~/utils/FilestackUpload'
 import v from '~/utils/variables'
@@ -57,6 +58,31 @@ export const StyledCollectionCover = styled.div`
   `};
 `
 StyledCollectionCover.displayName = 'StyledCollectionCover'
+
+const MarkdownStyling = styled.span`
+  div,
+  p {
+    display: inline;
+  }
+
+  button:nth-of-type(1) {
+  }
+
+  button:nth-of-type(2) {
+    top: 84px;
+  }
+
+  button:nth-of-type(3) {
+    top: 134px;
+  }
+`
+
+const PositionedButton = styled(Button)`
+  display: block;
+  left: calc(50% - 95px);
+  margin-top: 10px;
+  position: absolute;
+`
 
 const pad = 16
 const calcSectionWidth = props => {
@@ -415,6 +441,32 @@ class CollectionCover extends React.Component {
     return tag_list && tag_list.includes('case study')
   }
 
+  get renderSubtitle() {
+    const { collection } = this.props
+    const { subtitle } = collection
+    return (
+      <MarkdownStyling>
+        <ReactMarkdown
+          source={subtitle}
+          allowedTypes={['link', 'paragraph', 'text', 'root']}
+          renderers={{
+            link: ({ key, href, children, title } = {}) => {
+              return (
+                <PositionedButton
+                  onClick={ev => this.handleButtonClick(href, ev)}
+                  key={key}
+                  colorScheme={title}
+                >
+                  {children}
+                </PositionedButton>
+              )
+            },
+          }}
+        />
+      </MarkdownStyling>
+    )
+  }
+
   render() {
     const {
       height,
@@ -530,9 +582,11 @@ class CollectionCover extends React.Component {
                   {!this.hasLaunchTestButton && subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
                       {this.useTextBackground ? (
-                        <TextWithBackground>{subtitle}</TextWithBackground>
+                        <TextWithBackground>
+                          {this.renderSubtitle}
+                        </TextWithBackground>
                       ) : (
-                        subtitle
+                        this.renderSubtitle
                       )}
                     </Dotdotdot>
                   )}

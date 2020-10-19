@@ -3,11 +3,9 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import english from 'hyphenation.en-us'
 import Hypher from 'hypher'
-import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components'
 import { some } from 'lodash'
 
-import Button from '~/ui/global/Button'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { TextWithBackground } from './CollectionCover'
 
@@ -36,31 +34,6 @@ export const IconHolder = styled.span`
   vertical-align: middle;
   width: 27px;
   height: 27px;
-`
-
-const MarkdownStyling = styled.span`
-  div,
-  p {
-    display: inline;
-  }
-
-  button:nth-of-type(1) {
-  }
-
-  button:nth-of-type(2) {
-    top: 84px;
-  }
-
-  button:nth-of-type(3) {
-    top: 134px;
-  }
-`
-
-const PositionedButton = styled(Button)`
-  display: block;
-  left: calc(50% - 95px);
-  margin-top: 10px;
-  position: absolute;
 `
 
 @observer
@@ -125,31 +98,6 @@ class CollectionCoverTitle extends React.Component {
     const {
       collection: { name },
     } = this.props
-
-    // Check if theres any markdown in the name
-    if (name.match(/\[[^\[]+\]\(.*\)/)) {
-      return (
-        <MarkdownStyling>
-          <ReactMarkdown
-            source={name}
-            allowedTypes={['link', 'paragraph', 'text', 'root']}
-            renderers={{
-              link: ({ key, href, children, title } = {}) => {
-                return (
-                  <PositionedButton
-                    onClick={ev => this.handleButtonClick(href, ev)}
-                    key={key}
-                    colorScheme={title}
-                  >
-                    {children}
-                  </PositionedButton>
-                )
-              },
-            }}
-          />
-        </MarkdownStyling>
-      )
-    }
 
     if (!this.hasIcon) return name
 
