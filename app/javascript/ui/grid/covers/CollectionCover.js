@@ -113,6 +113,9 @@ const CoverIconWrapper = styled.div`
 CoverIconWrapper.displayName = 'CoverIconWrapper'
 
 const StyledCardContent = styled.div`
+  .top {
+    z-index: 1;
+  }
   .top,
   .bottom {
     color: ${props => (props.color ? props.color : 'white')};
@@ -181,6 +184,7 @@ StyledCardContent.displayName = 'StyledCardContent'
 const PositionedCardHeading = styled(CardHeading)`
   bottom: 0;
   position: absolute;
+  width: 100%;
 `
 
 export const TextWithBackground = styled.span`
@@ -499,6 +503,7 @@ class CollectionCover extends React.Component {
                       >
                         <CollectionCoverTitle
                           collection={collection}
+                          onCollectionClick={this.handleClick}
                           useTextBackground={this.useTextBackground}
                         />
                       </PlainLink>

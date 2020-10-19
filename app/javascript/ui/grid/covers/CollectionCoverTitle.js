@@ -38,8 +38,45 @@ export const IconHolder = styled.span`
   height: 27px;
 `
 
+const MarkdownStyling = styled.span`
+  div,
+  p {
+    display: inline;
+  }
+
+  button:nth-of-type(1) {
+  }
+
+  button:nth-of-type(2) {
+    top: 84px;
+  }
+
+  button:nth-of-type(3) {
+    top: 134px;
+  }
+`
+
+const PositionedButton = styled(Button)`
+  display: block;
+  left: calc(50% - 95px);
+  margin-top: 10px;
+  position: absolute;
+`
+
 @observer
 class CollectionCoverTitle extends React.Component {
+  handleButtonClick = (href, ev) => {
+    // Call the parent on click handler
+    if (href.length < 6) {
+      this.props.onCollectionClick(ev)
+      return
+    }
+    ev.stopPropagation()
+    ev.preventDefault()
+    window.location = href
+    return false
+  }
+
   get hasIcon() {
     const { collection } = this.props
 
@@ -88,24 +125,34 @@ class CollectionCoverTitle extends React.Component {
     const {
       collection: { name },
     } = this.props
-    if (!this.hasIcon) return name
 
     // Check if theres any markdown in the name
     if (name.match(/\[[^\[]+\]\(.*\)/)) {
       return (
-        <Fragment>
-          {this.leftIcon && <IconHolder>{this.leftIcon}</IconHolder>}
+        <MarkdownStyling>
           <ReactMarkdown
             source={name}
-            allowedTypes={['link', 'linkReference']}
+            allowedTypes={['link', 'paragraph', 'text', 'root']}
             renderers={{
-              link: Button,
+              link: ({ key, href, children, title } = {}) => {
+                return (
+                  <PositionedButton
+                    onClick={ev => this.handleButtonClick(href, ev)}
+                    key={key}
+                    colorScheme={title}
+                  >
+                    {children}
+                  </PositionedButton>
+                )
+              },
             }}
           />
-          {this.rightIcon && <IconHolder>{this.rightIcon}</IconHolder>}
-        </Fragment>
+        </MarkdownStyling>
       )
     }
+
+    if (!this.hasIcon) return name
+
     const nameParts = splitName(name)
     if (!nameParts) return name
 
@@ -141,10 +188,12 @@ class CollectionCoverTitle extends React.Component {
 CollectionCoverTitle.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   useTextBackground: PropTypes.bool,
+  onCollectionClick: PropTypes.func,
 }
 
 CollectionCoverTitle.defaultProps = {
   useTextBackground: false,
+  onCollectionClick: null,
 }
 
 export default CollectionCoverTitle
