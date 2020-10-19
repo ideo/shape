@@ -198,6 +198,7 @@ export default class UiStore {
   @observable
   // have to track this e.g. if you are editing the original or link card (same item)
   textEditingCardId = null
+  hotSwapQuillPosition = null
   @observable
   overdueBannerVisible = true
   @observable
@@ -1030,9 +1031,19 @@ export default class UiStore {
   }
 
   @action
-  clearTempTextCardItems() {
+  clearTempTextCardItems({
+    hotSwapQuillContent = false,
+    hotSwapQuillPosition = 0,
+  } = {}) {
     const { viewingCollection } = this
     if (viewingCollection) {
+      const { newPersistedTextCard } = viewingCollection
+      if (newPersistedTextCard && hotSwapQuillContent) {
+        // swap out the temp text card (currently editing) for the persisted one
+        newPersistedTextCard.record.quill_data = hotSwapQuillContent
+        this.hotSwapQuillPosition = hotSwapQuillPosition
+        this.setTextEditingCard(newPersistedTextCard)
+      }
       viewingCollection.tempTextCard = null
       viewingCollection.newPersistedTextCard = null
     }
