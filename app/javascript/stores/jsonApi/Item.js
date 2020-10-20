@@ -165,6 +165,17 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.isVideo || this.isLink
   }
 
+  get subtitle() {
+    if (this.subtitle_hidden) {
+      return ''
+    }
+    return this.content
+  }
+
+  get subtitleHidden() {
+    return this.subtitle_hidden
+  }
+
   get fileUrl() {
     if (this.isReportDownloadable) {
       return `/api/v1/items/${this.id}/csv_report`

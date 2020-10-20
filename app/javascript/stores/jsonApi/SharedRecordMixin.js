@@ -78,39 +78,6 @@ const SharedRecordMixin = superclass =>
       )
     }
 
-    get subtitle() {
-      if (
-        this.internalType === 'collection_cards' &&
-        this.type === COLLECTION_CARD_TYPES.LINK
-      ) {
-        const { cover } = this
-        const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
-
-        if (coverSubtitle) {
-          return cover.subtitle_hidden ? '' : coverSubtitle
-        }
-
-        return this.linkedCoverSubtitleOrText
-      } else if (this.internalType === 'collections') {
-        const { cover } = this
-        if (cover.subtitle_hidden) {
-          return ''
-        }
-        return cover.hardcoded_subtitle || cover.text || ''
-      }
-
-      return this.subtitle_hidden ? '' : this.content
-    }
-
-    get subtitleHidden() {
-      if (this.isCollectionOrLinkCardType) {
-        const { cover } = this
-        return cover && cover.subtitle_hidden ? true : false
-      }
-
-      return this.subtitle_hidden
-    }
-
     get linkedCoverSubtitleOrText() {
       // used by collection_cards to fall-back to the linked record's subtitle
       if (
@@ -124,34 +91,6 @@ const SharedRecordMixin = superclass =>
       const recordText = _.get(this, 'record.cover.text', '')
 
       return recordSubtitle || recordText || ''
-    }
-
-    get subtitleForEditing() {
-      if (
-        this.internalType === 'collection_cards' &&
-        this.type === COLLECTION_CARD_TYPES.LINK
-      ) {
-        const { cover } = this
-        const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
-        return coverSubtitle || this.linkedCoverSubtitleOrText
-      } else if (this.internalType === 'collections') {
-        const { cover } = this
-        if (!cover) return ''
-
-        return cover.hardcoded_subtitle || cover.text || ''
-      }
-      return ''
-    }
-
-    get titleForEditing() {
-      if (
-        this.internalType === 'collection_cards' &&
-        this.type === COLLECTION_CARD_TYPES.LINK
-      ) {
-        const { cover } = this
-        return (cover && cover.hardcoded_title) || ''
-      }
-      return null
     }
 
     @action

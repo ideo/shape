@@ -9,9 +9,8 @@ import {
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
-import SharedRecordMixin from './SharedRecordMixin'
 
-class CollectionCard extends SharedRecordMixin(BaseRecord) {
+class CollectionCard extends BaseRecord {
   static type = 'collection_cards'
   static endpoint = apiUrl('collection_cards')
 
@@ -137,6 +136,37 @@ class CollectionCard extends SharedRecordMixin(BaseRecord) {
       !this.isPinnedAndLocked &&
       (this.can_edit_parent || (this.record && this.record.can_edit))
     )
+  }
+
+  get subtitle() {
+    // Collection cards only show titles for link cards
+    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    const { cover } = this
+    const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+
+    if (coverSubtitle) {
+      return cover.subtitle_hidden ? '' : coverSubtitle
+    }
+
+    return this.linkedCoverSubtitleOrText
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    return cover && cover.subtitle_hidden ? true : false
+  }
+
+  get subtitleForEditing() {
+    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    const { cover } = this
+    const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+    return coverSubtitle || this.linkedCoverSubtitleOrText
+  }
+
+  get titleForEditing() {
+    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    const { cover } = this
+    return (cover && cover.hardcoded_title) || ''
   }
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.

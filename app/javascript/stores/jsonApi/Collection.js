@@ -1854,6 +1854,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  get subtitle() {
+    const { cover } = this
+    if (cover.subtitle_hidden) {
+      return ''
+    }
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    return cover && cover.subtitle_hidden ? true : false
+  }
+
+  get subtitleForEditing() {
+    const { cover } = this
+    if (!cover) return ''
+
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
   get coverItem() {
     const { collection_cover_items } = this
     if (!collection_cover_items || collection_cover_items.length === 0)
