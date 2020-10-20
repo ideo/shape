@@ -169,6 +169,16 @@ class CollectionCard extends BaseRecord {
     return (cover && cover.hardcoded_title) || ''
   }
 
+  // TODO find a place for these?
+  @action
+  API_updateNameAndCover(args) {
+    this.record.API_updateNameAndCover.call(this, args)
+  }
+
+  pushUndo(args) {
+    this.record.pushUndo.call(this, args)
+  }
+
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action

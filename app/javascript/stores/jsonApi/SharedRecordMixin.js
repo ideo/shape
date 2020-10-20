@@ -70,14 +70,6 @@ const SharedRecordMixin = superclass =>
       return this.routingStore.pathTo('homepage')
     }
 
-    get isCollectionOrLinkCardType() {
-      return (
-        this.internalType === 'collections' ||
-        (this.internalType === 'collection_cards' &&
-          this.type === COLLECTION_CARD_TYPES.LINK)
-      )
-    }
-
     get linkedCoverSubtitleOrText() {
       // used by collection_cards to fall-back to the linked record's subtitle
       if (
