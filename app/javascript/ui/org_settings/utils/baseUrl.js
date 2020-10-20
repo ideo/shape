@@ -4,8 +4,8 @@ const urlScheme = () => {
 
 const baseDomain = () => {
   return process.env.NODE_ENV === 'development'
-    ? 'localhost:3000'
-    : 'creativedifference.ideo.com'
+    ? 'localhost:3001'
+    : 'shape.space'
 }
 
 const apiUrl = string => {

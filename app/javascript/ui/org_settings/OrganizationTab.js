@@ -1,5 +1,6 @@
 import { action, observable, runInAction } from 'mobx'
-import { observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import {
   organizationsStore,
   supportedLanguagesStore,
@@ -8,13 +9,14 @@ import {
 } from './creativeDifferenceApis'
 
 import DropdownSelect from './DropdownSelect'
-import OrganizationRoles from './SimpleUserSummary'
+import SimpleUserSummary from './SimpleUserSummary'
 import Languages from './Languages'
 import Loader from '~/ui/layout/Loader'
 import { apiStore } from '~/stores'
 import { Label } from '../global/styled/forms'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
+@inject('uiStore') // this is for the people & groups modal
 @observer
 class OrganizationTab extends React.Component {
   @observable
@@ -99,6 +101,10 @@ class OrganizationTab extends React.Component {
     }
   }
 
+  openGroup = groupId => {
+    this.props.uiStore.openGroup(groupId)
+  }
+
   render() {
     const {
       isLoading,
@@ -174,9 +180,12 @@ class OrganizationTab extends React.Component {
             >
               Organization Administrators
             </Label>
-            <OrganizationRoles
-              roles={apiStore.currentUserOrganization.primary_group.roles}
-              canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
+            <SimpleUserSummary
+              group={apiStore.currentUserOrganization.admin_group}
+              roleName={'admin'}
+              handleClick={() =>
+                this.openGroup(apiStore.currentUserOrganization.admin_group.id)
+              }
             />
             <Label
               style={{
@@ -188,10 +197,14 @@ class OrganizationTab extends React.Component {
             >
               Organization Members
             </Label>
-            {/* TODO: Need to figure out admins/members vs viewers/editors */}
-            <OrganizationRoles
-              roles={apiStore.currentUserOrganization.primary_group.roles}
-              canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
+            <SimpleUserSummary
+              group={apiStore.currentUserOrganization.primary_group}
+              roleName={'member'}
+              handleClick={() =>
+                this.openGroup(
+                  apiStore.currentUserOrganization.primary_group.id
+                )
+              }
             />
             <Languages
               orgLanguages={organization.supported_languages}
@@ -217,6 +230,11 @@ class OrganizationTab extends React.Component {
       </div>
     )
   }
+}
+
+OrganizationTab.propTypes = {}
+OrganizationTab.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default OrganizationTab

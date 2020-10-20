@@ -12,6 +12,7 @@ import Tooltip from '../global/Tooltip'
 // import OrganizationMenu from '~/ui/organizations'
 import _ from 'lodash'
 import AdminUsersModal from '../admin/AdminUsersModal'
+import RolesAdd from '../roles/RolesAdd'
 // TODO: load groups/BUs and their roles?
 // OrganizationMenu gets its roles from /users/me
 // Will need to rework that for this
@@ -48,16 +49,13 @@ class OrgSettingsUserSummary extends React.Component {
   }
 
   render() {
-    const maxAvatars = this.props.roleName === 'admin' ? 2 : 5
-    // Replace with specific users (members/admins of groups)
     const users = this.usersAndGroupsForRole(this.props.roleName).slice(
       0,
-      maxAvatars // MAX_AVATARS_TO_SHOW
+      MAX_AVATARS_TO_SHOW
     )
     const userCount = users.length
-    const toolTipText = 'Do it now Gohan!'
-    console.log('simpleUserSummary: ', this.props.group)
-    console.log(users)
+    const toolTipText = `Add ${this.props.roleName}`
+
     return (
       <Fragment>
         <AvatarGroup
@@ -77,8 +75,6 @@ class OrgSettingsUserSummary extends React.Component {
         <Tooltip title={toolTipText}>
           <AddButton onClick={this.props.handleClick}> + </AddButton>
         </Tooltip>
-        {/* <RolesAdd /> */}
-        <AdminUsersModal />
         {/* TODO: import people and groups modal & open when clicking + button */}
       </Fragment>
     )
@@ -88,7 +84,7 @@ class OrgSettingsUserSummary extends React.Component {
 OrgSettingsUserSummary.propTypes = {
   handleClick: PropTypes.func.isRequired,
   roleName: PropTypes.string.isRequired,
-  group: MobxPropTypes.objectOrObservableObject,
+  group: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 OrgSettingsUserSummary.wrappedComponent.propTypes = {

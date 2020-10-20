@@ -51,12 +51,12 @@ class Group extends BaseRecord {
   }
 }
 
-Group.refDefaults = {
-  roles: {
-    model: Role,
-    type: ReferenceType.TO_MANY,
-    defaultValue: [],
-  },
-}
+// Group.refDefaults = {
+//   roles: {
+//     model: Role,
+//     type: ReferenceType.TO_MANY,
+//     defaultValue: [],
+//   },
+// }
 
 export default Group

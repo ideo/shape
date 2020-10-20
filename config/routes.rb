@@ -227,8 +227,9 @@ Rails.application.routes.draw do
       end
 
       namespace :creative_difference do
-        resources :groups, only: %i[index]
         resources :business_units, only: %i[index]
+        resources :groups, only: %i[index create]
+        resources :proxy, only: %i[index]
       end
     end
   end

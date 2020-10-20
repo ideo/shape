@@ -24,7 +24,7 @@ const StyledIconWrapper = styled.span`
   width: ${props => (props.width ? props.width : 10)}px;
 `
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class TeamsTab extends React.Component {
   @observable
@@ -61,15 +61,16 @@ class TeamsTab extends React.Component {
       runInAction(() => {
         this.industrySubcategories = responses[0]
         this.contentVersions = responses[1]
-        this.businessUnitGroups = responses[2].data
+        this.businessUnitGroups = responses[2].data // for JSON API
         this.organization = responses[3]
         // extract BUs from Groups
         console.log('bu groups: ', this.businessUnitGroups)
         const businessUnits = _.map(this.businessUnitGroups, group => ({
           ...group.business_unit,
         }))
-        console.log(businessUnits)
-        businessUnitsStore.set(businessUnits)
+        const uniqueBUs = _.uniqBy(businessUnits, 'id')
+        console.log(uniqueBUs)
+        businessUnitsStore.set(uniqueBUs)
       })
 
       this.setIsLoading(false)
@@ -114,25 +115,23 @@ class TeamsTab extends React.Component {
     const values = this.initialNewTeamValues()
     // TODO: how to show loader without causing rerender that makes componentDidMount fire?
     try {
-      const businessUnitModelInstance = businessUnitsStore.build(values)
-      const creatingBusinessUnit = businessUnitModelInstance.save(
-        {},
-        {
-          optimistic: false,
-        }
-      )
-      const result = await creatingBusinessUnit
+      const result = await this.props.apiStore.createCreativeDifferenceGroup({
+        business_unit: values,
+      })
 
-      console.log('created BU: ', result)
+      const groups = result.data
+      console.log('created result.data with BU data: ', groups)
 
-      if (result) {
-        console.log('new BU created: ', result)
+      if (groups) {
+        console.log('setting BU from groups: ', groups[0].business_unit.id)
         runInAction(() => {
-          this.newBusinessUnitId = result.id
+          this.newBusinessUnitId = groups[0].business_unit.id
+          businessUnitsStore.add([groups[0].business_unit])
+          this.businessUnitGroups = this.businessUnitGroups.concat(groups)
         })
       }
     } catch (err) {
-      console.log('failed to create BU: ', err)
+      console.log('failed to create BU and groups: ', err)
       this.setIsError(true)
       this.setBusinessUnitErrors(err.error)
     }

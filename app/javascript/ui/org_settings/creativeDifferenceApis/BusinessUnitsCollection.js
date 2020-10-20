@@ -18,7 +18,8 @@ class BusinessUnitModel extends Model {
 class BusinessUnitsCollection extends Collection {
   // use .rpc({ endpoint: /api/v3/users/me }) for non-rest calls
   url() {
-    return `/api/v1/creative_difference/business_units`
+    return `/api/v1/creative_difference/proxy?url=business_units`
+    // need to handle organization id
   }
   model() {
     return BusinessUnitModel

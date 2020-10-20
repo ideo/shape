@@ -8,12 +8,12 @@ apiClient(adapter, {
 
 class Organization extends Model {
   url() {
-    return `/api/v3/organizations/${this.id}`
+    return `/api/v1/creative_difference/proxy?url=organizations/${this.id}`
   }
 }
 class OrganizationsCollection extends Collection {
   url() {
-    return '/api/v3/organizations'
+    return `/api/v1/creative_difference/proxy?url=organizations`
   }
   model() {
     return Organization

@@ -312,6 +312,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request('creative_difference/groups')
   }
 
+  createCreativeDifferenceGroup(params) {
+    return this.request('creative_difference/groups', 'POST', params)
+  }
+
   async searchForRespondents(audienceId, numRespondents) {
     const url = `admin/users/search?audience_id=${audienceId}&num_respondents=${numRespondents}`
     const res = await this.request(url)

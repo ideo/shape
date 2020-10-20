@@ -1,21 +1,17 @@
+import PropTypes from 'prop-types'
+import { action, observable } from 'mobx'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import { Row } from '~/ui/global/styled/layout'
 import { TextField } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 
 import BusinessUnitActionMenu from './BusinessUnitActionMenu'
-import { action, observable, runInAction } from 'mobx'
-import {
-  observer,
-  inject,
-  PropTypes as MobxPropTypes,
-  PropTypes,
-} from 'mobx-react'
 import SimpleUserSummary from './SimpleUserSummary'
 import DropdownSelect from './DropdownSelect'
 import Loader from '../layout/Loader'
 
-// TODO: maybe just pass in currentUserOrganization.primary_group as prop?
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class BusinessUnitRow extends React.Component {
   @observable
@@ -33,12 +29,6 @@ class BusinessUnitRow extends React.Component {
     super(props)
 
     this.textInput = null
-
-    // props.apiStore.fetch(
-    //   'groups',
-    //   props.apiStore.currentUserOrganization.primary_group.id,
-    //   true
-    // )
   }
 
   componentDidMount() {
@@ -169,6 +159,10 @@ class BusinessUnitRow extends React.Component {
       name: businessUnit.get('name'),
     })
     this.setIsEditingName(false)
+  }
+
+  openGroup = groupId => {
+    this.props.uiStore.openGroup(groupId)
   }
 
   render() {
@@ -313,7 +307,7 @@ class BusinessUnitRow extends React.Component {
             <SimpleUserSummary
               group={this.props.adminGroup}
               roleName={'admin'}
-              handleClick={() => console.log('click adminGroup button')}
+              handleClick={() => this.openGroup(this.props.adminGroup.id)}
             />
           </div>
           {/* Members */}
@@ -325,8 +319,8 @@ class BusinessUnitRow extends React.Component {
           >
             <SimpleUserSummary
               group={this.props.memberGroup}
-              roleName={'member'}
-              handleClick={() => console.log('click memberGroup button')}
+              roleName={'admin'}
+              handleClick={() => this.openGroup(this.props.memberGroup.id)}
             />
           </div>
         </form>
@@ -367,6 +361,7 @@ BusinessUnitRow.propTypes = {
 
 BusinessUnitRow.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default BusinessUnitRow

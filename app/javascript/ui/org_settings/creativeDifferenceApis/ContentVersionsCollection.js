@@ -10,7 +10,7 @@ class ContentVersionModel extends Model {}
 
 class ContentVersionsCollection extends Collection {
   url() {
-    return `/api/v3/content_versions`
+    return `/api/v1/creative_difference/proxy?url=content_versions`
   }
 
   model() {

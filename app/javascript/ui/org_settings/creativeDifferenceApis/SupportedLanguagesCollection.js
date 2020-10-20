@@ -10,7 +10,7 @@ class SupportedLanguageModel extends Model {}
 
 class SupportedLanguagesCollection extends Collection {
   url() {
-    return `/api/v3/supported_languages`
+    return `/api/v1/creative_difference/proxy?url=supported_languages`
   }
 
   model() {

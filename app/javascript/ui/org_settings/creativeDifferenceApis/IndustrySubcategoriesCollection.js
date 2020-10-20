@@ -10,7 +10,7 @@ class IndustrySubcategoryModel extends Model {}
 
 class IndustrySubcategoriesCollection extends Collection {
   url() {
-    return '/api/v3/industry_subcategories'
+    return `/api/v1/creative_difference/proxy?url=industry_subcategories`
   }
   model() {
     return IndustrySubcategoryModel
