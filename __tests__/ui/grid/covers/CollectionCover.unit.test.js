@@ -43,8 +43,7 @@ describe('CollectionCover', () => {
         .find('Dotdotdot')
         .at(1)
         .find('ReactMarkdown')
-        .props()
-        .source
+        .props().source
     ).toContain(cover.text)
     expect(component.numberOfLinesForDescription).toEqual(3)
   })
