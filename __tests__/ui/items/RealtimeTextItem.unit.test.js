@@ -4,6 +4,9 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
+import ChannelManager from '~/utils/ChannelManager'
+
+jest.mock('../../../app/javascript/utils/ChannelManager')
 
 const props = {
   item: fakeTextItem,
@@ -21,6 +24,7 @@ const props = {
 
 let wrapper, component
 const rerender = (merge = {}) => {
+  ChannelManager.subscribe.mockClear()
   const mergedProps = { ...props, ...merge }
   wrapper = shallow(<RealtimeTextItem.wrappedComponent {...mergedProps} />)
   component = wrapper.instance()
@@ -204,6 +208,27 @@ describe('RealtimeTextItem', () => {
     })
   })
 
+  describe('with unpersisted item', () => {
+    beforeEach(() => {
+      props.item.persisted = false
+      rerender()
+    })
+    afterEach(() => {
+      props.item.persisted = true
+    })
+
+    it('does not subscribe to ItemRealtimeChannel', () => {
+      expect(ChannelManager.subscribe).not.toHaveBeenCalled()
+      expect(component.version).toBe(null)
+    })
+
+    it('does subscribe and set version after receiving persisted item', () => {
+      wrapper.setProps({ item: { ...props.item, version: 1, persisted: true } })
+      expect(ChannelManager.subscribe).toHaveBeenCalled()
+      expect(component.version).toEqual(1)
+    })
+  })
+
   describe('realtime text methods', () => {
     const hello = new Delta({ ops: [{ insert: 'Hello' }] })
     const world = new Delta({ ops: [{ retain: 5 }, { insert: ', World.' }] })
@@ -227,6 +252,10 @@ describe('RealtimeTextItem', () => {
     beforeEach(() => {
       props.item = { ...fakeTextItem, version: 1 }
       rerender()
+    })
+
+    it('subscribes to ItemRealtimeChannel', () => {
+      expect(ChannelManager.subscribe).toHaveBeenCalled()
     })
 
     it('combines and buffers input text changes', () => {

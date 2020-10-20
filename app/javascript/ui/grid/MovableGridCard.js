@@ -536,6 +536,7 @@ class MovableGridCard extends React.Component {
       activeDragTarget,
       currentlyZooming,
       shouldOpenMoveSnackbar,
+      textEditingCardId,
       isTouchDevice,
       isCypress,
     } = uiStore
@@ -543,7 +544,10 @@ class MovableGridCard extends React.Component {
     let _zIndex = 1
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
-    let disableDragging = !canEditCollection || card.isPinnedAndLocked
+    let disableDragging =
+      !canEditCollection ||
+      card.isPinnedAndLocked ||
+      textEditingCardId === card.id
     const { currentUser } = uiStore.apiStore
     const isSuperAdmin = currentUser && currentUser.is_super_admin
     if (isSuperAdmin) {
@@ -608,6 +612,16 @@ class MovableGridCard extends React.Component {
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
 
+    const enableResizing =
+      canEditCollection &&
+      uiStore.selectedArea.minX === null &&
+      (isSuperAdmin || !card.isPinnedAndLocked) &&
+      card.persisted &&
+      card.record &&
+      !card.record.isChart &&
+      !card.record.isGenericFile &&
+      !card.record.isCarousel
+
     const rndProps = {
       ref: c => {
         this.rnd = c
@@ -635,13 +649,7 @@ class MovableGridCard extends React.Component {
       default: defaultPosition,
       disableDragging,
       enableResizing: {
-        bottomRight:
-          canEditCollection &&
-          (isSuperAdmin || !card.isPinnedAndLocked) &&
-          card.record &&
-          !card.record.isChart &&
-          !card.record.isGenericFile &&
-          !card.record.isCarousel,
+        bottomRight: enableResizing,
         bottom: false,
         bottomLeft: false,
         left: false,

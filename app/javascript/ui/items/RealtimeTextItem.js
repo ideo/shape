@@ -38,7 +38,6 @@ const DockedToolbar = styled.div`
   height: 32px;
   margin-bottom: 20px;
   padding: 8px;
-  padding-bottom: 26px;
   position: absolute;
   z-index: ${v.zIndex.gridCardTop};
 
@@ -61,14 +60,14 @@ const DockedToolbar = styled.div`
     !props.fullPageView &&
     `
       width: 220px;
-      left: ${props.leftAdjust}px;
+      padding-bottom: 26px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
       border-radius: 4px;
       box-sizing: border-box;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-      margin-top: ${-18 / props.zoomLevel}px;
-      top: ${-36 * props.zoomLevel}px;
+      left: ${props.leftAdjust}px;
+      top: ${props.topAdjust}px;
     `};
 `
 DockedToolbar.defaultProps = {
@@ -181,6 +180,11 @@ class RealtimeTextItem extends React.Component {
     if (initSnapshot || prevState.disconnected !== this.state.disconnected) {
       this.calculateCanEdit()
     }
+    if (!prevProps.item.persisted && this.props.item.persisted) {
+      // set the version now that it is persisted
+      this.version = this.props.item.version
+      this.subscribeToItemRealtimeChannel()
+    }
   }
 
   componentWillUnmount() {
@@ -196,6 +200,10 @@ class RealtimeTextItem extends React.Component {
     if (routingToSameItem) return
     ChannelManager.unsubscribe(ITEM_CHANNEL_NAME, item.id)
     item.setCollaborators([])
+  }
+
+  get isPersisted() {
+    return this.props.item.persisted
   }
 
   clearQuillClipboardHistory() {
@@ -240,6 +248,10 @@ class RealtimeTextItem extends React.Component {
 
   subscribeToItemRealtimeChannel() {
     const { item } = this.props
+    if (!this.isPersisted) {
+      return
+    }
+
     this.channel = ChannelManager.subscribe(ITEM_CHANNEL_NAME, item.id, {
       channelConnected: this.channelConnected,
       channelDisconnected: this.channelDisconnected,
@@ -406,6 +418,7 @@ class RealtimeTextItem extends React.Component {
     return quillData
   }
 
+  @action
   cancel = (ev, { route = true } = {}) => {
     if (this.canceled) return
     const { onCancel } = this.props
@@ -419,12 +432,16 @@ class RealtimeTextItem extends React.Component {
 
     const item = this.setItemQuillData()
     this.pushTextUndo()
+
     // tell the TextItemCover about number of viewers so it can know whether to perform an additional save
     return onCancel({ item, ev, route, num_viewers: this.num_viewers })
   }
 
   pushTextUndo() {
     const { item, uiStore } = this.props
+    if (!item.persisted) {
+      return
+    }
     const collection = uiStore.viewingCollection || item.parent
     const redirectTo = collection
     const previousData = this.quillData
@@ -522,6 +539,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCombinedDelta = () => {
+    if (!this.isPersisted) {
+      return
+    }
+
     if (!this.combinedDelta.length() || this.currentlySending) {
       if (this.currentlySending && !this.currentlySendingCheck) {
         this.currentlySendingCheck = setTimeout(() => {
@@ -575,6 +596,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   socketSend = (method, data) => {
+    if (!this.isPersisted) {
+      return
+    }
+
     const channel = ChannelManager.getChannel(
       ITEM_CHANNEL_NAME,
       this.props.item.id
@@ -752,10 +777,10 @@ class RealtimeTextItem extends React.Component {
 
     // this is for adjusting where the fully scaled toolbar appears above the card
     let leftAdjustToolbar = -16
-    if (relativeZoomLevel > 2) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 36
-    } else if (relativeZoomLevel > 1) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 24
+    let topAdjustToolbar = -52
+    if (relativeZoomLevel > 1) {
+      leftAdjustToolbar = -186 + Math.pow(relativeZoomLevel, 0.8) * 164
+      topAdjustToolbar = -6 + Math.pow(relativeZoomLevel, 0.63) * -43
     }
 
     return (
@@ -768,6 +793,7 @@ class RealtimeTextItem extends React.Component {
           fullPageView={fullPageView}
           zoomLevel={!fullPageView ? uiStore.relativeZoomLevel : 1}
           leftAdjust={leftAdjustToolbar}
+          topAdjust={topAdjustToolbar}
         >
           {canEdit && (
             <TextItemToolbar

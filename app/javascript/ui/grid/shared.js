@@ -114,20 +114,21 @@ export const StyledGridCard = styled.div`
 StyledGridCard.displayName = 'StyledGridCard'
 
 export const showOnHoverCss = css`
-  .hide-on-cover-edit {
-    /* don't show hover items while editing a title */
-    opacity: 0;
-    z-index: 1;
+  .hidden-actions {
+    /* don't show hover items while editing a title or dragging selection square */
+    visibility: hidden;
+    .show-on-hover {
+      visibility: hidden !important;
+    }
   }
   .show-on-hover {
-    opacity: 0;
-    transition: opacity 0.25s;
+    visibility: hidden;
   }
   &:hover,
   &.touch-device {
     .show-on-hover {
       /* don't show hover items while dragging */
-      opacity: ${props => (props.dragging ? 0 : 1)};
+      visibility: ${props => (props.dragging ? 'hidden' : 'visible')};
     }
   }
 `
@@ -305,10 +306,12 @@ export const StyledTopRightActions = styled.div`
   ${props =>
     props.forceOpen &&
     `
-      opacity: 1 !important;
+      visibility: visible !important;
+      z-index: ${v.zIndex.popoutMenu};
 
       .show-on-hover {
-        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: ${v.zIndex.popoutMenu};
       }
   `}
 
@@ -321,6 +324,9 @@ export const StyledTopRightActions = styled.div`
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
+    &.open {
+      visibility: visible;
+    }
   }
 
   svg {

@@ -3,7 +3,7 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-import { fakeGroup, fakeUser } from '#/mocks/data'
+import { fakeGroup, fakeUser, fakeCollection } from '#/mocks/data'
 
 const fakeUserAndGroupSearch = [
   {
@@ -51,7 +51,8 @@ describe('RolesAdd', () => {
   describe('constructor', () => {
     describe('when passing in a default group id', () => {
       beforeEach(() => {
-        props.defaultGroupId = '2'
+        fakeCollection.default_group_id = '2'
+        props.record = fakeCollection
         wrapper = mount(<RolesAdd {...props} />)
       })
 
@@ -277,7 +278,8 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             [{ id: '1' }],
             'viewer',
-            defaultOpts
+            defaultOpts,
+            null
           )
           done()
         })
@@ -319,7 +321,8 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
             'viewer',
-            defaultOpts
+            defaultOpts,
+            null
           )
           done()
         })
@@ -337,7 +340,8 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
             'member',
-            Object.assign({}, defaultOpts, { addToGroupId: fakeGroup.id })
+            Object.assign({}, defaultOpts, { addToGroupId: fakeGroup.id }),
+            null
           )
           done()
         })
@@ -370,7 +374,8 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
             'viewer',
-            { sendInvites: false, addToGroupId: '' }
+            { sendInvites: false, addToGroupId: '' },
+            null
           )
           done()
         })

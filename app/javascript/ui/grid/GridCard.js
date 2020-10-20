@@ -125,8 +125,8 @@ class GridCard extends React.Component {
     }
 
     let className = 'show-on-hover'
-    if (this.isEditingCardCover) {
-      className = 'hide-on-cover-edit'
+    if (this.isEditingCardCover || uiStore.selectedArea.minX) {
+      className = 'hidden-actions'
     }
 
     const cardWidth = uiStore.gridSettings.gridW / zoomLevel
@@ -476,6 +476,17 @@ class GridCard extends React.Component {
       // Instead use the item for the cover rather than the collection
       record = coverItem
       cardType = 'items'
+    }
+
+    const { viewingCollection } = uiStore
+    if (
+      !card.persisted &&
+      viewingCollection &&
+      viewingCollection.newPersistedTextCard
+    ) {
+      // special case, the new text item has just finished getting created
+      // so we want to swap the card.record (unpersisted fake item) with the real one
+      record = viewingCollection.newPersistedTextCard.record
     }
 
     return (

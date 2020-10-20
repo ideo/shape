@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
@@ -20,6 +21,7 @@ import VideoIcon from '~/ui/icons/htc/VideoIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import Item from '~/stores/jsonApi/Item'
 import { DisplayText } from '~/ui/global/styled/typography'
 import FilestackUpload from '~/utils/FilestackUpload'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -217,9 +219,7 @@ class GridCardBlank extends React.Component {
 
       if (type === ITEM_TYPES.TEXT) {
         const { uiStore } = this.props
-        uiStore.update('textEditingItemHasTitleText', false)
-        uiStore.update('textEditingItem', card.record)
-        uiStore.update('textEditingCardId', card.id)
+        uiStore.setTextEditingCard(card)
       }
     }
   }
@@ -314,6 +314,30 @@ class GridCardBlank extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
+    if (
+      // don't use this behavior for text item submissions as it behaves oddly
+      !parent.isSubmissionsCollection &&
+      attrs.item_attributes &&
+      attrs.item_attributes.type === ITEM_TYPES.TEXT
+    ) {
+      const item = new Item(attrs.item_attributes, apiStore)
+      runInAction(() => {
+        item.can_edit_content = true
+        item.class_type = ITEM_TYPES.TEXT
+        card.record = item
+        // Creates a temporary card for the user to edit
+        parent.tempTextCard = card
+        // unset this so it does not call placeholderCard.API_destroy() when closing BCT
+        uiStore.setBctPlaceholderCard(null)
+        uiStore.closeBlankContentTool({ force: true })
+      })
+      // For text cards to be available immediately, don't await this
+      card.API_create()
+      if (afterCreate) afterCreate(card)
+      if (options.afterCreate) options.afterCreate(card)
+      return
+    }
+
     this.setState({ loading: true, uploaded: false }, async () => {
       let newCard
       if (isReplacing) {
@@ -330,26 +354,24 @@ class GridCardBlank extends React.Component {
     })
   }
 
-  createTextItem = item => {
+  createTextItem = () => {
     // prevent multiple clicks (or pressing enter) to create multiple items
     if (this.state.loading) {
       return
     }
-    this.setState({ loading: true }, () => {
-      this.createCard(
-        {
-          item_attributes: {
-            name: 'Text',
-            content: '',
-            quill_data: { ops: [] },
-            type: ITEM_TYPES.TEXT,
-          },
+    this.createCard(
+      {
+        item_attributes: {
+          name: 'Text',
+          content: '',
+          quill_data: { ops: [] },
+          type: ITEM_TYPES.TEXT,
         },
-        {
-          afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
-        }
-      )
-    })
+      },
+      {
+        afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
+      }
+    )
   }
 
   closeBlankContentTool = () => {

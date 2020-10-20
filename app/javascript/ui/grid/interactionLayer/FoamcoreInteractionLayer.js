@@ -292,7 +292,7 @@ class FoamcoreInteractionLayer extends React.Component {
       this.resetHoveringRowCol()
     } else {
       this.repositionBlankCard({ row, col })
-      if (uiStore.isMobileXs) {
+      if (uiStore.isTouchDevice) {
         this.scrollToBlank(clientY)
       }
     }

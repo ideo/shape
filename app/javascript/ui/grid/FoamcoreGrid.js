@@ -25,6 +25,7 @@ const Grid = styled.div`
   position: relative;
   width: ${props => `${props.width}px`};
   height: ${props => `${props.height}px`};
+  z-index: ${props => props.zIndex};
 `
 
 function getMapKey({ col, row }) {
@@ -223,7 +224,7 @@ class FoamcoreGrid extends React.Component {
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
-    const visRows = _.get('visibleRows.num', uiStore) || 1
+    const visRows = _.get(uiStore, 'visibleRows.num', 1)
     let maxRows = collection.max_row_index + 1
     if (collection.isSplitLevelBottom) {
       maxRows += 1
@@ -1006,11 +1007,16 @@ class FoamcoreGrid extends React.Component {
 
   renderVisibleCards() {
     const { collection } = this.props
+    const { tempTextCard } = collection
     let cards = _.reject(
       collection.collection_cards,
       // hide additional cards that are being moved/hidden
       'shouldHideFromUI'
     )
+    if (tempTextCard) {
+      // push the temporary card which was created to allow the user to edit right away
+      cards.push(tempTextCard)
+    }
     cards = _.map(cards, this.renderCard)
 
     return cards
@@ -1094,6 +1100,8 @@ class FoamcoreGrid extends React.Component {
         className={`${FOAMCORE_GRID_BOUNDARY}${
           isSplitLevelBottom ? '-bottom' : ''
         }`}
+        // make top Grid a higher z-index so its actionmenu/dropdowns can appear over the bottom grid
+        zIndex={isSplitLevelBottom ? 1 : 2}
         data-empty-space-click
         ref={ref => {
           this.gridRef = ref

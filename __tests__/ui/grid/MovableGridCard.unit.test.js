@@ -107,6 +107,7 @@ describe('MovableGridCard', () => {
   describe('as editor, with grid cards for items and collections', () => {
     beforeEach(() => {
       props.cardType = 'items'
+      props.card.persisted = true
       props.canEditCollection = true
       rerender()
     })

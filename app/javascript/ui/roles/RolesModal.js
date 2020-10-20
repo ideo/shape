@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
+
 import Modal from '~/ui/global/modals/Modal'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class RolesModal extends React.Component {
-  handleClose = async ev => {
+  handleClose = async () => {
     const { uiStore, record, open } = this.props
     if (open) {
       if (uiStore.viewingRecord === record) {
@@ -17,18 +19,30 @@ class RolesModal extends React.Component {
     }
   }
 
+  get dialogActions() {
+    const { record } = this.props
+
+    return <RolesMenuDialogActions record={record} />
+  }
+
   render() {
-    const { record, open } = this.props
-    const title = `Sharing: ${record.name}`
+    const { record, open, uiStore } = this.props
 
     return (
-      <Modal title={title} onClose={this.handleClose} open={open} noScroll>
+      <Modal
+        title={`Sharing: ${record.name}`}
+        onClose={this.handleClose}
+        open={open}
+        noScroll
+        dialogActions={this.dialogActions}
+      >
         <RolesMenu
           record={record}
           canEdit={record.can_edit}
           ownerId={record.id}
           ownerType={record.internalType}
           submissionBox={record.isSubmissionBox}
+          addedNewRole={uiStore.addedNewRole}
           title="Shared with"
         />
       </Modal>
@@ -41,6 +55,7 @@ RolesModal.propTypes = {
   open: PropTypes.bool.isRequired,
 }
 RolesModal.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

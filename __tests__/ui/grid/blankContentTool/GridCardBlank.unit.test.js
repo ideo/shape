@@ -5,6 +5,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { fakeCollectionCard } from '#/mocks/data'
 import googleTagManager from '~/vendor/googleTagManager'
+import { ITEM_TYPES } from '~/utils/variables'
 
 jest.mock('../../../../app/javascript/vendor/googleTagManager')
 
@@ -19,8 +20,16 @@ jest.mock('../../../../app/javascript/utils/FilestackUpload')
 jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard', () =>
   jest.fn().mockImplementation(() => mockCardMethods)
 )
+jest.mock('../../../../app/javascript/stores/jsonApi/Item', () =>
+  jest.fn().mockImplementation(() => mockCardMethods)
+)
 
 let props, wrapper, replacingCard, component
+const rerender = () => {
+  wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+  component = wrapper.instance()
+}
+
 beforeEach(() => {
   CollectionCard.mockClear()
   replacingCard = fakeCollectionCard
@@ -29,8 +38,7 @@ beforeEach(() => {
     apiStore: fakeApiStore({ findResult: replacingCard }),
     parent: { id: 1 },
   }
-  wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
-  component = wrapper.instance()
+  rerender()
   FilestackUpload.pickImage = jest
     .fn()
     .mockReturnValue(Promise.resolve({ filesUploaded: [] }))
@@ -75,13 +83,38 @@ describe('GridCardBlank', () => {
     })
 
     describe('when creating a card', () => {
-      it('calls API_create with TextItem onClick handler', async () => {
-        await wrapper.instance().createTextItem()
+      it('synchronously calls API_create with TextItem onClick handler', () => {
+        component.createTextItem()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
+        expect(wrapper.state().loading).toBeFalsy()
+        // should clear this out before closing
+        expect(props.uiStore.setBctPlaceholderCard).toHaveBeenCalledWith(null)
+        expect(props.uiStore.closeBlankContentTool).toHaveBeenCalled()
+        // should mark tempTextCard
+        expect(props.parent.tempTextCard.record).toEqual(expect.any(Object))
+        expect(props.parent.tempTextCard.parent).toEqual(props.parent)
+      })
+
+      describe('with submissionsCollection', () => {
+        beforeEach(() => {
+          props.parent.isSubmissionsCollection = true
+          rerender()
+        })
+        afterEach(() => {
+          props.parent.isSubmissionsCollection = false
+        })
+
+        it('calls async API_create with TextItem onClick handler', async () => {
+          await component.createTextItem()
+          expect(wrapper.state().loading).toBeTruthy()
+          expect(mockCardMethods.API_create).toHaveBeenCalled()
+          // should not create this
+          expect(props.parent.tempTextCard).toBeFalsy()
+        })
       })
 
       it('calls API_create when creating', async () => {
-        await wrapper.instance().createCard()
+        await component.createCard()
         expect(wrapper.state().loading).toBeTruthy()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
       })
@@ -96,7 +129,7 @@ describe('GridCardBlank', () => {
         height: 1,
         emptyCollection: true,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('does not render the close button', () => {
@@ -113,7 +146,7 @@ describe('GridCardBlank', () => {
         height: 1,
         replacingId,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('only renders video and image content creation buttons', () => {
@@ -143,7 +176,7 @@ describe('GridCardBlank', () => {
       props.uiStore.viewingCollection = {
         maxColumnIndex: 15,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
       component = wrapper.instance()
       // mock this to test how it is called
       component.createCard = jest.fn()
@@ -175,12 +208,12 @@ describe('GridCardBlank', () => {
   describe('afterCreate', () => {
     describe('when creating a TextItem', () => {
       it('pushes an event to google tag manager', () => {
-        const afterCreate = component.afterCreate('Item::TextItem')
+        const afterCreate = component.afterCreate(ITEM_TYPES.TEXT)
         afterCreate({ record: {} })
 
         expect(googleTagManager.push).toHaveBeenCalledWith({
           event: 'formSubmission',
-          formType: `Create Item::TextItem`,
+          formType: `Create ${ITEM_TYPES.TEXT}`,
           parentType: 'anywhere',
         })
       })
