@@ -35,9 +35,9 @@ const parseURLMeta = async urlStr => {
   }
 
   const parser = new DOMParser()
-  const proxy = '/passthru?url='
+  const proxy = '/passthru'
   try {
-    const response = await axios.get(`${proxy}${url}`)
+    const response = await axios.get(proxy, { params: { url } })
     const doc = parser.parseFromString(response.data, 'text/html')
     const metadata = metaDataParser.getMetadata(doc, url)
     return metadata
