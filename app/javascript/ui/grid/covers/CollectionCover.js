@@ -346,6 +346,7 @@ class CollectionCover extends React.Component {
     // Either get the cover from the collection card itself, or get it from the collection it links to
 
     const cover = cardCover ? cardCover : linkedCollectionCover
+    console.log('colcover', collection.name, cover)
 
     if (cover.image_handle) {
       return FilestackUpload.imageUrl({

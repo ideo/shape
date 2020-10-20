@@ -138,6 +138,10 @@ class CollectionCard extends BaseRecord {
     )
   }
 
+  get isCollectionOrLinkCardType() {
+    return this.type === COLLECTION_CARD_TYPES.LINK
+  }
+
   get subtitle() {
     // Collection cards only show titles for link cards
     if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
