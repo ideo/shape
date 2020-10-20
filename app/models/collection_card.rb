@@ -595,23 +595,23 @@ class CollectionCard < ApplicationRecord
     "CollectionCardCache::#{key}"
   end
 
-  def cache_cover
-    cover_card = collection.collection_cards.find_by(id: cover_card_id)
-    return unless cover_card&.item&.is_a? Item::FileItem
-
-    cover = {
-      # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
-      image_url: cover_card.item.image_url,
-      # image items use handle so that they can generate a secure filestack URL
-      image_handle: cover_card.item.filestack_file_handle,
-    }
-    self.cached_cover = cover
-  end
-
-  def cache_cover!
-    cache_cover
-    save
-  end
+  # def cache_cover
+  #   cover_card = collection.collection_cards.find_by(id: cover_card_id)
+  #   return unless cover_card&.item&.is_a? Item::FileItem
+  #
+  #   cover = {
+  #     # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
+  #     image_url: cover_card.item.image_url,
+  #     # image items use handle so that they can generate a secure filestack URL
+  #     image_handle: cover_card.item.filestack_file_handle,
+  #   }
+  #   self.cached_cover = cover
+  # end
+  #
+  # def cache_cover!
+  #   cache_cover
+  #   save
+  # end
 
   def clear_collection_card_cover
     self.cached_cover = nil

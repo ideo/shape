@@ -673,6 +673,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :font_color,
       :font_background,
       :cover_card_id,
+      :hardcoded_title,
+      :hardcoded_subtitle,
+      :subtitle_hidden,
     )
   end
 

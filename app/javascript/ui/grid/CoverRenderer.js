@@ -128,7 +128,7 @@ class CoverRenderer extends React.Component {
             card.parentCollection.isSubmissionsCollection
           }
           textItem={nestedTextItem}
-          cover={card.cover}
+          card={card}
         />
       )
     }

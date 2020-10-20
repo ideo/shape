@@ -3,7 +3,7 @@ import { action, computed, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
-import v from '~/utils/variables'
+import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
 
 // This contains some shared methods between Collection and Item
 const SharedRecordMixin = superclass =>
@@ -70,9 +70,94 @@ const SharedRecordMixin = superclass =>
       return this.routingStore.pathTo('homepage')
     }
 
+    get isCollectionOrLinkCardType() {
+      return (
+        this.internalType === 'collections' ||
+        (this.internalType === 'collection_cards' &&
+          this.type === COLLECTION_CARD_TYPES.LINK)
+      )
+    }
+
+    get subtitle() {
+      if (
+        this.internalType === 'collection_cards' &&
+        this.type === COLLECTION_CARD_TYPES.LINK
+      ) {
+        const { cover } = this
+        const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+
+        if (coverSubtitle) {
+          return cover.subtitle_hidden ? '' : coverSubtitle
+        }
+
+        return this.linkedCoverSubtitleOrText
+      } else if (this.internalType === 'collections') {
+        const { cover } = this
+        if (cover.subtitle_hidden) {
+          return ''
+        }
+        return cover.hardcoded_subtitle || cover.text || ''
+      }
+
+      return this.subtitle_hidden ? '' : this.content
+    }
+
+    get subtitleHidden() {
+      if (this.isCollectionOrLinkCardType) {
+        const { cover } = this
+        return cover && cover.subtitle_hidden ? true : false
+      }
+
+      return this.subtitle_hidden
+    }
+
+    get linkedCoverSubtitleOrText() {
+      // used by collection_cards to fall-back to the linked record's subtitle
+      if (
+        this.internalType !== 'collection_cards' ||
+        this.type !== COLLECTION_CARD_TYPES.LINK
+      ) {
+        return null
+      }
+
+      const recordSubtitle = _.get(this, 'record.cover.hardcoded_subtitle', '')
+      const recordText = _.get(this, 'record.cover.text', '')
+
+      return recordSubtitle || recordText || ''
+    }
+
+    get subtitleForEditing() {
+      if (
+        this.internalType === 'collection_cards' &&
+        this.type === COLLECTION_CARD_TYPES.LINK
+      ) {
+        const { cover } = this
+        const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+        return coverSubtitle || this.linkedCoverSubtitleOrText
+      } else if (this.internalType === 'collections') {
+        const { cover } = this
+        if (!cover) return ''
+
+        return cover.hardcoded_subtitle || cover.text || ''
+      }
+      return ''
+    }
+
+    get titleForEditing() {
+      if (
+        this.internalType === 'collection_cards' &&
+        this.type === COLLECTION_CARD_TYPES.LINK
+      ) {
+        const { cover } = this
+        return (cover && cover.hardcoded_title) || ''
+      }
+      return null
+    }
+
     @action
     API_updateNameAndCover({
       name,
+      hardcodedTitle = '',
       hardcodedSubtitle = '',
       subtitleHidden = false,
     }) {
@@ -93,11 +178,14 @@ const SharedRecordMixin = superclass =>
         })
       }
       const data = this.toJsonApi()
-      // see collection_updater.rb for deserialization
-      if (this.internalType === 'collections') {
+      if (this.isCollectionOrLinkCardType) {
+        if (hardcodedTitle !== this.cover.hardcoded_title) {
+          this.cover.hardcoded_title = hardcodedTitle
+        }
         if (hardcodedSubtitle !== this.subtitle) {
           this.cover.hardcoded_subtitle = hardcodedSubtitle
         }
+        data.attributes.hardcoded_title = hardcodedTitle
         data.attributes.hardcoded_subtitle = hardcodedSubtitle
         this.cover.subtitle_hidden = subtitleHidden
         data.attributes.subtitle_hidden = subtitleHidden

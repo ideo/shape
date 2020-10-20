@@ -9,8 +9,9 @@ import {
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
+import SharedRecordMixin from './SharedRecordMixin'
 
-class CollectionCard extends BaseRecord {
+class CollectionCard extends SharedRecordMixin(BaseRecord) {
   static type = 'collection_cards'
   static endpoint = apiUrl('collection_cards')
 
