@@ -340,12 +340,14 @@ class CollectionCover extends React.Component {
 
   get coverImageUrl() {
     const { card, collection } = this.props
-    const { cover: cardCover } = card
-    const { cover: linkedCollectionCover } = collection
+    const cardCover = _.get(card, 'cover', null)
+    const linkedCollectionCover = _.get(collection, 'cover', null)
 
     // Either get the cover from the collection card itself, or get it from the collection it links to
 
     const cover = cardCover ? cardCover : linkedCollectionCover
+
+    if (!cover) return
 
     if (cover.image_handle) {
       return FilestackUpload.imageUrl({
@@ -373,10 +375,9 @@ class CollectionCover extends React.Component {
 
   get title() {
     const { card } = this.props
-    const { cover } = card
-    if (this.cardIsLink && cover) {
-      const { hardcoded_title } = cover
-      return hardcoded_title
+    const hardcodedTitle = _.get(card, 'cover.hardcoded_title', null)
+    if (this.cardIsLink && hardcodedTitle) {
+      return hardcodedTitle
     }
     return null
   }

@@ -566,15 +566,6 @@ class CollectionCard extends SharedRecordMixin(BaseRecord) {
       { data: this.toJsonApi() }
     )
   }
-
-  @action
-  async API_clearCollectionCardCover() {
-    await this.apiStore.request(
-      `collection_cards/${this.id}/clear_collection_card_cover`,
-      'PATCH',
-      { data: this.toJsonApi() }
-    )
-  }
 }
 
 export default CollectionCard

@@ -149,18 +149,19 @@ class CardCoverEditor extends React.Component {
         return
       }
 
-      if (
-        record.name === this.cardTitle &&
-        record.subtitle === this.hardcodedSubtitle &&
-        record.subtitleHidden === this.subtitleHidden
-      ) {
-        return
-      }
-
       const cardOrRecord = this.cardIsLink ? card : record
+
       // if card has a cached cover, modify it instead of record.name
       const cardName = this.cardIsLink ? null : this.cardTitle
       const hardCodedTitle = this.cardIsLink ? this.cardTitle : null
+
+      if (
+        (cardName === this.cardTitle || hardCodedTitle === this.cardTitle) &&
+        cardOrRecord.subtitle === this.hardcodedSubtitle &&
+        cardOrRecord.subtitleHidden === this.subtitleHidden
+      ) {
+        return
+      }
 
       // only update when you close the editor and there are changes
       cardOrRecord.API_updateNameAndCover({
@@ -262,7 +263,7 @@ class CardCoverEditor extends React.Component {
     this.setLoading(false)
 
     let bgOption = null
-    if (!this.recordIsCollection) {
+    if (this.recordIsCollection && !this.cardIsLink) {
       bgOption = collectionBackgroundOption
     } else if (record.isLink) {
       bgOption = linkBackgroundOption
@@ -287,7 +288,7 @@ class CardCoverEditor extends React.Component {
     const isCover = type === 'cover'
     const isBackground = type === 'background'
     if (isCover) {
-      await collection.API_clearCollectionCover()
+      await collection.API_clearCover()
     }
     const attrs = {
       item_attributes: {
@@ -407,9 +408,9 @@ class CardCoverEditor extends React.Component {
   async clearCover() {
     const { card } = this.props
     const { recordIsCollection } = this
-    if (recordIsCollection) {
-      const collection = card.record
-      return collection.API_clearCollectionCover()
+    if (this.cardIsLink || recordIsCollection) {
+      const cardOrRecord = this.cardIsLink ? card : card.record
+      return cardOrRecord.API_clearCover()
     }
     const item = card.record
     item.thumbnail_url = ''
@@ -434,10 +435,6 @@ class CardCoverEditor extends React.Component {
       }
       await selectedCard.patch({ attributes: { is_cover: true } })
     } else if (option.type === 'remove') {
-      if (card.cover) {
-        await card.API_clearCollectionCardCover()
-        return
-      }
       await this.clearCover()
     } else if (option.type === 'upload') {
       const afterPickAction = recordIsCollection

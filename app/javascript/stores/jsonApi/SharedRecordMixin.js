@@ -454,6 +454,27 @@ const SharedRecordMixin = superclass =>
         this.tags = [...userTagsWithUsers, ...tagList]
       })
     }
+
+    @action
+    API_clearCover() {
+      let path = ''
+      if (
+        this.internalType === 'collection_cards' &&
+        this.type === COLLECTION_CARD_TYPES.LINK
+      ) {
+        path = `collection_cards/${this.id}/clear_collection_card_cover`
+      } else if (this.internalType === 'collections') {
+        path = `collections/${this.id}/clear_collection_cover`
+      }
+      if (!path) return
+
+      return this.apiStore.request(path, 'POST').catch(err => {
+        console.warn(err)
+        this.uiStore.alert(
+          'Unable to change the collection cover. This may be a special collection that you cannot edit.'
+        )
+      })
+    }
   }
 
 export default SharedRecordMixin
