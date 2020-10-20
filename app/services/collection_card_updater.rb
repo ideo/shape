@@ -17,8 +17,8 @@ class CollectionCardUpdater < SimpleService
 
   def update_cached_cover
     cover_hash = {}
-    if @attributes['cover_card_id'].present?
-      cover_card = CollectionCard.find(@attributes['cover_card_id'])
+    if @attributes[:cover_card_id].present?
+      cover_card = CollectionCard.find(@attributes[:cover_card_id])
 
       return unless cover_card&.item&.is_a? Item::FileItem
 

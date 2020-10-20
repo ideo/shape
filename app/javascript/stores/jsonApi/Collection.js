@@ -1608,17 +1608,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return res
   }
 
-  API_clearCollectionCover() {
-    return this.apiStore
-      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
-      .catch(err => {
-        console.warn(err)
-        this.uiStore.alert(
-          'Unable to change the collection cover. This may be a special collection that you cannot edit.'
-        )
-      })
-  }
-
   API_clearBackgroundImage() {
     this.background_image_url = null
     return this.apiStore.request(
