@@ -973,8 +973,9 @@ export default class UiStore {
       record &&
       this.viewingRecord.id === record.id &&
       this.viewingRecord.internalType === record.internalType
-    )
+    ) {
       return
+    }
     if (this.viewingRecord) {
       this.previousViewingRecord = this.viewingRecord
       // clear out previous collaborators
@@ -1032,21 +1033,21 @@ export default class UiStore {
 
   @action
   clearTempTextCardItems({
-    hotSwapQuillContent = false,
+    hotSwapQuillContent = null,
     hotSwapQuillPosition = 0,
   } = {}) {
     const { viewingCollection } = this
-    if (viewingCollection) {
-      const { newPersistedTextCard } = viewingCollection
-      if (newPersistedTextCard && hotSwapQuillContent) {
-        // swap out the temp text card (currently editing) for the persisted one
-        newPersistedTextCard.record.quill_data = hotSwapQuillContent
-        this.hotSwapQuillPosition = hotSwapQuillPosition
-        this.setTextEditingCard(newPersistedTextCard)
-      }
-      viewingCollection.tempTextCard = null
-      viewingCollection.newPersistedTextCard = null
+    if (!viewingCollection) return
+
+    const { newPersistedTextCard } = viewingCollection
+    if (newPersistedTextCard && hotSwapQuillContent) {
+      // swap out the temp text card (currently editing) for the persisted one
+      newPersistedTextCard.record.quill_data = hotSwapQuillContent
+      this.hotSwapQuillPosition = hotSwapQuillPosition
+      this.setTextEditingCard(newPersistedTextCard)
     }
+    viewingCollection.tempTextCard = null
+    viewingCollection.newPersistedTextCard = null
   }
 
   @action

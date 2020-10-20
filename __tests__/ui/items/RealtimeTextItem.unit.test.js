@@ -226,6 +226,7 @@ describe('RealtimeTextItem', () => {
       wrapper.setProps({ item: { ...props.item, version: 1, persisted: true } })
       expect(ChannelManager.subscribe).toHaveBeenCalled()
       expect(component.version).toEqual(1)
+      expect(component.initiateHotSwap).toBeTruthy()
     })
   })
 
