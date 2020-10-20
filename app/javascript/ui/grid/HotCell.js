@@ -339,7 +339,6 @@ class HotCell extends React.Component {
     const PositionWrapper = uiStore.isTouchDevice
       ? CornerPositioned
       : DefaultWrapper
-    
     return (
       <PositionWrapper>
         <Container
