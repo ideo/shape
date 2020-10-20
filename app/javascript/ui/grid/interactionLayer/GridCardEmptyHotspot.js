@@ -31,7 +31,7 @@ const StyledGridCardEmpty = styled.div`
       display: block;
     }
   }
-  .plus-icon,
+  .plus-icon {
     display: none;
   }
 `

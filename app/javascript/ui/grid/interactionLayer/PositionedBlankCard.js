@@ -47,7 +47,9 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     return 1
   }};
   z-index: ${props =>
-    _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 1};
+    _.includes(props.interactionType, 'drag')
+      ? v.zIndex.cardHovering
+      : v.zIndex.gridCardTop};
 `
 
 BlankCardContainer.displayName = 'BlankCardContainer'
