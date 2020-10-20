@@ -541,4 +541,36 @@ describe('UiStore', () => {
       })
     })
   })
+
+  describe('clearTempTextCardItems', () => {
+    beforeEach(() => {
+      uiStore.setViewingRecord({
+        ...fakeCollection,
+        id: '123123',
+        tempTextCard: { id: -7 },
+        newPersistedTextCard: { id: '10', record: {} },
+      })
+    })
+
+    it('should clear temp values set on viewingCollection', () => {
+      const { viewingCollection } = uiStore
+      expect(viewingCollection.tempTextCard).not.toBe(null)
+      expect(viewingCollection.newPersistedTextCard).not.toBe(null)
+      uiStore.clearTempTextCardItems()
+      expect(viewingCollection.tempTextCard).toBe(null)
+      expect(viewingCollection.newPersistedTextCard).toBe(null)
+    })
+
+    it('should set hotSwap text data as needed', () => {
+      const { viewingCollection } = uiStore
+      const { record } = viewingCollection.newPersistedTextCard
+      const fakeQuillData = { ops: [{}] }
+      uiStore.clearTempTextCardItems({
+        hotSwapQuillContent: fakeQuillData,
+        hotSwapQuillPosition: 5,
+      })
+      expect(record.quill_data).toEqual(fakeQuillData)
+      expect(uiStore.hotSwapQuillPosition).toEqual(5)
+    })
+  })
 })

@@ -86,9 +86,6 @@ class TextItemCover extends React.Component {
 
   componentWillUnmount() {
     this.unmounted = true
-    if (this.interval) {
-      window.clearInterval(this.interval)
-    }
   }
 
   @computed
