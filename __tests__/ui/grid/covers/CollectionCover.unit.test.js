@@ -42,8 +42,9 @@ describe('CollectionCover', () => {
       wrapper
         .find('Dotdotdot')
         .at(1)
-        .children()
-        .text()
+        .find('ReactMarkdown')
+        .props()
+        .source
     ).toContain(cover.text)
     expect(component.numberOfLinesForDescription).toEqual(3)
   })
