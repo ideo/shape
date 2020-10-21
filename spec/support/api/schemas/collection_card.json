@@ -25,7 +25,7 @@
     "font_color": { "type": ["string", "null"] },
     "font_background": { "type": ["boolean"] },
     "cover_card_id": { "type": ["integer", "null"] },
-    "cover": { "type": ["object"] },
+    "cover": { "type": ["object", "null"] }
   },
   "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }

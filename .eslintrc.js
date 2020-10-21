@@ -7,6 +7,7 @@ module.exports = {
     'prettier',
     'import',
     'compat',
+    'json'
   ],
   env: {
     es6: true,
