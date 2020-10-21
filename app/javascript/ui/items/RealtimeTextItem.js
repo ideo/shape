@@ -61,12 +61,12 @@ const DockedToolbar = styled.div`
     `
       width: 220px;
       padding-bottom: 26px;
-      left: ${props.leftAdjust}px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
       border-radius: 4px;
       box-sizing: border-box;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      left: ${props.leftAdjust}px;
       top: ${props.topAdjust}px;
     `};
 `
@@ -130,6 +130,7 @@ class RealtimeTextItem extends React.Component {
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
+  initiateHotSwap = false
   @observable
   activeSizeFormat = null
 
@@ -184,6 +185,9 @@ class RealtimeTextItem extends React.Component {
       // set the version now that it is persisted
       this.version = this.props.item.version
       this.subscribeToItemRealtimeChannel()
+      // on the next debounce (stopped typing for ~200ms), remove the temp card
+      this.initiateHotSwap = true
+      this.sendCombinedDelta()
     }
   }
 
@@ -193,10 +197,13 @@ class RealtimeTextItem extends React.Component {
     this.cancel(null, { route: false })
     // check if you're leaving to go to the same item, e.g. item on CollectionPage -> ItemPage
     // in which case we keep the channel open
-    const { routingTo } = this.props.routingStore
-    const { item } = this.props
+    const { item, uiStore, routingStore } = this.props
+    const { routingTo } = routingStore
+    const { hotSwapQuillPosition } = uiStore
     const routingToSameItem =
-      routingTo.id === item.id && routingTo.type === 'items'
+      // if we are "hot swapping" then we are technically routing to the same item
+      hotSwapQuillPosition !== null ||
+      (routingTo.id === item.id && routingTo.type === 'items')
     if (routingToSameItem) return
     ChannelManager.unsubscribe(ITEM_CHANNEL_NAME, item.id)
     item.setCollaborators([])
@@ -265,8 +272,13 @@ class RealtimeTextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
 
     if (!initSnapshot) return
-    this.version = this.props.item.version
+    const { item, uiStore } = this.props
+    this.version = item.version
     this.contentSnapshot = this.quillEditor.getContents()
+    if (uiStore.hotSwapQuillPosition) {
+      this.quillEditor.setSelection(uiStore.hotSwapQuillPosition)
+      uiStore.update('hotSwapQuillPosition', null)
+    }
     this.updateUiStoreSnapshot()
   }
 
@@ -538,9 +550,18 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
+  @action
   _sendCombinedDelta = () => {
     if (!this.isPersisted) {
       return
+    }
+
+    const full_content = this.contentSnapshot.compose(this.combinedDelta)
+    if (this.initiateHotSwap) {
+      // this check exists inside _sendCombinedDelta so that it only picks up when
+      // the user takes a small break from typing (via debounce)
+      this.hotSwapQuillContent(full_content)
+      this.initiateHotSwap = false
     }
 
     if (!this.combinedDelta.length() || this.currentlySending) {
@@ -557,7 +578,6 @@ class RealtimeTextItem extends React.Component {
     }
 
     this.currentlySending = true
-    const full_content = this.contentSnapshot.compose(this.combinedDelta)
     // persist the change locally e.g. when we close the text box
     this.updateUiStoreSnapshot(full_content)
 
@@ -575,6 +595,19 @@ class RealtimeTextItem extends React.Component {
     // our combinedDelta won't clear out until we know it has successfully sent
     this.bufferDelta = new Delta()
     return this.combinedDelta
+  }
+
+  hotSwapQuillContent(quillData) {
+    const { quillEditor } = this
+    const { uiStore } = this.props
+    this.initiateHotSwap = false
+    // cleanly switch out editing to the persisted card
+    const range = quillEditor.getSelection() || {}
+    const index = range.index || 0
+    uiStore.clearTempTextCardItems({
+      hotSwapQuillContent: quillData,
+      hotSwapQuillPosition: index,
+    })
   }
 
   _instanceTextContentUpdate = () => {
@@ -778,12 +811,9 @@ class RealtimeTextItem extends React.Component {
     // this is for adjusting where the fully scaled toolbar appears above the card
     let leftAdjustToolbar = -16
     let topAdjustToolbar = -52
-    if (relativeZoomLevel > 2) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 33
-      topAdjustToolbar = -52 - Math.pow(relativeZoomLevel, 1.3) * 9
-    } else if (relativeZoomLevel > 1) {
-      leftAdjustToolbar = Math.pow(relativeZoomLevel, 1.5) * 24
-      topAdjustToolbar = Math.pow(relativeZoomLevel, 1.3) * -36
+    if (relativeZoomLevel > 1) {
+      leftAdjustToolbar = -186 + Math.pow(relativeZoomLevel, 0.8) * 164
+      topAdjustToolbar = -6 + Math.pow(relativeZoomLevel, 0.63) * -43
     }
 
     return (

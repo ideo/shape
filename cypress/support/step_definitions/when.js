@@ -581,14 +581,14 @@ When('I close the modal', () => {
 When('I click the info button for the first audience', index => {
   cy.locate('AudienceInfoButton')
     .first()
-    .click()
+    .click({ force: true })
   cy.wait(100)
 })
 
 When('I click the new query button for the first audience', index => {
   cy.locate('NewQueryButton')
     .first()
-    .click()
+    .click({ force: true })
   cy.wait(100)
 })
 

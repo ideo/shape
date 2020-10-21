@@ -109,7 +109,7 @@ export const StyledMenuWrapper = styled.div`
   }};
   padding: 10px;
   transition: left 120ms;
-  z-index: ${v.zIndex.aboveclickwrapper};
+  z-index: ${v.zIndex.aboveClickWrapper};
 
   ${props =>
     props.theme.isMobileFullScreen &&
@@ -220,6 +220,8 @@ StyledMenuToggle.defaultTypes = {
 }
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
+
+const DefaultWrapper = styled.div``
 
 export const StyledMenuButton = styled.button`
   text-transform: capitalize;
@@ -594,7 +596,7 @@ class PopoutMenu extends React.Component {
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
     const icon = this.buttonStyleIcon(buttonStyle)
-    const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
+    const Wrapper = isMobileFullScreen ? CornerPositioned : DefaultWrapper
 
     return (
       <Wrapper

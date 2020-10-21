@@ -324,6 +324,9 @@ export const StyledTopRightActions = styled.div`
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
+    &.open {
+      visibility: visible;
+    }
   }
 
   svg {

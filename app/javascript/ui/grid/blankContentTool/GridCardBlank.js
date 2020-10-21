@@ -315,6 +315,8 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     if (
+      // don't use this behavior for text item submissions as it behaves oddly
+      !parent.isSubmissionsCollection &&
       attrs.item_attributes &&
       attrs.item_attributes.type === ITEM_TYPES.TEXT
     ) {
@@ -325,6 +327,8 @@ class GridCardBlank extends React.Component {
         card.record = item
         // Creates a temporary card for the user to edit
         parent.tempTextCard = card
+        // unset this so it does not call placeholderCard.API_destroy() when closing BCT
+        uiStore.setBctPlaceholderCard(null)
         uiStore.closeBlankContentTool({ force: true })
       })
       // For text cards to be available immediately, don't await this

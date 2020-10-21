@@ -536,6 +536,7 @@ class MovableGridCard extends React.Component {
       activeDragTarget,
       currentlyZooming,
       shouldOpenMoveSnackbar,
+      textEditingCardId,
       isTouchDevice,
       isCypress,
     } = uiStore
@@ -543,7 +544,10 @@ class MovableGridCard extends React.Component {
     let _zIndex = 1
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
-    let disableDragging = !canEditCollection || card.isPinnedAndLocked
+    let disableDragging =
+      !canEditCollection ||
+      card.isPinnedAndLocked ||
+      textEditingCardId === card.id
     const { currentUser } = uiStore.apiStore
     const isSuperAdmin = currentUser && currentUser.is_super_admin
     if (isSuperAdmin) {
@@ -612,6 +616,7 @@ class MovableGridCard extends React.Component {
       canEditCollection &&
       uiStore.selectedArea.minX === null &&
       (isSuperAdmin || !card.isPinnedAndLocked) &&
+      card.persisted &&
       card.record &&
       !card.record.isChart &&
       !card.record.isGenericFile &&

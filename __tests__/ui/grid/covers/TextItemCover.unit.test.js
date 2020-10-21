@@ -147,6 +147,8 @@ describe('TextItemCover', () => {
             item.persisted = false
             component.cancel({ item, ev: e })
             expect(item.API_updateWithoutSync).not.toHaveBeenCalled()
+            // should clear out temp items
+            expect(uiStore.clearTempTextCardItems).toHaveBeenCalled()
           })
         })
 

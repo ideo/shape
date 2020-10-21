@@ -48,7 +48,7 @@ const TextItemToolbar = props => (
       <StyledButton
         className="ql-size ql-format-reg"
         value=""
-        onClick={props.toggleSize(null)}
+        onClick={props.toggleSize && props.toggleSize(null)}
       >
         b
       </StyledButton>
