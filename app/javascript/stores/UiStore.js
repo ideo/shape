@@ -1568,10 +1568,18 @@ export default class UiStore {
       if (linkCrumb.inMyCollection) {
         this.linkedInMyCollection = true
       }
-      return _.uniqBy(
-        linkedBreadcrumbTrail.concat(breadcrumb.slice(foundIdx + 1)),
-        'id'
+      // retain the breadcrumb trail that you're linking from, concat with the linking point
+      const combined = linkedBreadcrumbTrail.concat(
+        breadcrumb.slice(foundIdx + 1)
       )
+      const foundCount = _.filter(combined, { id: record.id }).length
+      if (foundCount > 1) {
+        // if we've looped back around (current record was linked further up the trail)
+        // reset rather than show Collection X -> Link -> Collection X
+        this.linkedBreadcrumbTrail.replace([])
+        return breadcrumb
+      }
+      return combined
     } else {
       // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
       this.linkedBreadcrumbTrail.replace([])
