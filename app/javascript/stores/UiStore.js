@@ -1113,6 +1113,20 @@ export default class UiStore {
     }
   }
 
+  broadcastCursorPosition = coordinates => {
+    const { viewingCollection } = this
+    if (!viewingCollection) {
+      return
+    }
+    const channel = ChannelManager.getChannel(
+      COLLECTION_CHANNEL_NAME,
+      viewingCollection.id
+    )
+    if (channel) {
+      channel.perform('cursor', { coordinates })
+    }
+  }
+
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
     const filteredCards = this.apiStore
       .findAll('collection_cards')

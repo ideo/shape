@@ -1,10 +1,11 @@
 module RealtimeEditorsViewers
   extend ActiveSupport::Concern
 
-  def received_changes(data, user = nil)
+  def received_changes(data, user = nil, include_all_collaborators: true)
     publish_to_channel(
       current_editor: user ? user.as_json : {},
       data: data,
+      include_all_collaborators: include_all_collaborators,
     )
   end
 
@@ -50,14 +51,20 @@ module RealtimeEditorsViewers
   private
 
   def publish_to_channel(merge_data = {})
+    include_all_collaborators = merge_data.delete :include_all_collaborators
     defaults = {
       current_editor: {},
-      collaborators: channel_collaborators,
-      num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
     }
-    data = defaults.merge!(merge_data)
+    data = defaults
+    if include_all_collaborators
+      data = data.merge!(
+        collaborators: channel_collaborators,
+        num_viewers: num_viewers,
+      )
+    end
+    data = data.merge!(merge_data)
     ActionCable.server.broadcast stream_name, data
   end
 

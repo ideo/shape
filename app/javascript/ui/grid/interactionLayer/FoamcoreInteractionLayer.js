@@ -273,11 +273,11 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    const coords = coordinatesForPosition({
+    const rawCoords = {
       x: clientX - rect.left,
       y: clientY - rect.top,
-    })
-
+    }
+    const coords = coordinatesForPosition(rawCoords)
     const { cardMatrix } = this.props.collection
     const { row, col } = coords
 

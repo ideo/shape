@@ -353,17 +353,25 @@ class CollectionPage extends React.Component {
     if (collection.id !== data.record_id) {
       return
     }
+
     if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
       // don't reload your own updates
       return
     }
 
     // set collaborators on this collection
-    collection.setCollaborators(collaborators)
+    if (_.isArray(collaborators)) {
+      collection.setCollaborators(collaborators)
+    }
 
     const updateData = data.data
-    if (updateData && !updateData.text_item && !updateData.cards_selected) {
-      // don't show editor for text item updates, might be overkill
+    if (
+      updateData &&
+      !updateData.coordinates &&
+      !updateData.text_item &&
+      !updateData.cards_selected
+    ) {
+      // don't show editor pill for small updates: cursor, text, selected cards
       this.setEditor(current_editor)
     }
     if (!updateData || updateData.reload_cards) {

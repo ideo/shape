@@ -70,6 +70,13 @@ export default class CollectionCollaborationService {
         this.setCollaborator(card, current_editor)
       })
     }
+    if (updateData.coordinates) {
+      const { coordinates } = updateData
+      collection.setCollaboratorCursorPosition({
+        collaboratorId: current_editor.id,
+        coordinates,
+      })
+    }
     if (updateData.num_viewers_changed) {
       // TODO: update collaborators here?
       // uiStore.update('collaborators' ...)
