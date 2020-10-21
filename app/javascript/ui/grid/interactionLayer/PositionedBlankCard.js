@@ -47,6 +47,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     return 1
   }};
   z-index: ${props =>
+    // NOTE: changing this `1` value z-index can break the drag-n-drop upload!
     _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 1};
 `
 

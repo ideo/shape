@@ -25,6 +25,11 @@ jest.mock('../../../../app/javascript/stores/jsonApi/Item', () =>
 )
 
 let props, wrapper, replacingCard, component
+const rerender = () => {
+  wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+  component = wrapper.instance()
+}
+
 beforeEach(() => {
   CollectionCard.mockClear()
   replacingCard = fakeCollectionCard
@@ -33,8 +38,7 @@ beforeEach(() => {
     apiStore: fakeApiStore({ findResult: replacingCard }),
     parent: { id: 1 },
   }
-  wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
-  component = wrapper.instance()
+  rerender()
   FilestackUpload.pickImage = jest
     .fn()
     .mockReturnValue(Promise.resolve({ filesUploaded: [] }))
@@ -82,9 +86,31 @@ describe('GridCardBlank', () => {
       it('synchronously calls API_create with TextItem onClick handler', () => {
         component.createTextItem()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
+        expect(wrapper.state().loading).toBeFalsy()
         // should clear this out before closing
         expect(props.uiStore.setBctPlaceholderCard).toHaveBeenCalledWith(null)
         expect(props.uiStore.closeBlankContentTool).toHaveBeenCalled()
+        // should mark tempTextCard
+        expect(props.parent.tempTextCard.record).toEqual(expect.any(Object))
+        expect(props.parent.tempTextCard.parent).toEqual(props.parent)
+      })
+
+      describe('with submissionsCollection', () => {
+        beforeEach(() => {
+          props.parent.isSubmissionsCollection = true
+          rerender()
+        })
+        afterEach(() => {
+          props.parent.isSubmissionsCollection = false
+        })
+
+        it('calls async API_create with TextItem onClick handler', async () => {
+          await component.createTextItem()
+          expect(wrapper.state().loading).toBeTruthy()
+          expect(mockCardMethods.API_create).toHaveBeenCalled()
+          // should not create this
+          expect(props.parent.tempTextCard).toBeFalsy()
+        })
       })
 
       it('calls API_create when creating', async () => {
@@ -103,7 +129,7 @@ describe('GridCardBlank', () => {
         height: 1,
         emptyCollection: true,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('does not render the close button', () => {
@@ -120,7 +146,7 @@ describe('GridCardBlank', () => {
         height: 1,
         replacingId,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('only renders video and image content creation buttons', () => {
@@ -150,7 +176,7 @@ describe('GridCardBlank', () => {
       props.uiStore.viewingCollection = {
         maxColumnIndex: 15,
       }
-      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      rerender()
       component = wrapper.instance()
       // mock this to test how it is called
       component.createCard = jest.fn()

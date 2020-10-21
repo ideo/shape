@@ -109,7 +109,7 @@ export const StyledMenuWrapper = styled.div`
   }};
   padding: 10px;
   transition: left 120ms;
-  z-index: ${v.zIndex.aboveclickwrapper};
+  z-index: ${v.zIndex.aboveClickWrapper};
 
   ${props =>
     props.theme.isMobileFullScreen &&
