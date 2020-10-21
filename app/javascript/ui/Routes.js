@@ -90,6 +90,10 @@ class Routes extends React.Component {
     super(props)
     this.mouseDownAt = { x: null, y: null }
     this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
+    this.throttledCalculateGridCursorPosition = _.throttle(
+      this._calculateGridCursorPosition,
+      25
+    )
   }
 
   componentDidMount() {
@@ -142,7 +146,7 @@ class Routes extends React.Component {
   }
 
   handleMouseMoveSelection = e => {
-    this.calculateGridCursorPosition(e)
+    this.throttledCalculateGridCursorPosition(e)
 
     // Return if mouse is only scrolling, not click-dragging
     if (!this.mouseDownAt.x) return
@@ -170,7 +174,7 @@ class Routes extends React.Component {
     )
   }
 
-  calculateGridCursorPosition = e => {
+  _calculateGridCursorPosition = e => {
     const { uiStore } = this.props
     const { relativeZoomLevel } = uiStore
     let rect = { left: 0, top: 0 }
