@@ -198,6 +198,7 @@ export default class UiStore {
   @observable
   // have to track this e.g. if you are editing the original or link card (same item)
   textEditingCardId = null
+  hotSwapQuillPosition = null
   @observable
   overdueBannerVisible = true
   @observable
@@ -357,7 +358,7 @@ export default class UiStore {
   @action
   openTouchActionMenu(cardId) {
     this.touchActionMenuOpenId = cardId
-    this.clearTextEditingItem()
+    this.clearTextEditingCard()
   }
 
   @action
@@ -972,8 +973,9 @@ export default class UiStore {
       record &&
       this.viewingRecord.id === record.id &&
       this.viewingRecord.internalType === record.internalType
-    )
+    ) {
       return
+    }
     if (this.viewingRecord) {
       this.previousViewingRecord = this.viewingRecord
       // clear out previous collaborators
@@ -1030,12 +1032,22 @@ export default class UiStore {
   }
 
   @action
-  clearTempTextCardItems() {
+  clearTempTextCardItems({
+    hotSwapQuillContent = null,
+    hotSwapQuillPosition = 0,
+  } = {}) {
     const { viewingCollection } = this
-    if (viewingCollection) {
-      viewingCollection.tempTextCard = null
-      viewingCollection.newPersistedTextCard = null
+    if (!viewingCollection) return
+
+    const { newPersistedTextCard } = viewingCollection
+    if (newPersistedTextCard && hotSwapQuillContent) {
+      // swap out the temp text card (currently editing) for the persisted one
+      newPersistedTextCard.record.quill_data = hotSwapQuillContent
+      this.hotSwapQuillPosition = hotSwapQuillPosition
+      this.setTextEditingCard(newPersistedTextCard)
     }
+    viewingCollection.tempTextCard = null
+    viewingCollection.newPersistedTextCard = null
   }
 
   @action
@@ -1556,10 +1568,18 @@ export default class UiStore {
       if (linkCrumb.inMyCollection) {
         this.linkedInMyCollection = true
       }
-      return _.uniqBy(
-        linkedBreadcrumbTrail.concat(breadcrumb.slice(foundIdx + 1)),
-        'id'
+      // retain the breadcrumb trail that you're linking from, concat with the linking point
+      const combined = linkedBreadcrumbTrail.concat(
+        breadcrumb.slice(foundIdx + 1)
       )
+      const foundCount = _.filter(combined, { id: record.id }).length
+      if (foundCount > 1) {
+        // if we've looped back around (current record was linked further up the trail)
+        // reset rather than show Collection X -> Link -> Collection X
+        this.linkedBreadcrumbTrail.replace([])
+        return breadcrumb
+      }
+      return combined
     } else {
       // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
       this.linkedBreadcrumbTrail.replace([])

@@ -60,10 +60,10 @@ const QuadrantIconHolder = styled.div`
 `
 
 const More = styled.button`
-  bottom: 6px;
-  height: ${props => 28 * props.zoomLevel}px;
-  right: 6px;
   position: absolute;
+  bottom: 6px;
+  right: 6px;
+  height: ${props => 28 * props.zoomLevel}px;
   width: ${props => 28 * props.zoomLevel}px;
   z-index: ${props => (props.currentMenuOpen ? v.zIndex.gridCardTop : 1)};
 

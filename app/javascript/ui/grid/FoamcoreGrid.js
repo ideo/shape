@@ -25,7 +25,6 @@ const Grid = styled.div`
   position: relative;
   width: ${props => `${props.width}px`};
   height: ${props => `${props.height}px`};
-  z-index: ${props => props.zIndex};
 `
 
 function getMapKey({ col, row }) {
@@ -1100,8 +1099,6 @@ class FoamcoreGrid extends React.Component {
         className={`${FOAMCORE_GRID_BOUNDARY}${
           isSplitLevelBottom ? '-bottom' : ''
         }`}
-        // make top Grid a higher z-index so its actionmenu/dropdowns can appear over the bottom grid
-        zIndex={isSplitLevelBottom ? 1 : 2}
         data-empty-space-click
         ref={ref => {
           this.gridRef = ref
