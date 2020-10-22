@@ -8,10 +8,10 @@ import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
 import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
-import { SketchPicker } from 'react-color'
 
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
+import ColorPicker from '~/ui/global/ColorPicker'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
 import QuillClipboard from '~/ui/global/QuillClipboard'
@@ -876,13 +876,9 @@ class RealtimeTextItem extends React.Component {
                 activeSizeFormat={this.activeSizeFormat}
               />
               {this.colorPickerOpen && (
-                <SketchPicker
+                <ColorPicker
                   color={item.background_color || '#000000'}
                   onChangeComplete={this.onSelectColor}
-                  presetColors={[
-                    { color: 'transparent', title: 'Transparent' },
-                    { color: 'red', title: 'Red' },
-                  ]}
                 />
               )}
             </Fragment>
