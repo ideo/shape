@@ -61,7 +61,7 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      width: 220px;
+      width: 250px;
       padding-bottom: 26px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
@@ -717,23 +717,21 @@ class RealtimeTextItem extends React.Component {
 
   onSelectColor = async colorData => {
     const { item } = this.props
-    console.log('select color', colorData)
     item.background_color = colorData.hex
     item.background_color_opacity = colorData.rgb.a
-    // await item.save()
     runInAction(() => {
       this.colorPickerOpen = false
     })
     this.sendBackgroundColorChange({
-      background_color: item.background_color,
-      background_color_opacity: item.background_color_opacity,
+      color: item.background_color,
+      opacity: item.background_color_opacity,
     })
   }
 
-  sendBackgroundColorChange(color, opacity) {
+  sendBackgroundColorChange({ color, opacity } = {}) {
     this.socketSend('background_color', {
-      backgroundColor: color,
-      backgroundColorOpacity: opacity,
+      background_color: color,
+      background_color_opacity: opacity,
     })
   }
 

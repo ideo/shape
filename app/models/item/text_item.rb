@@ -114,7 +114,7 @@ class Item
       )
     end
 
-    def save_and_broadcast_background(data, user)
+    def save_and_broadcast_background(user, data)
       self.background_color = data.background_color
       self.background_color_opacity = data.background_color_opacity
       save
