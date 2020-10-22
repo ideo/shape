@@ -5,6 +5,9 @@ import { SketchPicker } from 'react-color'
 import v from '~/utils/variables'
 
 const ColorPickerStyleWrapper = styled.div`
+  position: relative;
+  z-index: ${v.zIndex.aboveClickWrapper};
+
   .sketch-picker {
     font-family: ${v.fonts.sans};
   }
@@ -43,11 +46,12 @@ const ColorPicker = props => (
 
 ColorPicker.propTypes = {
   color: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onChangeComplete: PropTypes.func,
 }
 
 ColorPicker.defaultProps = {
+  onChange: () => {},
   onChangeComplete: () => {},
 }
 
