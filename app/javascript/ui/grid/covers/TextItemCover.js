@@ -22,6 +22,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
       : 'none'};
   background: ${props => {
     const { hasTitleText, isTransparent, uneditable } = props
+    if (props.backgroundColor) return props.backgroundColor
     if (hasTitleText && uneditable) {
       // for carousel covers w/ title text
       return `${v.colors.white}`
@@ -284,7 +285,7 @@ class TextItemCover extends React.Component {
 
   render() {
     const { isEditing, hasTitleText, props } = this
-    const { isTransparent, uneditable } = props
+    const { isTransparent, item, uneditable } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
 
     return (
@@ -300,6 +301,7 @@ class TextItemCover extends React.Component {
         isTransparent={isTransparent}
         uneditable={uneditable}
         isEditing={isEditing}
+        backgroundColor={item.background_color}
       >
         <QuillStyleWrapper
           notEditing={!isEditing}

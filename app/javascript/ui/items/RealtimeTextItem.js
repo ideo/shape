@@ -720,16 +720,14 @@ class RealtimeTextItem extends React.Component {
     console.log('select color', colorData)
     item.background_color = colorData.hex
     item.background_color_opacity = colorData.rgb.a
-    await item.save()
+    // await item.save()
     runInAction(() => {
       this.colorPickerOpen = false
     })
-    // Send color updates once they complete, but not too many to avoid flashing
-    // cards
-    this.throttleSendBackgroundColorChange(
-      item.background_color,
-      item.background_color_opacity
-    )
+    this.sendBackgroundColorChange({
+      background_color: item.background_color,
+      background_color_opacity: item.background_color_opacity,
+    })
   }
 
   sendBackgroundColorChange(color, opacity) {

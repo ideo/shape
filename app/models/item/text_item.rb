@@ -114,6 +114,14 @@ class Item
       )
     end
 
+    def save_and_broadcast_background(data, user)
+      self.background_color = data.background_color
+      self.background_color_opacity = data.background_color_opacity
+      save
+
+      received_changes(data, user)
+    end
+
     def threadlocked_transform_realtime_delta(user, data)
       RedisClassy.redis = Cache.client
       lock_name = "rt_text_id_#{id}"
