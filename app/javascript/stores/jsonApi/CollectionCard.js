@@ -273,7 +273,9 @@ class CollectionCard extends BaseRecord {
       uiStore.trackEvent('replace', this.parentCollection)
       // can get rid of this temp model
       this.apiStore.remove(this)
-      return res.data
+      const card = res.data
+      card.stopReplacing()
+      return card
     } catch (e) {
       console.warn(e)
       uiStore.closeBlankContentTool({ force: true })
