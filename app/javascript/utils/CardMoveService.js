@@ -113,7 +113,7 @@ export default class CardMoveService {
           }
           res = await apiStore.createTemplateInstance({
             data,
-            template: toCollection,
+            template: movingFromCollection,
           })
           successMessage = 'Your template instance has been created!'
           break

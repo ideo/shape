@@ -72,7 +72,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   container: () => ({}),
   control: () => ({
     paddingBottom: '3px',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     marginBottom: '-5px',
     paddingLeft: '24px',
     display: 'flex',
@@ -121,7 +121,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   placeholder: base => ({
     ...base,
     paddingTop: '0px',
-    paddingBottom: '12px',
+    paddingBottom: '5px',
   }),
   singleValue: () => ({}),
   valueContainer: () => ({}),
@@ -214,7 +214,7 @@ const SelectWrapped = props => {
 
 const styles = theme => ({
   root: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     flexGrow: 1,
     height: 30,
     paddingTop: '8px',
@@ -229,6 +229,8 @@ const styles = theme => ({
     paddingTop: 0,
   },
   input: {
+    backgroundColor: 'transparent',
+    height: '11px',
     paddingBottom: '20px',
     paddingTop: '0px',
   },
@@ -267,9 +269,11 @@ class AutoComplete extends React.Component {
   }
 
   handleOnInputChange = (inputValue, action) => {
+    const { onInputChange } = this.props
     if (action.action !== 'input-blur' && action.action !== 'menu-close') {
       this.setState({ inputValue })
     }
+    if (onInputChange) onInputChange(inputValue)
   }
 
   render() {
@@ -287,22 +291,27 @@ class AutoComplete extends React.Component {
       menuStyles,
       onMenuClose,
       numOptionsToShow,
+      searchValueOverride,
+      disableUnderline,
     } = this.props
     const { option, inputValue } = this.state
+    const searchValue = searchValueOverride || inputValue
     return (
       <div className={classes.root}>
         <Input
+          disableUnderline={!!disableUnderline}
           fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             autoFocus,
             classes,
+            disableUnderline: !!disableUnderline,
             menuStyles,
             numOptionsToShow,
             multi: true,
             value: keepSelectedOptions ? option : null,
             defaultOptions,
-            inputValue,
+            inputValue: searchValue,
             options,
             optionSearch,
             onChange: this.handleChange,
@@ -345,6 +354,7 @@ AutoComplete.propTypes = {
     })
   ),
   onOptionSelect: PropTypes.func.isRequired,
+  onInputChange: PropTypes.func,
   optionSearch: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
   placeholder: PropTypes.string,
@@ -352,8 +362,10 @@ AutoComplete.propTypes = {
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
+  searchValueOverride: PropTypes.string,
   numOptionsToShow: PropTypes.number,
   onMenuClose: PropTypes.func,
+  disableUnderline: PropTypes.bool,
   menuStyles: PropTypes.shape({
     width: PropTypes.string,
     zIndex: PropTypes.number,
@@ -364,6 +376,7 @@ AutoComplete.defaultProps = {
   autoFocus: false,
   onSelect: () => {},
   keepSelectedOptions: false,
+  onInputChange: null,
   creatable: false,
   placeholder: '',
   value: undefined,
@@ -371,8 +384,10 @@ AutoComplete.defaultProps = {
   defaultOptions: [],
   optionSearch: null,
   menuPlacement: 'bottom',
+  searchValueOverride: null,
   keepMenuClosed: false,
   numOptionsToShow: 3.5,
+  disableUnderline: false,
   onMenuClose: () => {},
   menuStyles: {
     width: '370px',

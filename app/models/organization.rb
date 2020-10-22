@@ -6,6 +6,7 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  billable                              :boolean          default(FALSE)
+#  cached_attributes                     :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
@@ -54,6 +55,9 @@ class Organization < ApplicationRecord
   include Externalizable
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
+
+  store_accessor :cached_attributes,
+                 :cached_5_most_used_template_ids
 
   has_many :collections, dependent: :destroy
   has_many :items, through: :collections, dependent: :destroy
@@ -168,7 +172,7 @@ class Organization < ApplicationRecord
     profile.archive! if profile.present?
 
     # Remove last_active_at for org they are being removed from
-    timestamps = user.last_active_at.except(self.id.to_s)
+    timestamps = user.last_active_at.except(id.to_s)
     user.update_columns(last_active_at: timestamps)
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
@@ -379,6 +383,38 @@ class Organization < ApplicationRecord
 
   def default_locale
     default_locale_in_database
+  end
+
+  def cache_most_used_template_ids!
+    self.cached_5_most_used_template_ids = most_used_template_ids || []
+    if cached_5_most_used_template_ids.count < 5
+      templates_alpha_order = Collection
+                              .where(
+                                master_template: true,
+                                organization_id: id,
+                              )
+                              .joins(roles: :groups_roles)
+                              .where(GroupsRole.arel_table[:group_id].eq(
+                                       primary_group.id,
+                                     ))
+                              .order(:name)
+                              .first(5 - cached_5_most_used_template_ids.count)
+                              .pluck(:id)
+      self.cached_5_most_used_template_ids += templates_alpha_order
+    end
+    save
+  end
+
+  def most_used_template_ids(amount = 5)
+    Activity.where(organization: id, action: :template_used)
+            .joins(collection: [roles: :groups_roles])
+            .where(GroupsRole.arel_table[:group_id].eq(primary_group.id))
+            .where(Collection.arel_table[:archived].eq(false))
+            .group(:collection)
+            .order('count_id desc')
+            .count('id')
+            .first(amount)
+            .map { |arr| arr[0].id }
   end
 
   private

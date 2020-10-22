@@ -48,6 +48,7 @@ class ActivityAndNotificationBuilder < SimpleService
 
     create_activity
     cache_activity_count_and_reindex
+    cache_most_used_organization_templates if @action == :template_used
     return unless @should_notify && @activity&.should_notify?
 
     create_notifications_async
@@ -92,6 +93,10 @@ class ActivityAndNotificationBuilder < SimpleService
     ids += [@target.id] if @target.is_a?(Collection)
     # reindex for boosting search results by activity_count
     Collection.reindex_async(ids)
+  end
+
+  def cache_most_used_organization_templates
+    @organization.cache_most_used_template_ids!
   end
 
   def create_notifications_async

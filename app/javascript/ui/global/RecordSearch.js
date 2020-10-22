@@ -1,9 +1,13 @@
 import _ from 'lodash'
+import { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
+import { apiStore } from '~/stores'
 import AutoComplete from '~/ui/global/AutoComplete'
 import trackError from '~/utils/trackError'
+import v from '~/utils/variables'
 
 function formatCollections(collections) {
   return collections.map(collection => ({
@@ -13,80 +17,108 @@ function formatCollections(collections) {
   }))
 }
 
-@inject('apiStore')
-@observer
-class RecordSearch extends React.Component {
-  constructor(props) {
-    super(props)
-    this.debouncedSearch = _.debounce((term, callback) => {
-      if (!term) {
-        callback()
-        return
-      }
-      const tags = props.searchTags.map(tag => `#${tag}`).join(' ')
-      const params = _.merge(
-        {
-          query: _.trim(`${term} ${tags}`),
-          per_page: 30,
-        },
-        props.searchParams
-      )
-      props.apiStore
-        .searchCollections(params)
-        .then(res => _.map(res.data, 'record').filter(props.searchFilter))
-        .then(records =>
-          props.onSearch
-            ? props.onSearch(records)
-            : callback(formatCollections(records))
-        )
-        .catch(e => {
-          trackError(e)
-        })
-    }, 350)
-  }
+const AutoCompleteWrapper = styled.div`
+  width: 100%;
 
-  componentDidMount() {
-    const { initialLoadAmount } = this.props
-    if (initialLoadAmount > 0) {
-      this.debouncedSearch(' ')
+  ${props =>
+    props.smallSearchStyle &&
+    `
+    max-width: 350px;
+    #react-select-chip {
+      background-color: ${v.colors.commonLight} !important;
+      border-radius: 18px !important;
     }
+  `}
+`
+
+const RecordSearch = ({
+  controlled,
+  initialLoadAmount,
+  onInputChange,
+  onSearch,
+  onSelect,
+  searchFilter,
+  searchTags,
+  searchParams,
+  smallSearchStyle,
+  text,
+}) => {
+  const handleSearch = (value, callback) => debouncedSearch(value, callback)
+  const debouncedSearch = _.debounce((term, callback) => {
+    if (!term) {
+      callback()
+      return
+    }
+    const tags = searchTags.map(tag => `#${tag}`).join(' ')
+    const params = _.merge(
+      {
+        query: _.trim(`${term} ${tags}`),
+        per_page: 30,
+      },
+      searchParams
+    )
+    apiStore
+      .searchCollections(params)
+      .then(res => _.map(res.data, 'record').filter(searchFilter))
+      .then(records => {
+        if (onSearch) {
+          onSearch(records)
+          _.isFunction(callback) && callback()
+        } else {
+          callback(formatCollections(records))
+        }
+      })
+      .catch(e => {
+        trackError(e)
+      })
+  }, 350)
+
+  if (initialLoadAmount > 0) {
+    useEffect(() => {
+      debouncedSearch(' ')
+    }, [])
   }
 
-  onSearch = (value, callback) => this.debouncedSearch(value, callback)
-
-  render() {
-    return (
+  return (
+    <AutoCompleteWrapper smallSearchStyle={smallSearchStyle}>
       <AutoComplete
         options={[]}
-        optionSearch={this.onSearch}
-        onOptionSelect={option => this.props.onSelect(option)}
+        optionSearch={handleSearch}
+        onOptionSelect={option => onSelect(option)}
         placeholder="Collection name"
         style={{ display: 'inline-block' }}
-        keepMenuClosed={!!this.props.onSearch}
+        keepMenuClosed={!!onSearch}
+        searchValueOverride={controlled ? text : null}
+        onInputChange={controlled ? onInputChange : null}
+        disableUnderline={smallSearchStyle}
       />
-    )
-  }
+    </AutoCompleteWrapper>
+  )
 }
 
 RecordSearch.propTypes = {
   onSelect: PropTypes.func.isRequired,
+  controlled: PropTypes.bool,
+  onInputChange: PropTypes.func,
   onSearch: PropTypes.func,
   initialLoadAmount: PropTypes.number,
   searchFilter: PropTypes.func,
   searchTags: PropTypes.arrayOf(PropTypes.string),
   searchParams: MobxPropTypes.objectOrObservableObject,
-}
-
-RecordSearch.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  smallSearchStyle: PropTypes.bool,
+  text: PropTypes.string,
 }
 
 RecordSearch.defaultProps = {
-  onSearch: null,
+  controlled: false,
   initialLoadAmount: 0,
+  onInputChange: null,
+  onSearch: null,
   searchFilter: r => r,
   searchTags: [],
   searchParams: null,
+  smallSearchStyle: false,
+  text: null,
 }
 
 export default RecordSearch
