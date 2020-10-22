@@ -26,6 +26,11 @@ class ItemRealtimeChannel < ApplicationCable::Channel
     item.received_changes(data, current_user)
   end
 
+  def background_color(data)
+    return reject if item.nil?
+    item.received_changes(data, current_user)
+  end
+
   private
 
   def item

@@ -2,6 +2,7 @@ import ReactDOMServer from 'react-dom/server'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
+import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
 import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -85,6 +86,12 @@ const TextItemToolbar = props => (
         <LinkIcon />
       </StyledButton>
 
+      {props.onColorChange && (
+        <StyledButton onClick={ev => props.onColorChange(ev)}>
+          <ColorPickerIcon />
+        </StyledButton>
+      )}
+
       {props.onComment && (
         <StyledButton onClick={props.onComment}>
           <CommentIcon />
@@ -103,6 +110,7 @@ TextItemToolbar.propTypes = {
   onComment: PropTypes.func,
   toggleSize: PropTypes.func,
   toggleHeader: PropTypes.func,
+  onColorChange: PropTypes.func,
   activeSizeFormat: PropTypes.string,
 }
 TextItemToolbar.defaultProps = {
@@ -110,6 +118,7 @@ TextItemToolbar.defaultProps = {
   onComment: null,
   toggleSize: null,
   toggleHeader: null,
+  onColorChange: null,
   activeSizeFormat: null,
 }
 

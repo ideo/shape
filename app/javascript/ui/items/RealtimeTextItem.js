@@ -1,12 +1,14 @@
 import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { action, observable, toJS } from 'mobx'
+import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
 import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
+import { SketchPicker } from 'react-color'
 
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
@@ -133,6 +135,8 @@ class RealtimeTextItem extends React.Component {
   initiateHotSwap = false
   @observable
   activeSizeFormat = null
+  @observable
+  colorPickerOpen = false
 
   constructor(props) {
     super(props)
@@ -144,6 +148,10 @@ class RealtimeTextItem extends React.Component {
       30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
+    this.throttleSendBackgroundColorChange = _.throttle(
+      this.sendBackgroundColorChange,
+      1000
+    )
     this.quillData = this.initialQuillData()
   }
 
@@ -700,6 +708,37 @@ class RealtimeTextItem extends React.Component {
     this.checkActiveSizeFormat()
   }
 
+  onColorPickerOpen = ev => {
+    ev.preventDefault()
+    runInAction(() => {
+      this.colorPickerOpen = !this.colorPickerOpen
+    })
+  }
+
+  onSelectColor = async colorData => {
+    const { item } = this.props
+    console.log('select color', colorData)
+    item.background_color = colorData.hex
+    item.background_color_opacity = colorData.rgb.a
+    await item.save()
+    runInAction(() => {
+      this.colorPickerOpen = false
+    })
+    // Send color updates once they complete, but not too many to avoid flashing
+    // cards
+    this.throttleSendBackgroundColorChange(
+      item.background_color,
+      item.background_color_opacity
+    )
+  }
+
+  sendBackgroundColorChange(color, opacity) {
+    this.socketSend('background_color', {
+      backgroundColor: color,
+      backgroundColorOpacity: opacity,
+    })
+  }
+
   checkForTitleText = () => {
     const { uiStore } = this.props
     let hasTitle = false
@@ -829,13 +868,26 @@ class RealtimeTextItem extends React.Component {
           topAdjust={topAdjustToolbar}
         >
           {canEdit && (
-            <TextItemToolbar
-              onExpand={onExpand}
-              toggleSize={this.toggleSize}
-              toggleHeader={this.toggleHeader}
-              onComment={this.onComment}
-              activeSizeFormat={this.activeSizeFormat}
-            />
+            <Fragment>
+              <TextItemToolbar
+                onExpand={onExpand}
+                toggleSize={this.toggleSize}
+                toggleHeader={this.toggleHeader}
+                onComment={this.onComment}
+                onColorChange={this.onColorPickerOpen}
+                activeSizeFormat={this.activeSizeFormat}
+              />
+              {this.colorPickerOpen && (
+                <SketchPicker
+                  color={item.background_color || '#000000'}
+                  onChangeComplete={this.onSelectColor}
+                  presetColors={[
+                    { color: 'transparent', title: 'Transparent' },
+                    { color: 'red', title: 'Red' },
+                  ]}
+                />
+              )}
+            </Fragment>
           )}
           <CloseButton
             data-cy="TextItemClose"
