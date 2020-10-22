@@ -42,7 +42,7 @@ const ColorPicker = props => (
 )
 
 ColorPicker.propTypes = {
-  color: PropTypes.string.isRequired,
+  color: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   onChange: PropTypes.func.isRequired,
   onChangeComplete: PropTypes.func,
 }

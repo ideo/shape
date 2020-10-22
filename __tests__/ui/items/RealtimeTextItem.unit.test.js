@@ -4,6 +4,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
+import ColorPicker from '~/ui/global/ColorPicker'
 import ChannelManager from '~/utils/ChannelManager'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
@@ -54,9 +55,32 @@ describe('RealtimeTextItem', () => {
     )
   })
 
+  describe('render()', () => {
+    describe('when color picker is open', () => {
+      beforeEach(() => {
+        props.item.can_edit_content = true
+        props.item.background_color = '#A85751'
+        props.item.background_color_opacity = 1
+        rerender()
+        component.colorPickerOpen = true
+        wrapper.update()
+      })
+
+      it('should render the ColorPicker', () => {
+        expect(wrapper.find(ColorPicker).exists()).toBe(true)
+      })
+
+      it('should give the color picker the background_color in rgb', () => {
+        const picker = wrapper.find(ColorPicker)
+        expect(picker.props().color).toEqual({ a: 1, b: 81, g: 87, r: 168 })
+      })
+    })
+  })
+
   describe('can view', () => {
     beforeEach(() => {
       props.item.can_edit = false
+      props.item.can_edit_content = false
       rerender()
     })
 
@@ -311,6 +335,22 @@ describe('RealtimeTextItem', () => {
           ops: [{ retain: 7 }, { insert: 'Hello, World.' }],
         })
       )
+    })
+  })
+
+  describe('onSelectColor', () => {
+    beforeEach(() => {
+      props.item.can_edit_content = true
+      rerender()
+      component.onSelectColor({
+        hex: '#83fa21',
+        rgb: { a: 0.35 },
+      })
+    })
+
+    it('should set the item background color and opacity', () => {
+      expect(props.item.background_color).toEqual('#83fa21')
+      expect(props.item.background_color_opacity).toEqual(0.35)
     })
   })
 })
