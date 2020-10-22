@@ -437,6 +437,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         post(path, params: params)
       end
 
+      it 'updates the users last 5 used templates' do
+        user.cached_last_5_used_template_ids = []
+        user.save
+        post(path, params: params)
+        expect(user.cached_last_5_used_template_ids.count).to eq 1
+      end
+
       context 'with collection name in params' do
         let(:params_with_name) do
           raw_params.merge(collection: { name: 'Awesomeness' }).to_json

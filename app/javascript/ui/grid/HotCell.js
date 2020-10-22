@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import localStorage from 'mobx-localstorage'
@@ -7,6 +8,7 @@ import styled from 'styled-components'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
+import RecordSearch from '~/ui/global/RecordSearch'
 import v from '~/utils/variables'
 
 const SLIDE_MS = 200
@@ -70,25 +72,38 @@ const CloseButton = styled.button`
 const DefaultWrapper = styled.div`
   height: 100%;
 `
+DefaultWrapper.displayName = 'DefaultWrapper'
 
-const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
-const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
-const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
+export const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
+export const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
+export const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
+export const HOT_CELL_DEFAULT_TEMPLATE_TYPE = 'HotCellDefaultTemplateType'
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class HotCell extends React.Component {
   @observable
   animated = false
   @observable
   moreMenuOpen = null
+  @observable
+  templateSearch = ''
+  @observable
+  templateSearchResults = []
 
   componentDidMount() {
     setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
   }
 
-  handleTypeClick = type => () => {
-    this.startCreating(type)
+  collectionIntoQudrant(collection) {
+    return {
+      name: 'useTemplate',
+      description: collection.name,
+      opts: {
+        templateName: collection.name,
+        templateId: collection.id,
+      },
+    }
   }
 
   handleClose = ev => {
@@ -99,21 +114,34 @@ class HotCell extends React.Component {
     }, SLIDE_MS)
   }
 
-  onCreateContent = type => {
+  onCreateContent = (type, opts) => {
     const { onCreateContent } = this.props
+    onCreateContent(type, opts)
+    const hotCellType = type
+    if (type === 'useTemplate') {
+      localStorage.setItem(HOT_CELL_DEFAULT_TEMPLATE_TYPE, {
+        name: 'useTemplate',
+        description: opts.templateName,
+        opts: {
+          templateId: opts.templateId,
+        },
+      })
+      return
+    }
     const collectionType = this.collectionTypes.find(
-      collectionType => collectionType.name === type
+      collectionType => collectionType.name === hotCellType
     )
-    const itemType = this.itemTypes.find(itemType => itemType.name === type)
-    onCreateContent(type)
+    const itemType = this.itemTypes.find(
+      itemType => itemType.name === hotCellType
+    )
     runInAction(() => {
       if (collectionType) {
-        localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, hotCellType)
       } else if (itemType) {
-        localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, hotCellType)
       }
       if (this.isSmallCard) {
-        localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, hotCellType)
       }
     })
   }
@@ -124,8 +152,17 @@ class HotCell extends React.Component {
 
   onMoreMenuClose = menuKey => {
     if (this.moreMenuOpen === menuKey) {
-      runInAction(() => (this.moreMenuOpen = null))
+      runInAction(() => {
+        this.moreMenuOpen = null
+        this.templateSearchResults = []
+      })
     }
+  }
+
+  onTemplateSearch = results => {
+    runInAction(() => {
+      this.templateSearchResults = _.take(results, 5)
+    })
   }
 
   get isSmallCard() {
@@ -158,7 +195,49 @@ class HotCell extends React.Component {
   }
 
   get templateTypes() {
-    return [{ description: 'Create New Template', name: 'template' }]
+    const { uiStore } = this.props
+    let templates = [
+      { description: 'Create New Template', name: 'template' },
+      {
+        name: 'component',
+        component: (
+          <RecordSearch
+            onSelect={this.onCreateContent}
+            onSearch={this.onTemplateSearch}
+            initialLoadAmount={0}
+            searchParams={{ master_template: true, per_page: 10 }}
+            smallSearchStyle={!uiStore.isTouchDevice}
+          />
+        ),
+      },
+      { description: 'Recently used templates', name: 'header' },
+    ]
+    if (this.templateSearchResults.length > 0) {
+      templates = [
+        templates[0],
+        templates[1],
+        ...this.templateSearchResults.map(this.collectionIntoQudrant),
+      ]
+      return templates
+    }
+    const {
+      apiStore: { currentUser, currentOrganization },
+    } = this.props
+    templates = [
+      ...templates,
+      ...currentUser.mostUsedTemplateCollections.map(
+        this.collectionIntoQudrant
+      ),
+    ]
+    // Should be 5 template options plus create new template
+    if (templates.length < 7) {
+      const orgTemplates = currentOrganization.most_used_templates || []
+      templates = [
+        ...templates,
+        ...orgTemplates.map(this.collectionIntoQudrant),
+      ]
+    }
+    return _.take(templates, 7)
   }
 
   get defaultEitherType() {
@@ -186,23 +265,34 @@ class HotCell extends React.Component {
     return this.itemTypes[0]
   }
 
+  get defaultTemplateType() {
+    const quickUseTemplate = localStorage.getItem(
+      HOT_CELL_DEFAULT_TEMPLATE_TYPE
+    )
+    if (quickUseTemplate) return quickUseTemplate
+    return {
+      name: 'template',
+      description: 'Templates',
+    }
+  }
+
   get expandedSubTypes() {
     return [
       { name: 'text', description: 'Add Text' },
       {
         description: 'Media',
         isCategory: true,
-        subTypes: () => this.itemTypes,
+        subTypes: this.itemTypes,
       },
       {
         description: 'Collections',
         isCategory: true,
-        subTypes: () => this.collectionTypes,
+        subTypes: this.collectionTypes,
       },
       {
         description: 'Template',
         isCategory: true,
-        subTypes: () => this.templateTypes,
+        subTypes: this.templateTypes,
       },
     ]
   }
@@ -219,17 +309,16 @@ class HotCell extends React.Component {
     const { uiStore, zoomLevel } = this.props
     let primaryTypes = [
       { name: 'text', description: 'Add Text' },
-      { ...this.defaultItemType, subTypes: () => this.itemTypes },
-      { ...this.defaultCollectionType, subTypes: () => this.collectionTypes },
+      { ...this.defaultItemType, subTypes: this.itemTypes },
+      { ...this.defaultCollectionType, subTypes: this.collectionTypes },
       {
-        name: 'template',
-        description: 'Templates',
-        subTypes: () => this.templateTypes,
+        ...this.defaultTemplateType,
+        subTypes: this.templateTypes,
       },
     ]
     if (this.isSmallCard) {
       primaryTypes = [
-        { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
+        { ...this.defaultBothType, subTypes: this.expandedSubTypes },
       ]
     }
     if (uiStore.isTouchDevice) {
@@ -242,7 +331,7 @@ class HotCell extends React.Component {
         {
           name: 'more',
           description: 'More',
-          subTypes: () => this.expandedSubTypes,
+          subTypes: this.expandedSubTypes,
         },
       ]
     }
@@ -250,7 +339,6 @@ class HotCell extends React.Component {
     const PositionWrapper = uiStore.isTouchDevice
       ? CornerPositioned
       : DefaultWrapper
-
     return (
       <PositionWrapper>
         <Container
@@ -301,6 +389,7 @@ HotCell.defaultProps = {
   rowIdx: 0,
 }
 HotCell.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

@@ -44,6 +44,12 @@ const Row = styled.div`
   position: relative;
 
   ${props =>
+    props.actionMenuOpen &&
+    `
+    z-index: ${v.zIndex.aboveClickWrapper + 1};
+  `}
+
+  ${props =>
     !props.selected &&
     `
     ${Column} .show-on-hover {
@@ -347,6 +353,7 @@ class ListCard extends React.Component {
 
     return (
       <Row
+        actionMenuOpen={this.menuOpen}
         onClick={this.handleRowClick}
         onContextMenu={this.handleContextMenu}
         selected={this.isSelected}

@@ -10,6 +10,12 @@ class SerializableOrganization < BaseJsonSerializer
   belongs_to :admin_group
   belongs_to :terms_text_item
 
+  has_many :most_used_templates do
+    data do
+      Collection.where(id: @object.cached_5_most_used_template_ids)
+    end
+  end
+
   attribute :filestack_file_url do
     @object&.primary_group&.avatar_url
   end
