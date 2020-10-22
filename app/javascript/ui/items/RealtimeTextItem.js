@@ -669,6 +669,13 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  handleWrapperClick = ev => {
+    ev.preventDefault()
+    runInAction(() => {
+      this.colorPickerOpen = false
+    })
+  }
+
   onComment = async e => {
     e.preventDefault()
     const { apiStore, uiStore, item } = this.props
@@ -726,10 +733,7 @@ class RealtimeTextItem extends React.Component {
     const { item } = this.props
     item.background_color = color
     item.background_color_opacity = opacity
-    runInAction(() => {
-      this.colorPickerOpen = false
-    })
-    this.sendBackgroundColorChange({
+    this.throttleSendBackgroundColorChange({
       color,
       opacity,
     })
@@ -884,7 +888,7 @@ class RealtimeTextItem extends React.Component {
               {this.colorPickerOpen && (
                 <ColorPicker
                   color={item.background_color || '#ffffff'}
-                  onChangeComplete={this.onSelectColor}
+                  onChange={this.onSelectColor}
                 />
               )}
             </Fragment>
@@ -900,6 +904,7 @@ class RealtimeTextItem extends React.Component {
         <QuillStyleWrapper
           hasTitleText={textEditingItemHasTitleText}
           fullPageView={fullPageView}
+          onClick={this.handleWrapperClick}
         >
           <ReactQuill
             {...quillProps}

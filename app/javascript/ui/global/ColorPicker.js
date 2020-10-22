@@ -31,6 +31,7 @@ const ColorPicker = props => (
   <ColorPickerStyleWrapper>
     <SketchPicker
       color={props.color}
+      onChange={props.onChange}
       onChangeComplete={props.onChangeComplete}
       presetColors={[
         { color: 'transparent', title: 'Transparent' },
@@ -42,7 +43,12 @@ const ColorPicker = props => (
 
 ColorPicker.propTypes = {
   color: PropTypes.string.isRequired,
-  onChangeComplete: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onChangeComplete: PropTypes.func,
+}
+
+ColorPicker.defaultProps = {
+  onChangeComplete: () => {},
 }
 
 export default ColorPicker
