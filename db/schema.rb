@@ -495,7 +495,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.jsonb "style"
     t.datetime "last_broadcast_at"
     t.string "background_color"
-    t.integer "background_color_opacity", default: 100
+    t.float "background_color_opacity", default: 1.0
     t.index ["archive_batch"], name: "index_items_on_archive_batch"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
