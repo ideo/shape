@@ -12,6 +12,7 @@ import styled from 'styled-components'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
 import ColorPicker from '~/ui/global/ColorPicker'
+import color from 'color'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
 import QuillClipboard from '~/ui/global/QuillClipboard'
@@ -512,6 +513,15 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  get backgroundColorWithOpacity() {
+    const { item } = this.props
+    if (!item.background_color) return '#ffffff'
+    const fullColor = color(item.background_color)
+    const rgb = fullColor.object()
+    rgb.a = item.background_color_opacity
+    return rgb
+  }
+
   handleTextChange = (_content, delta, source, _editor) => {
     if (source !== 'user') return
     const cursors = this.quillEditor.getModule('cursors')
@@ -887,7 +897,7 @@ class RealtimeTextItem extends React.Component {
               />
               {this.colorPickerOpen && (
                 <ColorPicker
-                  color={item.background_color || '#ffffff'}
+                  color={this.backgroundColorWithOpacity}
                   onChange={this.onSelectColor}
                 />
               )}
