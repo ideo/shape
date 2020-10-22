@@ -878,11 +878,12 @@ class RealtimeTextItem extends React.Component {
                 toggleHeader={this.toggleHeader}
                 onComment={this.onComment}
                 onColorChange={this.onColorPickerOpen}
+                backgroundColor={item.background_color}
                 activeSizeFormat={this.activeSizeFormat}
               />
               {this.colorPickerOpen && (
                 <ColorPicker
-                  color={item.background_color || '#000000'}
+                  color={item.background_color || '#ffffff'}
                   onChangeComplete={this.onSelectColor}
                 />
               )}

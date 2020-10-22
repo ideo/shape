@@ -2,7 +2,7 @@ import ReactDOMServer from 'react-dom/server'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
-import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
+import ColorSquare from '~/ui/global/ColorSquare'
 import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -88,7 +88,7 @@ const TextItemToolbar = props => (
 
       {props.onColorChange && (
         <StyledButton onClick={ev => props.onColorChange(ev)}>
-          <ColorPickerIcon />
+          <ColorSquare color={props.backgroundColor} />
         </StyledButton>
       )}
 
@@ -111,6 +111,7 @@ TextItemToolbar.propTypes = {
   toggleSize: PropTypes.func,
   toggleHeader: PropTypes.func,
   onColorChange: PropTypes.func,
+  backgroundColor: PropTypes.string,
   activeSizeFormat: PropTypes.string,
 }
 TextItemToolbar.defaultProps = {
@@ -120,6 +121,7 @@ TextItemToolbar.defaultProps = {
   toggleHeader: null,
   onColorChange: null,
   activeSizeFormat: null,
+  backgroundColor: null,
 }
 
 export default TextItemToolbar
