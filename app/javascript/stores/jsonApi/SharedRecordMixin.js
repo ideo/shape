@@ -322,10 +322,6 @@ const SharedRecordMixin = superclass =>
     }
 
     setCollaboratorCursorPosition({ collaboratorId, coordinates } = {}) {
-      console.log('setCollaboratorCursorPosition', {
-        collaboratorId,
-        coordinates,
-      })
       const collaborator = _.find(this.collaborators, { id: collaboratorId })
       if (!collaborator) return
       collaborator.coordinates = coordinates

@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import _ from 'lodash'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
-import CollaboratorCursors from '~/ui/global/CollaboratorCursors'
+import CollaboratorCursorsLayer from '~/ui/global/collaborators/CollaboratorCursorsLayer'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import SelectedArea from '~/ui/global/SelectedArea'
@@ -29,7 +29,7 @@ import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
-import v, { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
+import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress, {
@@ -92,7 +92,7 @@ class Routes extends React.Component {
     this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
     this.throttledCalculateGridCursorPosition = _.throttle(
       this._calculateGridCursorPosition,
-      25
+      250
     )
   }
 
@@ -146,7 +146,10 @@ class Routes extends React.Component {
   }
 
   handleMouseMoveSelection = e => {
-    this.throttledCalculateGridCursorPosition(e)
+    this.throttledCalculateGridCursorPosition({
+      x: e.clientX,
+      y: e.clientY,
+    })
 
     // Return if mouse is only scrolling, not click-dragging
     if (!this.mouseDownAt.x) return
@@ -174,19 +177,12 @@ class Routes extends React.Component {
     )
   }
 
-  _calculateGridCursorPosition = e => {
+  _calculateGridCursorPosition = ({ x, y } = {}) => {
     const { uiStore } = this.props
-    const { relativeZoomLevel } = uiStore
-    let rect = { left: 0, top: 0 }
-    const container = document.querySelector(`.${FOAMCORE_INTERACTION_LAYER}`)
-    if (container) {
-      // just a guard for jest shallow render
-      rect = container.getBoundingClientRect()
-    }
-    const { clientX, clientY } = e
+    const { relativeZoomLevel, foamcoreBoundingRectangle } = uiStore
     const rawCoords = {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: x - foamcoreBoundingRectangle.left,
+      y: y - foamcoreBoundingRectangle.top,
     }
     uiStore.broadcastCursorPosition({
       x: rawCoords.x * relativeZoomLevel,
@@ -289,7 +285,7 @@ class Routes extends React.Component {
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
-            <CollaboratorCursors />
+            <CollaboratorCursorsLayer />
             <ZendeskWidget />
 
             <Header />
