@@ -1921,4 +1921,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe 'POST #clear_collection_card_cover' do
+    let(:collection_card) { create(:collection_card_collection, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/clear_collection_card_cover" }
+
+    it 'returns a 200' do
+      post(path)
+      expect(response.status).to eq(200)
+    end
+  end
 end

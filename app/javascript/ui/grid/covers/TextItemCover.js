@@ -34,6 +34,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
     return `${v.colors.white}`
   }};
 `
+StyledPaddedCover.displayName = 'StyledPaddedCover'
 
 const StyledReadMore = styled(ShowMoreButton)`
   z-index: ${v.zIndex.gridCard};

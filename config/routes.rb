@@ -115,6 +115,7 @@ Rails.application.routes.draw do
           patch 'replace'
           patch 'update'
           patch 'update_card_filter'
+          post 'clear_collection_card_cover'
           patch 'toggle_pin'
           delete 'destroy'
         end

@@ -140,7 +140,6 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.boolean "is_background", default: false
     t.jsonb "cached_attributes", default: {}
     t.integer "cover_card_id"
-    t.text "background_color"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
@@ -213,11 +212,11 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.string "search_term"
     t.integer "collection_type", default: 0
     t.integer "num_columns", default: 4
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.integer "challenge_admin_group_id"
     t.integer "challenge_reviewer_group_id"
     t.integer "challenge_participant_group_id"
-    t.datetime "start_date"
-    t.datetime "end_date"
     t.string "icon"
     t.boolean "show_icon_on_cover"
     t.string "font_color"
@@ -496,6 +495,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.datetime "last_broadcast_at"
     t.string "background_color"
     t.float "background_color_opacity", default: 1.0
+    t.index "((cached_attributes ->> 'pending_transcoding_uuid'::text))", name: "index_items_on_transcoding_uuid"
     t.index ["archive_batch"], name: "index_items_on_archive_batch"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
@@ -503,6 +503,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
     t.index ["question_type"], name: "index_items_on_question_type"
     t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
+    t.index ["type"], name: "index_items_on_type"
   end
 
   create_table "network_invitations", force: :cascade do |t|
@@ -648,7 +649,14 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.string "context", limit: 128
     t.datetime "created_at"
     t.index ["context"], name: "index_taggings_on_context"
+    t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
     t.index ["tag_id"], name: "index_taggings_on_tag_id"
+    t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
+    t.index ["taggable_id", "taggable_type", "tagger_id", "context"], name: "taggings_idy"
+    t.index ["taggable_id"], name: "index_taggings_on_taggable_id"
+    t.index ["taggable_type"], name: "index_taggings_on_taggable_type"
+    t.index ["tagger_id", "tagger_type"], name: "index_taggings_on_tagger_id_and_tagger_type"
+    t.index ["tagger_id"], name: "index_taggings_on_tagger_id"
   end
 
   create_table "tags", id: :serial, force: :cascade do |t|
@@ -748,6 +756,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
+    t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_users_roles_on_user_id"
   end
 

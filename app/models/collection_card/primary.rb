@@ -6,7 +6,6 @@
 #  archive_batch     :string
 #  archived          :boolean          default(FALSE)
 #  archived_at       :datetime
-#  background_color  :text
 #  cached_attributes :jsonb
 #  col               :integer
 #  filter            :integer          default("transparent_gray")
