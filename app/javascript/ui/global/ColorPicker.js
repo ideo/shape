@@ -34,6 +34,7 @@ const ColorPicker = props => (
   <ColorPickerStyleWrapper>
     <SketchPicker
       color={props.color}
+      disableAlpha={props.disableAlpha}
       onChange={props.onChange}
       onChangeComplete={props.onChangeComplete}
       presetColors={[
@@ -46,11 +47,13 @@ const ColorPicker = props => (
 
 ColorPicker.propTypes = {
   color: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  disableAlpha: PropTypes.bool,
   onChange: PropTypes.func,
   onChangeComplete: PropTypes.func,
 }
 
 ColorPicker.defaultProps = {
+  disableAlpha: false,
   onChange: () => {},
   onChangeComplete: () => {},
 }

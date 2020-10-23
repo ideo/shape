@@ -68,6 +68,7 @@ const FontColorSelector = ({
           <ClickWrapper clickHandlers={[() => setColorPickerOpen(false)]} />
           <ColorPicker
             color={fontColor || defaultFontColor}
+            disableAlpha
             onChangeComplete={onSelectColor}
           />
           <MediumBreak />
