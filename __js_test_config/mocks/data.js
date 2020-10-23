@@ -25,6 +25,7 @@ export const fakeCollectionCard = {
   image_contain: false,
   section_type: null,
   beginReplacing: jest.fn(),
+  stopReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
