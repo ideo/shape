@@ -733,13 +733,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   onSelectColor = colorData => {
-    const { r, g, b, a } = colorData.rgb
-    let color = colorData.hex
-    let opacity = colorData.rgb.a
-    if (r === 0 && g === 0 && b === 0 && a === 0) {
-      color = null
-      opacity = 100
-    }
+    const color = colorData.hex
+    const opacity = colorData.rgb.a
     const { item } = this.props
     item.background_color = color
     item.background_color_opacity = opacity
