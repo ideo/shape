@@ -184,7 +184,7 @@ class PageWithApiWrapper extends React.Component {
     uiStore.update('isTransparentLoading', false)
     // url could be null which will reset it
     uiStore.setBodyBackgroundImage(record.backgroundImageUrl)
-    // uiStore.setBodyFontColor(record.fontColor)
+    uiStore.setBodyFontColor(record.fontColor)
     // We may be in the callback of a request that we've since left (e.g. navigating multiple pages quickly),
     // so only set this.record if we're returning from our current matching request
     // -- could also abort past requests? https://developer.mozilla.org/en-US/docs/Web/API/AbortController
