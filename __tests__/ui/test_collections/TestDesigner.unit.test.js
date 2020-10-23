@@ -279,7 +279,6 @@ describe('TestDesigner', () => {
         'PATCH',
         expect.any(Object)
       )
-      expect(card.record.name).toEqual('some name')
     })
   })
 
