@@ -211,9 +211,9 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.integer "survey_response_id"
     t.string "search_term"
     t.integer "collection_type", default: 0
+    t.integer "num_columns", default: 4
     t.datetime "start_date"
     t.datetime "end_date"
-    t.integer "num_columns", default: 4
     t.integer "challenge_admin_group_id"
     t.integer "challenge_reviewer_group_id"
     t.integer "challenge_participant_group_id"
