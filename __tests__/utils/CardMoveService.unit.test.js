@@ -277,6 +277,7 @@ describe('CardMoveService', () => {
           parent_collection_card: { id: '10' },
         },
       }
+
       beforeEach(() => {
         apiStore.currentUser = fakeUser
         apiStore.createTemplateInstance = jest
@@ -300,7 +301,7 @@ describe('CardMoveService', () => {
             template_id: uiStore.movingFromCollectionId,
             placement: 'beginning',
           },
-          template: uiStore.viewingCollection,
+          template: expect.any(Object),
         })
         // expect the collection to reload
         expect(apiStore.fetch).toHaveBeenCalledWith(

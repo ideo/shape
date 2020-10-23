@@ -215,7 +215,7 @@ module CollectionCardFilter
     end
 
     def group_ids
-      @group_ids ||= @user.all_current_org_group_ids
+      @group_ids ||= @user.all_group_ids
     end
   end
 end

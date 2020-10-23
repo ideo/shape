@@ -19,13 +19,22 @@ module CardDuplicatorMapper
       new(*args).call
     end
 
-    # Register a card that has been duplicated so it can be remappeds
+    # Register a card that has been duplicated so it can be remapped
     def register_duplicated_card(original_card_id:, to_card_id:)
       Cache.hash_set("#{@batch_id}_duplicated_cards", original_card_id, to_card_id)
-      # TODO: How to ensure all cards were mapped or if duplication failed
+
+      remapper = CardDuplicatorMapper::RemapLinkedCards.new(
+        batch_id: @batch_id,
+      )
+      # remap the card that was just duplicated
+      remapper.remap_cards(original_card_id, to_card_id)
+
+      # if all have completed, then we run through them all, basically a last pass
+      # to ensure we match any links that were created later than the duplicates, etc.
+      # TODO: How to ensure all cards were mapped or if duplication failed?
       return unless all_cards_mapped?
 
-      CardDuplicatorMapper::RemapLinkedCards.call(batch_id: @batch_id)
+      remapper.call
     end
 
     # A hash of all cards that have been marked that they
