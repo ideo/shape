@@ -317,6 +317,7 @@ export default {
   },
 
   weights: {
+    light: 325,
     book: 400,
     medium: 500,
     bold: 700,

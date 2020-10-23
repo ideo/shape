@@ -29,10 +29,13 @@ class CollaboratorCursorsLayer extends React.Component {
     const { uiStore } = this.props
     const { relativeZoomLevel, foamcoreBoundingRectangle } = uiStore
     const cursors = _.map(this.collaborators, collaborator => {
+      const { coordinates, name, color } = collaborator
       return (
         <CollaboratorCursor
           key={collaborator.id}
-          collaborator={collaborator}
+          coordinates={coordinates}
+          color={color}
+          name={name}
           relativeZoomLevel={relativeZoomLevel}
         />
       )

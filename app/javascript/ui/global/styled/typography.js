@@ -91,6 +91,14 @@ export const NumberListText = styled(DisplayText)`
 `
 NumberListText.displayName = 'NumberListText'
 
+export const LabelText = styled.span`
+  display: inline-block;
+  font-family: ${v.fonts.sans};
+  font-size: 12px;
+  font-weight: ${v.weights.light};
+  text-align: center;
+`
+
 export const SpecialDisplayHeading = styled.p`
   color: ${v.colors.black};
   font-family: ${v.fonts.sans};
