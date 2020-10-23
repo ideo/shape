@@ -16,6 +16,7 @@ const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
         data-cy={`HotCellQuadrant-${type}`}
         creating={creating === type}
         onClick={onClick}
+        style={{ marginTop: '20px' }}
       >
         <Icon width={size} height={size} color="white" />
       </BctButton>

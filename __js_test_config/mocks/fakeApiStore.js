@@ -93,6 +93,7 @@ const fakeApiStore = ({
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,
+      mostUsedTemplateCollections: [],
       API_hideHelper: jest.fn(),
       API_updateUseTemplateSetting: jest.fn(),
     },
@@ -105,6 +106,26 @@ const fakeApiStore = ({
       primary_group: {
         name: 'Acme Inc',
       },
+      mostUsedTemplates: [
+        { id: 90, name: 'template 90' },
+      ],
+      most_used_templates: [
+        { id: 90, name: 'template 90' },
+      ],
+    },
+    currentOrganization: {
+      id: '1',
+      slug: 'org-slug',
+      name: 'Acme Inc',
+      primary_group: {
+        name: 'Acme Inc',
+      },
+      mostUsedTemplates: [
+        { id: 90, name: 'template 90' },
+      ],
+      most_used_templates: [
+        { id: 90, name: 'template 90' },
+      ],
     },
     unreadNotifications: [],
     recentNotifications: new Map(),

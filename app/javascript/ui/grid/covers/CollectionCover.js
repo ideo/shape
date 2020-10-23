@@ -7,7 +7,7 @@ import Dotdotdot from 'react-dotdotdot'
 import ReactMarkdown from 'react-markdown'
 
 import FilestackUpload from '~/utils/FilestackUpload'
-import v from '~/utils/variables'
+import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -373,13 +373,47 @@ class CollectionCover extends React.Component {
   }
 
   get coverImageUrl() {
-    const { cover } = this.props.collection
+    const { card, collection } = this.props
+    const cardCover = card && card.cover
+    const collectionCover = collection.cover
+
+    // Either get the cover from the collection card itself, or get it from the collection it links to
+
+    const cover = !_.isEmpty(cardCover) ? cardCover : collectionCover
+
+    if (_.isEmpty(cover)) return null
+
     if (cover.image_handle) {
       return FilestackUpload.imageUrl({
         handle: cover.image_handle,
       })
     }
     return cover.image_url
+  }
+
+  get cardIsLink() {
+    const { card } = this.props
+    return card && card.type === COLLECTION_CARD_TYPES.LINK
+  }
+
+  get subtitle() {
+    const { card, collection } = this.props
+    const cardOrRecord = this.cardIsLink ? card : collection
+    const { subtitle, subtitleHidden } = cardOrRecord
+
+    if (!subtitleHidden) {
+      return subtitle
+    }
+    return ''
+  }
+
+  get title() {
+    const { card } = this.props
+    const hardcodedTitle = _.get(card, 'cover.hardcoded_title', null)
+    if (this.cardIsLink && hardcodedTitle) {
+      return hardcodedTitle
+    }
+    return null
   }
 
   @action
@@ -493,8 +527,7 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
-
+    const { collection_type, icon, show_icon_on_cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
@@ -572,6 +605,7 @@ class CollectionCover extends React.Component {
                           collection={collection}
                           onCollectionClick={this.handleClick}
                           useTextBackground={this.useTextBackground}
+                          title={this.title}
                         />
                       </PlainLink>
                       {collIcon && (
@@ -594,7 +628,7 @@ class CollectionCover extends React.Component {
                   {this.challengeReviewButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
-                  {!this.hasLaunchTestButton && subtitle && (
+                  {!this.hasLaunchTestButton && this.subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
                       {this.useTextBackground ? (
                         <TextWithBackground>
@@ -625,6 +659,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
+  card: MobxPropTypes.objectOrObservableObject,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -637,6 +672,7 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
+  card: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

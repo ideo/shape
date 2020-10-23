@@ -221,18 +221,21 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
-const DefaultWrapper = styled.div``
-
+const DefaultWrapper = styled.div`
+  position: relative;
+  z-index: ${v.zIndex.aboveClickWrapper};
+`
 export const StyledMenuButton = styled.button`
-  text-transform: capitalize;
+  cursor: ${props => (props.linkCursor ? 'pointer' : 'auto')};
   font-family: ${v.fonts.sans};
   font-weight: 400;
   font-size: 1rem;
-  text-align: left;
   max-width: 280px;
-  padding-left: ${props => props.nested * 10}px;
   margin-top: -13px;
   margin-bottom: -13px;
+  padding-left: ${props => props.nested * 10}px;
+  text-align: left;
+  text-transform: capitalize;
   width: 100%;
   ${props =>
     props.wrapText
@@ -294,6 +297,10 @@ export const StyledMenuItem = styled.li`
     }
 
     .icon-left {
+      vertical-align: middle;
+      display: inline-block;
+      padding-top: 4px;
+
       margin-right: ${props => {
         if (props.hasCheckbox) {
           return 10
@@ -439,6 +446,7 @@ class PopoutMenu extends React.Component {
     const {
       id,
       name,
+      component,
       iconLeft,
       iconRight,
       onClick,
@@ -453,6 +461,13 @@ class PopoutMenu extends React.Component {
       noHover,
     } = item
     let { padding } = item
+    if (component) {
+      return (
+        <StyledMenuItem noHover width={width - 25} padding="0 0 0 16px">
+          {component}
+        </StyledMenuItem>
+      )
+    }
 
     let className = `menu-${_.kebabCase(name)}`
     const rightIconClassName = 'icon-right'
@@ -464,7 +479,7 @@ class PopoutMenu extends React.Component {
         key={`${name}-${id || i}`}
         borderColor={borderColor}
         noBorder={noBorder}
-        noHover={noHover}
+        noHover={noHover || !onClick}
         hasCheckbox={hasCheckbox}
         loading={loading}
         wrapperClassName={wrapperClassName}
@@ -518,6 +533,7 @@ class PopoutMenu extends React.Component {
               data-cy={`PopoutMenu_${_.camelCase(name)}`}
               className={className}
               wrapText={wrapText}
+              linkCursor={!!onClick}
             >
               {iconLeft && <span className="icon-left">{iconLeft}</span>}
               {this.renderName(item)}
@@ -599,9 +615,7 @@ class PopoutMenu extends React.Component {
     const Wrapper = isMobileFullScreen ? CornerPositioned : DefaultWrapper
 
     return (
-      <Wrapper
-        style={{ position: 'relative', zIndex: v.zIndex.aboveClickWrapper }}
-      >
+      <Wrapper>
         <ThemeProvider
           theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
@@ -664,6 +678,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     noHover: PropTypes.bool,
     onClick: PropTypes.func,
     subItems: PropTypes.arrayOf(PropTypes.object),
+    component: PropTypes.object,
     TextComponent: PropTypes.object,
     withAvatar: PropTypes.bool,
   })

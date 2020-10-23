@@ -56,7 +56,8 @@ class User < ApplicationRecord
   alias rolify_roles roles
 
   store_accessor :cached_attributes,
-                 :cached_user_profiles
+                 :cached_user_profiles,
+                 :cached_last_5_used_template_ids
 
   # list out all attributes here that we want to cache from Network
   store_accessor :network_data,
@@ -576,6 +577,13 @@ class User < ApplicationRecord
 
   def super_admin?
     has_cached_role?(Role::SUPER_ADMIN)
+  end
+
+  def last_used_template_ids(amount = 5)
+    Activity.where(organization: id, action: :template_used)
+            .order('created_at desc')
+            .first(amount)
+            .map { |arr| arr[0] }
   end
 
   private
