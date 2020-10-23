@@ -55,6 +55,8 @@ class FoamcoreInteractionLayer extends React.Component {
   creatingHotEdge = false
   @observable
   fileDropProgress = null
+  @observable
+  loadingCell = null
 
   componentDidMount() {
     this.createDropPane()
@@ -193,6 +195,34 @@ class FoamcoreInteractionLayer extends React.Component {
     uiStore.closeBlankContentTool()
   }
 
+  createTemplateInstance = async ({ col, row, templateId }) => {
+    runInAction(() => {
+      this.resetHoveringRowCol()
+      this.loadingCell = { col, row }
+    })
+    const { apiStore, collection } = this.props
+    const template = apiStore.find('collections', templateId)
+    const data = {
+      parent_id: collection.id,
+      template_id: templateId,
+      placement: { col, row },
+    }
+    const res = await apiStore.createTemplateInstance({
+      data,
+      template,
+    })
+    const { parent_collection_card } = res.data
+    const cardRes = await apiStore.fetch(
+      'collection_cards',
+      parent_collection_card.id,
+      true
+    )
+    collection.addCard(cardRes.data)
+    runInAction(() => {
+      this.loadingCell = null
+    })
+  }
+
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
@@ -298,8 +328,17 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  onCreateBct = async ({ row, col, hotcell = false }, contentType) => {
+  onCreateBct = async ({ row, col, hotcell = false }, contentType, opts) => {
     const { apiStore, uiStore, collection } = this.props
+
+    if (contentType === 'useTemplate') {
+      this.createTemplateInstance({
+        ...opts,
+        row,
+        col,
+      })
+      return
+    }
 
     // If we're already in the process of creating a hot edge and placeholder
     // don't create another one.
@@ -741,6 +780,17 @@ class FoamcoreInteractionLayer extends React.Component {
     return null
   }
 
+  get renderLoading() {
+    if (
+      !this.loadingCell ||
+      !_.isNumber(this.loadingCell.col) ||
+      !_.isNumber(this.loadingCell.row)
+    ) {
+      return null
+    }
+    return this.positionBlank({ ...this.loadingCell }, 'unrendered')
+  }
+
   render() {
     const { resizing, uiStore } = this.props
 
@@ -785,6 +835,7 @@ class FoamcoreInteractionLayer extends React.Component {
         {this.renderInnerDragLayer}
         {this.renderHotEdges}
         {this.renderBct}
+        {this.renderLoading}
         {this.renderRightBlankActions}
       </DragLayerWrapper>
     )

@@ -467,7 +467,7 @@ export const fakeCollection = {
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
   API_getNextAvailableTest: jest.fn().mockReturnValue(Promise.resolve(null)),
-  API_clearCollectionCover: jest.fn(),
+  API_clearCover: jest.fn(),
   API_clearBackgroundImage: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCard: jest.fn().mockReturnValue(Promise.resolve({})),

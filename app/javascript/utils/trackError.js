@@ -6,9 +6,9 @@ export default function trackError(err, opts = {}) {
   if (err && _.includes([401, 404], err.status)) {
     return
   }
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err) // eslint-disable-line no-console
-  }
+  // if (process.env.NODE_ENV === 'development') {
+  console.error(err) // eslint-disable-line no-console
+  // }
   trackErrorSpecify(
     opts.source || 'Any',
     opts.message || err.message,

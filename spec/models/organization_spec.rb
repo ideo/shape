@@ -734,4 +734,50 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '#most_used_template_ids' do
+    let(:organization) { create(:organization) }
+    let(:template) do
+      create(:collection,
+             add_editors: [organization.primary_group])
+    end
+
+    context 'with a template used by org' do
+      before do
+        ActivityAndNotificationBuilder.new(
+          actor: create(:user),
+          target: create(:collection),
+          action: :template_used,
+          source: template,
+          organization: organization,
+          async: false,
+        ).call
+      end
+
+      it 'should pull one collection id' do
+        expect(organization.most_used_template_ids).to eq([template.id])
+      end
+    end
+  end
+
+  describe '#cache_most_used_template_ids!' do
+    let(:organization) { create(:organization) }
+
+    context 'with no templates used yet but templates existing' do
+      let!(:template) do
+        create(:collection,
+               add_editors: [organization.primary_group],
+               master_template: true,
+               organization: organization)
+      end
+
+      before do
+        organization.cache_most_used_template_ids!
+      end
+
+      it 'should pull set the one template as cached result' do
+        expect(organization.reload.cached_5_most_used_template_ids).to eq([template.id])
+      end
+    end
+  end
 end

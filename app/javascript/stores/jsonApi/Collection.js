@@ -1608,17 +1608,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return res
   }
 
-  API_clearCollectionCover() {
-    return this.apiStore
-      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
-      .catch(err => {
-        console.warn(err)
-        this.uiStore.alert(
-          'Unable to change the collection cover. This may be a special collection that you cannot edit.'
-        )
-      })
-  }
-
   API_clearBackgroundImage() {
     this.background_image_url = null
     return this.apiStore.request(
@@ -1862,14 +1851,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cover.hardcoded_subtitle || cover.text || ''
   }
 
-  get subtitleForEditing() {
-    const { cover } = this
-    return cover.hardcoded_subtitle || cover.text || ''
-  }
-
   get subtitleHidden() {
     const { cover } = this
     return cover && cover.subtitle_hidden ? true : false
+  }
+
+  get subtitleForEditing() {
+    const { cover } = this
+    if (!cover) return ''
+
+    return cover.hardcoded_subtitle || cover.text || ''
   }
 
   get coverItem() {

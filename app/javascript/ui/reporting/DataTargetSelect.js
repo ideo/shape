@@ -1,10 +1,24 @@
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
+
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import v from '~/utils/variables'
 import { debouncedAutocompleteSearch } from '~/ui/reporting/utils'
+
+const Wrapper = styled.div`
+  display: block;
+  margin-bottom: 10px;
+  background-color: ${v.colors.commonLight};
+  width: 190px;
+
+  #react-select-chip {
+    background-color: ${v.colors.white} !important;
+    border-radius: 18px !important;
+  }
+`
 
 @inject('apiStore')
 @observer
@@ -70,14 +84,7 @@ class DataTargetSelect extends React.Component {
     return (
       <form className="form" style={{ display: 'inline-block' }}>
         {this.type === 'Collection' && this.editing ? (
-          <div
-            style={{
-              display: 'block',
-              marginBottom: '10px',
-              backgroundColor: v.colors.commonLight,
-              width: '190px',
-            }}
-          >
+          <Wrapper>
             <AutoComplete
               autoFocus
               options={[]}
@@ -86,8 +93,9 @@ class DataTargetSelect extends React.Component {
               placeholder="Collection name"
               keepSelectedOptions
               style={{ display: 'inline-block' }}
+              disableUnderline
             />
-          </div>
+          </Wrapper>
         ) : (
           <Select
             classes={{ root: 'select', selectMenu: 'selectMenu' }}

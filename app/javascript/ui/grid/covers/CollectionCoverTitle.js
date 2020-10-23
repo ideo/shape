@@ -8,11 +8,6 @@ import english from 'hyphenation.en-us'
 import { some } from 'lodash'
 import { TextWithBackground } from './CollectionCover'
 
-function namePartTooLong(fullName) {
-  const parts = fullName.split(' ')
-  return some(parts, part => part.length > 14)
-}
-
 function splitName(name) {
   return name.split(' ')
 }
@@ -74,17 +69,19 @@ class CollectionCoverTitle extends React.Component {
     return null
   }
 
-  get nameTooLong() {
+  get name() {
+    const { title } = this.props
     const {
       collection: { name },
     } = this.props
-    return namePartTooLong(name)
+
+    if (title) return title
+
+    return name
   }
 
   get renderName() {
-    const {
-      collection: { name },
-    } = this.props
+    const { name } = this
     if (!this.hasIcon) return name
 
     const nameParts = splitName(name)
@@ -122,10 +119,12 @@ class CollectionCoverTitle extends React.Component {
 CollectionCoverTitle.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   useTextBackground: PropTypes.bool,
+  title: PropTypes.string,
 }
 
 CollectionCoverTitle.defaultProps = {
   useTextBackground: false,
+  title: null,
 }
 
 export default CollectionCoverTitle

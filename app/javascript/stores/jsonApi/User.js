@@ -1,12 +1,32 @@
+import _ from 'lodash'
+import { action, computed, runInAction } from 'mobx'
+import localStorage from 'mobx-localstorage'
+
+import Collection from './Collection'
 import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 import IdeoSSO from '~/utils/IdeoSSO'
 
 import BaseRecord from './BaseRecord'
 
+export const USER_MOST_USED_TEMPLATES = 'UserMostUsedTemplates'
+
 class User extends BaseRecord {
   static type = 'users'
   static endpoint = apiUrl('users')
+
+  constructor(...args) {
+    super(...args)
+    if (this.is_current_user) {
+      const mostUsedTemplates = this.most_used_templates || []
+      runInAction(() => {
+        localStorage.setItem(
+          USER_MOST_USED_TEMPLATES,
+          mostUsedTemplates.map(template => template.toJsonApi())
+        )
+      })
+    }
+  }
 
   get name() {
     const nameDisplay = [this.first_name, this.last_name].join(' ')
@@ -100,6 +120,27 @@ class User extends BaseRecord {
     // set it ahead of time so the helper immediately disappears
     this.show_move_helper = false
     return this.API_updateCurrentUser({ show_move_helper: false })
+  }
+
+  @action
+  useTemplate(template) {
+    const templates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    // Add the most recently used template to beginning, filtering out dupes
+    localStorage.setItem(
+      USER_MOST_USED_TEMPLATES,
+      _.take(_.uniqBy([template.toJsonApi(), ...templates], 'id'), 5)
+    )
+  }
+
+  @computed
+  get mostUsedTemplateCollections() {
+    const deserializedTemplates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    if (deserializedTemplates) {
+      return deserializedTemplates.map(data => {
+        return new Collection(data, this.apiStore)
+      })
+    }
+    return []
   }
 }
 
