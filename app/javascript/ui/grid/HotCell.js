@@ -272,7 +272,7 @@ class HotCell extends React.Component {
     if (quickUseTemplate) return quickUseTemplate
     return {
       name: 'template',
-      description: 'Templates',
+      description: 'Create Template',
     }
   }
 
