@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import localStorage from 'mobx-localstorage'
 import { Flex } from 'reflexbox'
 import googleTagManager from '~/vendor/googleTagManager'
 
@@ -21,7 +22,7 @@ import VideoIcon from '~/ui/icons/htc/VideoIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-import Item from '~/stores/jsonApi/Item'
+import Item, { TEXT_ITEM_DEFAULT_BG_COLOR } from '~/stores/jsonApi/Item'
 import { DisplayText } from '~/ui/global/styled/typography'
 import FilestackUpload from '~/utils/FilestackUpload'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -292,9 +293,18 @@ class GridCardBlank extends React.Component {
       parent_id: parent.id,
       image_contain: defaultShowWholeImage,
     }
-
     // apply nested attrs
     Object.assign(attrs, nested)
+
+    // Set default text card background if there
+    if (attrs.item_attributes.type === ITEM_TYPES.TEXT) {
+      const defaultBgColor = localStorage.getItem(TEXT_ITEM_DEFAULT_BG_COLOR)
+      if (defaultBgColor) {
+        attrs.item_attributes.background_color = defaultBgColor.color
+        attrs.item_attributes.background_color_opacity = defaultBgColor.opacity
+      }
+    }
+
     if (testCollectionCard) {
       const { record } = testCollectionCard
       const item_attributes = {

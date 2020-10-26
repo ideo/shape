@@ -1,4 +1,5 @@
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
+import localStorage from 'mobx-localstorage'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -6,8 +7,10 @@ import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
 import ColorPicker from '~/ui/global/ColorPicker'
 import ChannelManager from '~/utils/ChannelManager'
+import { TEXT_ITEM_DEFAULT_BG_COLOR } from '~/stores/jsonApi/Item'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
+jest.mock('mobx-localstorage')
 
 const props = {
   item: fakeTextItem,
@@ -351,6 +354,31 @@ describe('RealtimeTextItem', () => {
     it('should set the item background color and opacity', () => {
       expect(props.item.background_color).toEqual('#83fa21')
       expect(props.item.background_color_opacity).toEqual(0.35)
+    })
+  })
+
+  describe('sendBackgroundColorChange()', () => {
+    let localStorageStore, color, opacity
+
+    beforeEach(() => {
+      localStorageStore = {}
+      localStorage.setItem = (key, val) => {
+        localStorageStore[key] = val
+      }
+      localStorage.getItem = key => localStorageStore[key]
+      localStorage.clear()
+      color = '#ff1122'
+      opacity = 1
+      component.sendBackgroundColorChange({ color, opacity })
+    })
+
+    it('should set the color in local storage', () => {
+      expect(localStorage.getItem(TEXT_ITEM_DEFAULT_BG_COLOR).color).toEqual(
+        color
+      )
+      expect(localStorage.getItem(TEXT_ITEM_DEFAULT_BG_COLOR).opacity).toEqual(
+        opacity
+      )
     })
   })
 })

@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import localStorage from 'mobx-localstorage'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
@@ -24,6 +25,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import v, { ITEM_CHANNEL_NAME } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { TEXT_ITEM_DEFAULT_BG_COLOR } from '~/stores/jsonApi/Item'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
@@ -749,6 +751,7 @@ class RealtimeTextItem extends React.Component {
       background_color: color,
       background_color_opacity: opacity,
     })
+    localStorage.setItem(TEXT_ITEM_DEFAULT_BG_COLOR, { color, opacity })
   }
 
   checkForTitleText = () => {

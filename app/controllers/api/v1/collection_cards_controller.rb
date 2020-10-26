@@ -719,6 +719,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :legend_item_id,
         :legend_search_source,
+        :background_color,
+        :background_color_opacity,
         tag_list: [],
         user_tag_list: [],
         data_content: {},
