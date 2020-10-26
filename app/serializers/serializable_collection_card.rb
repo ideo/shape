@@ -53,6 +53,6 @@ class SerializableCollectionCard < BaseJsonSerializer
   end
 
   attribute :cover do
-    @object.cached_cover
+    @object.cached_cover || {}
   end
 end

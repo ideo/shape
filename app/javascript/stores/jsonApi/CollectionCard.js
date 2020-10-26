@@ -8,6 +8,7 @@ import {
   COLLECTION_CARD_TYPES,
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
+import FilestackUpload from '~/utils/FilestackUpload'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -144,7 +145,7 @@ class CollectionCard extends BaseRecord {
 
   get subtitle() {
     // Collection cards only show titles for link cards
-    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    if (!this.isCollectionOrLinkCardType) return null
     const { cover } = this
     const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
 
@@ -161,27 +162,72 @@ class CollectionCard extends BaseRecord {
   }
 
   get subtitleForEditing() {
-    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    if (!this.isCollectionOrLinkCardType) return null
     const { cover } = this
     const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
     return coverSubtitle || this.linkedCoverSubtitleOrText
   }
 
   get titleForEditing() {
-    if (this.type !== COLLECTION_CARD_TYPES.LINK) return null
+    if (!this.isCollectionOrLinkCardType) return null
     const { cover } = this
     return (cover && cover.hardcoded_title) || ''
   }
 
-  // TODO find a place for these?
-  @action
+  get linkedCoverSubtitleOrText() {
+    // used by collection_cards to fall-back to the linked record's subtitle
+    if (!this.isCollectionOrLinkCardType) {
+      return null
+    }
+
+    const recordSubtitle = _.get(this, 'record.cover.hardcoded_subtitle', '')
+    const recordText = _.get(this, 'record.cover.text', '')
+
+    return recordSubtitle || recordText || ''
+  }
+
+  get coverImageUrl() {
+    const { record } = this
+    if (record.isCollection) {
+      const collection = record
+      // turn into normal object for overriding later w/out mobx issues
+      const cover = { ...collection.cover }
+      const cardCover = this.cover || {}
+
+      if (this.isCollectionOrLinkCardType)
+        _.each(['image_url', 'image_handle'], field => {
+          // allow cardCover to override collection cover if fields are present
+          if (cardCover[field]) {
+            cover[field] = cardCover[field]
+          }
+        })
+
+      if (_.isEmpty(cover)) return null
+
+      if (cover.image_handle) {
+        return FilestackUpload.imageUrl({
+          handle: cover.image_handle,
+        })
+      }
+      return cover.image_url
+    }
+    return record.thumbnail_url
+  }
+  // --------------------------------------
+  // TODO find a place for these? card has to call methods from SharedRecordMixin
+  // but reassign itself using call(this, ...)
   API_updateNameAndCover(args) {
-    this.record.API_updateNameAndCover.call(this, args)
+    return this.record.API_updateNameAndCover.call(this, args)
+  }
+
+  API_clearCover(args) {
+    return this.record.API_clearCover.call(this, args)
   }
 
   pushUndo(args) {
     this.record.pushUndo.call(this, args)
   }
+  // --------------------------------------
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4

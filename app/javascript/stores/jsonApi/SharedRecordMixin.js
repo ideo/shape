@@ -78,21 +78,6 @@ const SharedRecordMixin = superclass =>
       )
     }
 
-    get linkedCoverSubtitleOrText() {
-      // used by collection_cards to fall-back to the linked record's subtitle
-      if (
-        this.internalType !== 'collection_cards' ||
-        this.type !== COLLECTION_CARD_TYPES.LINK
-      ) {
-        return null
-      }
-
-      const recordSubtitle = _.get(this, 'record.cover.hardcoded_subtitle', '')
-      const recordText = _.get(this, 'record.cover.text', '')
-
-      return recordSubtitle || recordText || ''
-    }
-
     @action
     API_updateNameAndCover({
       name,
