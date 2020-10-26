@@ -412,7 +412,11 @@ class CollectionCover extends React.Component {
     }
     ev.stopPropagation()
     ev.preventDefault()
-    window.location = href
+    let fullHref = href
+    if (!/^https?:\/\//.test(href)) {
+      fullHref = `https://${href}`
+    }
+    window.location = fullHref
     return false
   }
 
