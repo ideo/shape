@@ -7,9 +7,13 @@ RSpec.describe CardDuplicatorMapper::Base, type: :service do
   end
 
   context 'registering duplicated cards' do
+    let(:remapper_instance) { double('remapper') }
+
     before do
       # Stub out so that it doesn't clear cards
-      allow(CardDuplicatorMapper::RemapLinkedCards).to receive(:call)
+      allow(CardDuplicatorMapper::RemapLinkedCards).to receive(:new).and_return(remapper_instance)
+      allow(remapper_instance).to receive(:remap_cards)
+      allow(remapper_instance).to receive(:call)
     end
 
     it 'stores card ids' do
@@ -24,9 +28,16 @@ RSpec.describe CardDuplicatorMapper::Base, type: :service do
     end
 
     it 'calls RemapLinkedCards if all cards mapped' do
-      expect(CardDuplicatorMapper::RemapLinkedCards).to receive(:call).with(
+      expect(CardDuplicatorMapper::RemapLinkedCards).to receive(:new).with(
         batch_id: batch_id,
       )
+      # should call the individual remap method
+      expect(remapper_instance).to receive(:remap_cards).with(
+        '123',
+        '456',
+      )
+      # and `call` when `all_cards_mapped?`
+      expect(remapper_instance).to receive(:call)
       subject.register_duplicated_card(
         original_card_id: '123',
         to_card_id: '456',

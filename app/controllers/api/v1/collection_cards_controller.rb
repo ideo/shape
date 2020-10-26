@@ -199,7 +199,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   def update_card_filter
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
@@ -353,6 +352,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder.delete if placeholder.present?
 
     head :no_content
+  end
+
+  def clear_collection_card_cover
+    @collection_card.clear_collection_card_cover
+    @collection_card.reload
+    render_collection_card
   end
 
   private
@@ -514,6 +519,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     authorize! :edit_content, @replacing_card.record
   end
 
+  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   def load_and_authorize_collection_card_update
     @collection_card = CollectionCard.find(params[:id])
     authorize! :edit_content, @collection
@@ -664,6 +670,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :section_type,
       :font_color,
       :font_background,
+      :cover_card_id,
+      :hardcoded_title,
+      :hardcoded_subtitle,
+      :subtitle_hidden,
     )
   end
 

@@ -1,10 +1,12 @@
 import _ from 'lodash'
+
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
+import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('~/stores/jsonApi/CollectionCard')
@@ -69,6 +71,39 @@ describe('FoamcoreInteractionLayer', () => {
     }
     rerender()
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
+  })
+
+  describe('onCreateBct()', () => {
+    describe('when useTemplate', () => {
+      beforeEach(() => {
+        const row = 1
+        const col = 1
+        const opts = {
+          templateId: 4,
+        }
+        component.onCreateBct({ row, col }, 'useTemplate', opts)
+      })
+
+      it('should reset hovering row and col', () => {
+        expect(component.hoveringRowCol).toEqual({ row: null, col: null })
+      })
+
+      it('should set the loading cell', () => {
+        expect(component.loadingCell).toEqual({ row: 1, col: 1 })
+      })
+
+      it('should call apiStore.createTemplateInstance with params and template', () => {
+        expect(props.apiStore.createTemplateInstance).toHaveBeenCalled()
+        expect(props.apiStore.createTemplateInstance).toHaveBeenCalledWith({
+          data: {
+            parent_id: fakeCollection.id,
+            template_id: 4,
+            placement: { col: 1, row: 1 },
+          },
+          template: '',
+        })
+      })
+    })
   })
 
   describe('onCursorMove', () => {
@@ -211,6 +246,21 @@ describe('FoamcoreInteractionLayer', () => {
 
     it('should render a PositionedBlankCard with dropping interactionType', () => {
       expect(component.renderDropSpots.length > 0).toEqual(true)
+    })
+  })
+
+  describe('renderLoading', () => {
+    beforeEach(() => {
+      component.loadingCell = { row: 1, col: 2 }
+      wrapper.update()
+    })
+
+    it('should render a unrendered blank in the spot', () => {
+      const blank = wrapper.find(PositionedBlankCard)
+      expect(blank.exists()).toBe(true)
+      expect(blank.props().row).toEqual(1)
+      expect(blank.props().col).toEqual(2)
+      expect(blank.props().interactionType).toEqual('unrendered')
     })
   })
 

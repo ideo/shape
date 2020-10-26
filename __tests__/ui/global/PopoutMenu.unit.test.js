@@ -80,6 +80,17 @@ describe('PopoutMenu', () => {
         expect(menuItem.at(1)).toHaveStyleRule('border-top-width', '0px')
       })
     })
+
+    describe('with a menu item with a component', () => {
+      beforeEach(() => {
+        props.menuItems = [{ component: <div id="fakeC" /> }, ...fakeMenuItems]
+        wrapper = mount(<PopoutMenu {...props} />)
+      })
+
+      it('will render the component', () => {
+        expect(wrapper.find('#fakeC').exists()).toBe(true)
+      })
+    })
   })
 
   describe('with groupedMenuItems', () => {

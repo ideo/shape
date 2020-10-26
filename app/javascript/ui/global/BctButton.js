@@ -7,7 +7,6 @@ import v from '~/utils/variables'
 const BctButton = styled.button`
   height: 36px;
   margin-bottom: 10px;
-  margin-top: 20px;
   position: relative;
   width: 36px;
 

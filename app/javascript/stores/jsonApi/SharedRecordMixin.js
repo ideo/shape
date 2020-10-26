@@ -3,7 +3,7 @@ import { action, computed, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
-import v from '~/utils/variables'
+import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
 
 // This contains some shared methods between Collection and Item
 const SharedRecordMixin = superclass =>
@@ -70,9 +70,33 @@ const SharedRecordMixin = superclass =>
       return this.routingStore.pathTo('homepage')
     }
 
+    get isCollectionOrLinkCardType() {
+      return (
+        this.internalType === 'collections' ||
+        (this.internalType === 'collection_cards' &&
+          this.type === COLLECTION_CARD_TYPES.LINK)
+      )
+    }
+
+    get linkedCoverSubtitleOrText() {
+      // used by collection_cards to fall-back to the linked record's subtitle
+      if (
+        this.internalType !== 'collection_cards' ||
+        this.type !== COLLECTION_CARD_TYPES.LINK
+      ) {
+        return null
+      }
+
+      const recordSubtitle = _.get(this, 'record.cover.hardcoded_subtitle', '')
+      const recordText = _.get(this, 'record.cover.text', '')
+
+      return recordSubtitle || recordText || ''
+    }
+
     @action
     API_updateNameAndCover({
       name,
+      hardcodedTitle = '',
       hardcodedSubtitle = '',
       subtitleHidden = false,
     }) {
@@ -93,11 +117,14 @@ const SharedRecordMixin = superclass =>
         })
       }
       const data = this.toJsonApi()
-      // see collection_updater.rb for deserialization
-      if (this.internalType === 'collections') {
+      if (this.isCollectionOrLinkCardType) {
+        if (hardcodedTitle !== this.cover.hardcoded_title) {
+          this.cover.hardcoded_title = hardcodedTitle
+        }
         if (hardcodedSubtitle !== this.subtitle) {
           this.cover.hardcoded_subtitle = hardcodedSubtitle
         }
+        data.attributes.hardcoded_title = hardcodedTitle
         data.attributes.hardcoded_subtitle = hardcodedSubtitle
         this.cover.subtitle_hidden = subtitleHidden
         data.attributes.subtitle_hidden = subtitleHidden
@@ -364,6 +391,27 @@ const SharedRecordMixin = superclass =>
 
       runInAction(() => {
         this.tags = [...userTagsWithUsers, ...tagList]
+      })
+    }
+
+    @action
+    API_clearCover() {
+      let path = ''
+      if (
+        this.internalType === 'collection_cards' &&
+        this.type === COLLECTION_CARD_TYPES.LINK
+      ) {
+        path = `collection_cards/${this.id}/clear_collection_card_cover`
+      } else if (this.internalType === 'collections') {
+        path = `collections/${this.id}/clear_collection_cover`
+      }
+      if (!path) return
+
+      return this.apiStore.request(path, 'POST').catch(err => {
+        console.warn(err)
+        this.uiStore.alert(
+          'Unable to change the collection cover. This may be a special collection that you cannot edit.'
+        )
       })
     }
   }
