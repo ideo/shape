@@ -42,8 +42,7 @@
     "subtitle_hidden": { "type": ["boolean", "null"] },
     "last_unresolved_comment_id": { "type": ["number", "null"] },
     "cloned_from_id": { "type": ["string", "null"] },
-    "background_color": { "type": ["string", "null"] },
-    "last_unresolved_comment_id": { "type": "number" }
+    "background_color": { "type": ["string", "null"] }
   },
   "required": ["class_type"]
 }
