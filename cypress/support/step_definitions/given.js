@@ -22,13 +22,6 @@ Given('I login and visit My Collection', () => {
 
 Given('I login and visit the Admin area', () => {
   cy.loginAndVisitAdmin()
-  Cypress.on(
-    'uncaught:exception',
-    () =>
-      // returning false here prevents Cypress from
-      // failing the test
-      false
-  )
 })
 
 Given('I login and visit the Test Area', () => {
@@ -65,6 +58,11 @@ Given('I visit the Test Area', () => {
 
 Given('I login and create an automated challenge', () => {
   cy.loginAndCreateAutomatedChallenge()
+  Cypress.on('uncaught:exception', e => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+  })
 })
 
 Given('I logout', () => {
