@@ -92,7 +92,7 @@ class Routes extends React.Component {
     this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
     this.throttledCalculateGridCursorPosition = _.throttle(
       this._calculateGridCursorPosition,
-      250
+      330
     )
   }
 
@@ -184,6 +184,7 @@ class Routes extends React.Component {
       x: x - foamcoreBoundingRectangle.left,
       y: y - foamcoreBoundingRectangle.top,
     }
+    // TODO: for some reason these coordinates get thrown off when resizing a card
     uiStore.broadcastCursorPosition({
       x: rawCoords.x * relativeZoomLevel,
       y: rawCoords.y * relativeZoomLevel,

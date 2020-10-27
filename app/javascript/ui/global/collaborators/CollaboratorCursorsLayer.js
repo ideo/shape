@@ -9,8 +9,9 @@ import v from '~/utils/variables'
 const CollaboratorCursorWrapper = styled.div`
   position: absolute;
   z-index: ${v.zIndex.aboveClickWrapper};
-  top: ${props => props.top}px;
-  left: ${props => props.left}px;
+  /* these numbers just account for the top/left of FoamcoreInteractionLayer */
+  left: 28px;
+  top: 134px;
 `
 
 @inject('uiStore')
@@ -27,27 +28,25 @@ class CollaboratorCursorsLayer extends React.Component {
 
   render() {
     const { uiStore } = this.props
-    const { relativeZoomLevel, foamcoreBoundingRectangle } = uiStore
+    const { relativeZoomLevel } = uiStore
     const cursors = _.map(this.collaborators, collaborator => {
       const { coordinates, name, color } = collaborator
+      // adjust for zoomLevel
+      if (coordinates && coordinates.x && coordinates.y) {
+        coordinates.x = coordinates.x / relativeZoomLevel
+        coordinates.y = coordinates.y / relativeZoomLevel
+      }
       return (
         <CollaboratorCursor
           key={collaborator.id}
           coordinates={coordinates}
           color={color}
           name={name}
-          relativeZoomLevel={relativeZoomLevel}
         />
       )
     })
 
-    // match the 0,0 point of the CollaboratorCursorWrapper with the FoamcoreInteractionLayer
-    const { left, top } = foamcoreBoundingRectangle
-    return (
-      <CollaboratorCursorWrapper left={left} top={top}>
-        {cursors}
-      </CollaboratorCursorWrapper>
-    )
+    return <CollaboratorCursorWrapper>{cursors}</CollaboratorCursorWrapper>
   }
 }
 

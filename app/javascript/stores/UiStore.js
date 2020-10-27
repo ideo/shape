@@ -1123,7 +1123,7 @@ export default class UiStore {
       COLLECTION_CHANNEL_NAME,
       viewingCollection.id
     )
-    if (channel) {
+    if (channel && viewingCollection.collaborators.length >= 1) {
       channel.perform('cursor', { coordinates })
     }
   }

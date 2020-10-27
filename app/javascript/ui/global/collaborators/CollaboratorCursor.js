@@ -11,16 +11,26 @@ const StyledCollaboratorCursor = styled.div`
   position: absolute;
   left: ${props => props.left}px;
   top: ${props => props.top}px;
-  display: ${props => props.display};
-  width: 13px;
-  height: 18px;
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s 1s, opacity 0.5s linear;
+  &.hidden {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .icon {
+    color: ${props => props.color};
+    width: 18px;
+    height: 18px;
+  }
 `
 
 const CollaboratorLabelContainer = styled.div`
-  position: absolute;
-  left: ${props => props.left}px;
-  top: ${props => props.top}px;
-  display: ${props => props.display};
+  position: relative;
+  left: 9px;
+  top: 0;
+  /* NOTE: assumes white text will always look good over collaboratorColor */
+  color: white;
   background: ${props => props.color};
   white-space: nowrap;
   padding: 0px 6px;
@@ -38,7 +48,7 @@ class CollaboratorCursor extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.coordinates !== this.props.coordinates) {
       if (!this.state.hidden) {
-        this.debouncedFadeCursorOut()
+        // this.debouncedFadeCursorOut()
       } else {
         this.setState({ hidden: false })
       }
@@ -52,41 +62,36 @@ class CollaboratorCursor extends React.Component {
   }
 
   render() {
-    const { coordinates, color, name, relativeZoomLevel } = this.props
+    const { coordinates, color, name } = this.props
 
     if (!coordinates) return null
 
-    const hexColor = v.colors[`collaboratorSecondary${color}`]
-    const left = coordinates.x / relativeZoomLevel
-    const top = coordinates.y / relativeZoomLevel
-    const display = this.state.hidden ? 'none' : 'block'
+    const hexColor = v.colors[`collaboratorPrimary${color}`]
+    const cursorClass = this.state.hidden ? 'hidden' : ''
 
     return (
-      <React.Fragment>
-        <StyledCollaboratorCursor left={left} top={top} display={display}>
-          <CursorIcon color={hexColor} />
-        </StyledCollaboratorCursor>
-        <CollaboratorLabelContainer
-          color={hexColor}
-          left={left + 7}
-          top={top + 16}
-          display={display}
-        >
+      <StyledCollaboratorCursor
+        color={hexColor}
+        className={cursorClass}
+        left={coordinates.x}
+        top={coordinates.y}
+      >
+        <CursorIcon />
+        <CollaboratorLabelContainer color={hexColor}>
           <LabelText>{name}</LabelText>
         </CollaboratorLabelContainer>
-      </React.Fragment>
+      </StyledCollaboratorCursor>
     )
   }
 }
 
 CollaboratorCursor.propTypes = {
   coordinates: PropTypes.shape({
-    left: PropTypes.number,
-    top: PropTypes.number,
+    x: PropTypes.number,
+    y: PropTypes.number,
   }).isRequired,
   color: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  relativeZoomLevel: PropTypes.number.isRequired,
 }
 
 export default CollaboratorCursor
