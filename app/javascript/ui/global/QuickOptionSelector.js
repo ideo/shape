@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import Tooltip from '~/ui/global/Tooltip'
+import v from '~/utils/variables'
 
 const Option = styled.span`
   background-color: ${props => props.color || 'transparent'};
@@ -11,6 +12,12 @@ const Option = styled.span`
   margin: 0;
   height: 32px;
   width: 32px;
+  ${props =>
+    props.active &&
+    `
+    outline: 2px solid ${v.colors.highlightActive};
+    margin: 0 2px;
+  `}
 `
 Option.displayName = 'QuickOption'
 
@@ -39,7 +46,11 @@ class QuickOptionSelector extends React.Component {
               {option.icon ? (
                 <Option color={'white'}>{option.icon}</Option>
               ) : (
-                <Option image={option.imageUrl} color={option.color} />
+                <Option
+                  active={option.active}
+                  image={option.imageUrl}
+                  color={option.color}
+                />
               )}
             </button>
           </Tooltip>
@@ -57,6 +68,7 @@ QuickOptionSelector.propTypes = {
       imageUrl: PropTypes.string,
       icon: PropTypes.node,
       color: PropTypes.string,
+      active: PropTypes.bool,
     })
   ),
   onSelect: PropTypes.func.isRequired,

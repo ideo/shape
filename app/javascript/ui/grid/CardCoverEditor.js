@@ -251,12 +251,25 @@ class CardCoverEditor extends React.Component {
     if (!this.recordIsCollection) {
       return []
     }
+    const { coverImageUrl } = this.props.card
     return _.take(
-      imageCards.map(card => ({
-        cardId: card.id,
-        title: card.record.name,
-        imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
-      })),
+      imageCards.map(card => {
+        let active = false
+        const thumbnail = card.record.imageUrl()
+        if (thumbnail.indexOf('filestackcontent') > 0) {
+          const handle1 = _.last(thumbnail.split('/'))
+          const handle2 = _.last(coverImageUrl.split('/'))
+          active = handle1 === handle2
+        } else if (thumbnail === coverImageUrl) {
+          active = true
+        }
+        return {
+          cardId: card.id,
+          title: card.record.name,
+          imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
+          active,
+        }
+      }),
       9
     )
   }
