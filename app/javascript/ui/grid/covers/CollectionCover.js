@@ -5,7 +5,7 @@ import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
-import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -337,14 +337,9 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get cardIsLink() {
-    const { card } = this.props
-    return card && card.type === COLLECTION_CARD_TYPES.LINK
-  }
-
   get subtitle() {
     const { card, collection } = this.props
-    if (this.cardIsLink) {
+    if (card.isLink) {
       // this will already fall back to the collection as needed
       return card.subtitle
     }
@@ -561,7 +556,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
-  card: MobxPropTypes.objectOrObservableObject,
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -574,7 +569,6 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
-  card: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

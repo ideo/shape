@@ -692,11 +692,20 @@ class CardCoverEditor extends React.Component {
     )
   }
 
-  render() {
+  get title() {
+    const { card } = this.props
     const { recordIsCollection } = this
+    let type = recordIsCollection ? 'Collection' : 'Cover'
+    if (card.isLinkCard && recordIsCollection) {
+      type = 'Link'
+    }
+    return `${type} Settings`
+  }
+
+  render() {
+    const { title } = this
     const { isEditingCardCover, pageMenu } = this.props
 
-    const title = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (

@@ -9,9 +9,10 @@ import {
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import FilestackUpload from '~/utils/FilestackUpload'
+import TitleAndCoverEditingMixin from './TitleAndCoverEditingMixin'
 import BaseRecord from './BaseRecord'
 
-class CollectionCard extends BaseRecord {
+class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
   static type = 'collection_cards'
   static endpoint = apiUrl('collection_cards')
 
@@ -139,13 +140,13 @@ class CollectionCard extends BaseRecord {
     )
   }
 
-  get isCollectionOrLinkCardType() {
+  get isLinkCard() {
     return this.type === COLLECTION_CARD_TYPES.LINK
   }
 
   get subtitle() {
     // Collection cards only show titles for link cards
-    if (!this.isCollectionOrLinkCardType) return null
+    if (!this.isLinkCard) return null
     const { cover } = this
     const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
 
@@ -162,21 +163,21 @@ class CollectionCard extends BaseRecord {
   }
 
   get subtitleForEditing() {
-    if (!this.isCollectionOrLinkCardType) return null
+    if (!this.isLinkCard) return null
     const { cover } = this
     const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
     return coverSubtitle || this.linkedCoverSubtitleOrText
   }
 
   get titleForEditing() {
-    if (!this.isCollectionOrLinkCardType) return null
+    if (!this.isLinkCard) return null
     const { cover } = this
     return (cover && cover.hardcoded_title) || ''
   }
 
   get linkedCoverSubtitleOrText() {
     // used by collection_cards to fall-back to the linked record's subtitle
-    if (!this.isCollectionOrLinkCardType) {
+    if (!this.isLinkCard) {
       return null
     }
 
@@ -194,7 +195,7 @@ class CollectionCard extends BaseRecord {
       const cover = { ...collection.cover }
       const cardCover = this.cover || {}
 
-      if (this.isCollectionOrLinkCardType)
+      if (this.isLinkCard)
         _.each(['image_url', 'image_handle'], field => {
           // allow cardCover to override collection cover if fields are present
           if (cardCover[field]) {
@@ -213,21 +214,6 @@ class CollectionCard extends BaseRecord {
     }
     return record.thumbnail_url
   }
-  // --------------------------------------
-  // TODO find a place for these? card has to call methods from SharedRecordMixin
-  // but reassign itself using call(this, ...)
-  API_updateNameAndCover(args) {
-    return this.record.API_updateNameAndCover.call(this, args)
-  }
-
-  API_clearCover(args) {
-    return this.record.API_clearCover.call(this, args)
-  }
-
-  pushUndo(args) {
-    this.record.pushUndo.call(this, args)
-  }
-  // --------------------------------------
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
