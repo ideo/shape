@@ -297,7 +297,7 @@ class GridCardBlank extends React.Component {
     Object.assign(attrs, nested)
 
     // Set default text card background if there
-    if (attrs.item_attributes.type === ITEM_TYPES.TEXT) {
+    if (attrs.item_attributes && attrs.item_attributes.type === ITEM_TYPES.TEXT) {
       const defaultBgColor = localStorage.getItem(TEXT_ITEM_DEFAULT_BG_COLOR)
       if (defaultBgColor) {
         attrs.item_attributes.background_color = defaultBgColor.color
