@@ -91,6 +91,9 @@ const createNamedRoutes = () => {
   cy.route('GET', '/api/v1/organizations/*/audiences').as(
     'apiGetOrganizationAudiences'
   )
+  cy.route('GET', '/api/v1/organizations/*/my_collection*').as(
+    'apiOrganizationMyCollection'
+  )
 
   // -- groups
   cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')

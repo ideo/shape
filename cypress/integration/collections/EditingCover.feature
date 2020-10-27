@@ -10,7 +10,7 @@ Feature: Editing Cover
     And I type "Subtitle" in the subtitle textarea
     And I click the 'ModalClose'
     And I wait for "@apiUpdateCollection" to finish
-    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#E27300" at 0,1
+    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#E27300" at 0,2
 
     When I click the edit collection settings icon
     Then I should see a 'EditCoverOptions'
