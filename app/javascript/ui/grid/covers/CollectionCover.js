@@ -6,8 +6,7 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 import ReactMarkdown from 'react-markdown'
 
-import FilestackUpload from '~/utils/FilestackUpload'
-import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -232,10 +231,10 @@ class CollectionCover extends React.Component {
   hasEmptyCarousel = false
 
   get backgroundColor() {
-    const { collection } = this.props
+    const { collection, card } = this.props
     if (collection.isSpecialCollection) return v.colors.offset
     // If image is present, have white background (for transparent images)
-    if (this.coverImageUrl) return v.colors.white
+    if (card.coverImageUrl) return v.colors.white
     // Otherwise default color
     return v.colors.collectionCover
   }
@@ -372,48 +371,22 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get coverImageUrl() {
-    const { card, collection } = this.props
-    const cardCover = card && card.cover
-    const collectionCover = collection.cover
-
-    // Either get the cover from the collection card itself, or get it from the collection it links to
-
-    const cover = !_.isEmpty(cardCover) ? cardCover : collectionCover
-
-    if (_.isEmpty(cover)) return null
-
-    if (cover.image_handle) {
-      return FilestackUpload.imageUrl({
-        handle: cover.image_handle,
-      })
-    }
-    return cover.image_url
-  }
-
-  get cardIsLink() {
-    const { card } = this.props
-    return card && card.type === COLLECTION_CARD_TYPES.LINK
-  }
-
   get subtitle() {
     const { card, collection } = this.props
-    const cardOrRecord = this.cardIsLink ? card : collection
-    const { subtitle, subtitleHidden } = cardOrRecord
-
+    if (card.isLink) {
+      // this will already fall back to the collection as needed
+      return card.subtitle
+    }
+    const { subtitle, subtitleHidden } = collection
     if (!subtitleHidden) {
       return subtitle
     }
     return ''
   }
 
-  get title() {
-    const { card } = this.props
-    const hardcodedTitle = _.get(card, 'cover.hardcoded_title', null)
-    if (this.cardIsLink && hardcodedTitle) {
-      return hardcodedTitle
-    }
-    return null
+  get coverTitle() {
+    const { collection, card } = this.props
+    return card.titleForEditing || collection.name
   }
 
   @action
@@ -481,10 +454,7 @@ class CollectionCover extends React.Component {
   }
 
   get requiresOverlay() {
-    const { collection } = this.props
-    const { cover } = collection
-
-    return !!(cover && cover.image_url)
+    return !!this.props.card.coverImageUrl
   }
 
   get useTextBackground() {
@@ -528,6 +498,7 @@ class CollectionCover extends React.Component {
       searchResult,
       uiStore,
       textItem,
+      card,
       cardId,
       fontColor,
     } = this.props
@@ -542,7 +513,7 @@ class CollectionCover extends React.Component {
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
-        url={this.coverImageUrl}
+        url={card.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
         backgroundColor={this.backgroundColor}
       >
@@ -564,7 +535,7 @@ class CollectionCover extends React.Component {
             color={fontColor}
             useTextBackground={this.useTextBackground}
           >
-            <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {this.requiresOverlay && <div className="overlay" />}
             {show_icon_on_cover && (
               <CoverIconWrapper>
                 <CollectionIcon type={icon} size="xxl" />
@@ -609,7 +580,7 @@ class CollectionCover extends React.Component {
                           collection={collection}
                           onCollectionClick={this.handleClick}
                           useTextBackground={this.useTextBackground}
-                          title={this.title}
+                          title={this.coverTitle}
                         />
                       </PlainLink>
                       {collIcon && (
@@ -663,7 +634,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
-  card: MobxPropTypes.objectOrObservableObject,
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -676,7 +647,6 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
-  card: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'
