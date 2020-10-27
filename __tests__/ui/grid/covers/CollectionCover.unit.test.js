@@ -38,6 +38,7 @@ describe('CollectionCover', () => {
   })
 
   it('renders cover text', () => {
+    const { cover } = fakeCollection
     expect(
       wrapper
         .find('Dotdotdot')
