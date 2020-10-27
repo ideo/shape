@@ -1,8 +1,8 @@
 import HotCellQuadrant, { Quadrant } from '~/ui/grid/HotCellQuadrant'
 import LinkIcon from '~/ui/icons/htc/LinkIcon'
-import PlusIcon from '~/ui/icons/PlusIcon'
-import PopoutMenu from '~/ui/global/PopoutMenu'
+import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
 import TextIcon from '~/ui/icons/htc/TextIcon'
+import PopoutMenu from '~/ui/global/PopoutMenu'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 
@@ -75,8 +75,8 @@ describe('HotCellQuadrant', () => {
         rerender({ name: 'template' })
       })
 
-      it('should render the PlusIcon', () => {
-        expect(wrapper.find(PlusIcon).exists()).toBe(true)
+      it('should render the TemplateIcon', () => {
+        expect(wrapper.find(TemplateIcon).exists()).toBe(true)
       })
     })
   })
