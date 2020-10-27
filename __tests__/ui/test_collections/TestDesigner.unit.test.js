@@ -267,7 +267,7 @@ describe('TestDesigner', () => {
     })
 
     it('calls CollectionCard.API_replace with params', async () => {
-      const card = await component.createNewQuestionCard({
+      await component.createNewQuestionCard({
         replacingCard: {
           id: '99',
           section_type: 'ideas',
