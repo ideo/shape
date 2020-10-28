@@ -1,11 +1,12 @@
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
-import styled from 'styled-components'
-import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
+import Hypher from 'hypher'
+import styled from 'styled-components'
 import { some } from 'lodash'
+
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { TextWithBackground } from './CollectionCover'
 
 function splitName(name) {
@@ -108,11 +109,14 @@ class CollectionCoverTitle extends React.Component {
 CollectionCoverTitle.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   useTextBackground: PropTypes.bool,
-  title: PropTypes.string.isRequired,
+  onCollectionClick: PropTypes.func,
+  title: PropTypes.string,
 }
 
 CollectionCoverTitle.defaultProps = {
   useTextBackground: false,
+  onCollectionClick: null,
+  title: null,
 }
 
 export default CollectionCoverTitle

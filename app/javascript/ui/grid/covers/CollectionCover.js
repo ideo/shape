@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import ReactMarkdown from 'react-markdown'
 
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
@@ -56,6 +57,35 @@ export const StyledCollectionCover = styled.div`
   `};
 `
 StyledCollectionCover.displayName = 'StyledCollectionCover'
+
+const MarkdownStyling = styled.span`
+  div,
+  p {
+    display: inline;
+  }
+
+  button:nth-of-type(1) {
+  }
+
+  button:nth-of-type(2) {
+    top: 50px;
+  }
+
+  button:nth-of-type(3) {
+    top: 100px;
+  }
+
+  button:nth-of-type(4) {
+    top: 150px;
+  }
+`
+
+const PositionedButton = styled(Button)`
+  display: block;
+  left: calc(50% - 85px);
+  margin-top: 10px;
+  position: absolute;
+`
 
 const pad = 16
 const calcSectionWidth = props => {
@@ -112,6 +142,9 @@ const CoverIconWrapper = styled.div`
 CoverIconWrapper.displayName = 'CoverIconWrapper'
 
 const StyledCardContent = styled.div`
+  .top {
+    z-index: 1;
+  }
   .top,
   .bottom {
     color: ${props => (props.color ? props.color : 'white')};
@@ -180,6 +213,7 @@ StyledCardContent.displayName = 'StyledCardContent'
 const PositionedCardHeading = styled(CardHeading)`
   bottom: 0;
   position: absolute;
+  width: 100%;
 `
 
 export const TextWithBackground = styled.span`
@@ -378,6 +412,21 @@ class CollectionCover extends React.Component {
     }
   }
 
+  handleButtonClick = (href, ev) => {
+    // Call the parent on click handler
+    if (href.length < 6) {
+      return true
+    }
+    ev.stopPropagation()
+    ev.preventDefault()
+    let fullHref = href
+    if (!/^https?:\/\//.test(href)) {
+      fullHref = `http://${href}`
+    }
+    window.location = fullHref
+    return false
+  }
+
   onOpenCollection = e => {
     const { searchResult, dragging, uiStore, collection } = this.props
     const { movingCardIds } = uiStore
@@ -413,6 +462,32 @@ class CollectionCover extends React.Component {
       collection: { tag_list },
     } = this.props
     return tag_list && tag_list.includes('case study')
+  }
+
+  get renderSubtitle() {
+    const { collection } = this.props
+    const { subtitle } = collection
+    return (
+      <MarkdownStyling>
+        <ReactMarkdown
+          source={subtitle}
+          allowedTypes={['link', 'paragraph', 'text', 'root']}
+          renderers={{
+            link: ({ key, href, children, title } = {}) => {
+              return (
+                <PositionedButton
+                  onClick={ev => this.handleButtonClick(href, ev)}
+                  key={key}
+                  colorScheme={title}
+                >
+                  {children}
+                </PositionedButton>
+              )
+            },
+          }}
+        />
+      </MarkdownStyling>
+    )
   }
 
   render() {
@@ -503,6 +578,7 @@ class CollectionCover extends React.Component {
                       >
                         <CollectionCoverTitle
                           collection={collection}
+                          onCollectionClick={this.handleClick}
                           useTextBackground={this.useTextBackground}
                           title={this.coverTitle}
                         />
@@ -530,9 +606,11 @@ class CollectionCover extends React.Component {
                   {!this.hasLaunchTestButton && this.subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
                       {this.useTextBackground ? (
-                        <TextWithBackground>{this.subtitle}</TextWithBackground>
+                        <TextWithBackground>
+                          {this.renderSubtitle}
+                        </TextWithBackground>
                       ) : (
-                        this.subtitle
+                        this.renderSubtitle
                       )}
                     </Dotdotdot>
                   )}

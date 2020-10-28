@@ -38,13 +38,14 @@ describe('CollectionCover', () => {
   })
 
   it('renders cover text', () => {
+    const { cover } = fakeCollection
     expect(
       wrapper
         .find('Dotdotdot')
         .at(1)
-        .children()
-        .text()
-    ).toContain(props.collection.cover.text)
+        .find('ReactMarkdown')
+        .props().source
+    ).toContain(cover.text)
     expect(component.numberOfLinesForDescription).toEqual(3)
   })
 
