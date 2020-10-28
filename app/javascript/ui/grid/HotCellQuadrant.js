@@ -59,7 +59,7 @@ const QuadrantIconHolder = styled.div`
   vertical-align: middle;
 `
 
-const More = styled.button`
+const More = styled.div`
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -89,7 +89,7 @@ const nameToIcon = {
   report: ReportIcon,
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
-  template: PlusIcon,
+  template: TemplateIcon,
   useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
   text: TextIcon,
@@ -153,7 +153,7 @@ class HotCellQuadrant extends React.Component {
                     (() => {
                       this.createContent(subType.name, subType.opts)
                     }),
-                  TextComponent: subType.name !== 'header' && HeadingText,
+                  TextComponent: subType.name !== 'header' ? HeadingText : null,
                 }
               }),
           }
@@ -163,9 +163,10 @@ class HotCellQuadrant extends React.Component {
         if (description === 'Create New Template') TypeIcon = PlusIcon
         return {
           name: description,
-          iconLeft: name !== 'header' && <TypeIcon />,
-          onClick: name !== 'header' && (() => this.createContent(name, opts)),
-          TextComponent: name === 'header' && HeadingText,
+          iconLeft: name !== 'header' ? <TypeIcon /> : null,
+          onClick:
+            name !== 'header' ? () => this.createContent(name, opts) : null,
+          TextComponent: name === 'header' ? HeadingText : null,
         }
       }
     )

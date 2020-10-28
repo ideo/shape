@@ -4,9 +4,9 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import ReactMarkdown from 'react-markdown'
 
-import FilestackUpload from '~/utils/FilestackUpload'
-import v, { COLLECTION_CARD_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -57,6 +57,35 @@ export const StyledCollectionCover = styled.div`
   `};
 `
 StyledCollectionCover.displayName = 'StyledCollectionCover'
+
+const MarkdownStyling = styled.span`
+  div,
+  p {
+    display: inline;
+  }
+
+  button:nth-of-type(1) {
+  }
+
+  button:nth-of-type(2) {
+    top: 50px;
+  }
+
+  button:nth-of-type(3) {
+    top: 100px;
+  }
+
+  button:nth-of-type(4) {
+    top: 150px;
+  }
+`
+
+const PositionedButton = styled(Button)`
+  display: block;
+  left: calc(50% - 85px);
+  margin-top: 10px;
+  position: absolute;
+`
 
 const pad = 16
 const calcSectionWidth = props => {
@@ -113,6 +142,9 @@ const CoverIconWrapper = styled.div`
 CoverIconWrapper.displayName = 'CoverIconWrapper'
 
 const StyledCardContent = styled.div`
+  .top {
+    z-index: 1;
+  }
   .top,
   .bottom {
     color: ${props => (props.color ? props.color : 'white')};
@@ -181,6 +213,7 @@ StyledCardContent.displayName = 'StyledCardContent'
 const PositionedCardHeading = styled(CardHeading)`
   bottom: 0;
   position: absolute;
+  width: 100%;
 `
 
 export const TextWithBackground = styled.span`
@@ -198,10 +231,10 @@ class CollectionCover extends React.Component {
   hasEmptyCarousel = false
 
   get backgroundColor() {
-    const { collection } = this.props
+    const { collection, card } = this.props
     if (collection.isSpecialCollection) return v.colors.offset
     // If image is present, have white background (for transparent images)
-    if (this.coverImageUrl) return v.colors.white
+    if (card.coverImageUrl) return v.colors.white
     // Otherwise default color
     return v.colors.collectionCover
   }
@@ -338,48 +371,22 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get coverImageUrl() {
-    const { card, collection } = this.props
-    const cardCover = card && card.cover
-    const collectionCover = collection.cover
-
-    // Either get the cover from the collection card itself, or get it from the collection it links to
-
-    const cover = !_.isEmpty(cardCover) ? cardCover : collectionCover
-
-    if (_.isEmpty(cover)) return null
-
-    if (cover.image_handle) {
-      return FilestackUpload.imageUrl({
-        handle: cover.image_handle,
-      })
-    }
-    return cover.image_url
-  }
-
-  get cardIsLink() {
-    const { card } = this.props
-    return card && card.type === COLLECTION_CARD_TYPES.LINK
-  }
-
   get subtitle() {
     const { card, collection } = this.props
-    const cardOrRecord = this.cardIsLink ? card : collection
-    const { subtitle, subtitleHidden } = cardOrRecord
-
+    if (card.isLinkCard) {
+      // this will already fall back to the collection as needed
+      return card.subtitle
+    }
+    const { subtitle, subtitleHidden } = collection
     if (!subtitleHidden) {
       return subtitle
     }
     return ''
   }
 
-  get title() {
-    const { card } = this.props
-    const hardcodedTitle = _.get(card, 'cover.hardcoded_title', null)
-    if (this.cardIsLink && hardcodedTitle) {
-      return hardcodedTitle
-    }
-    return null
+  get coverTitle() {
+    const { collection, card } = this.props
+    return card.titleForEditing || collection.name
   }
 
   @action
@@ -403,6 +410,21 @@ class CollectionCover extends React.Component {
     } else {
       return this.onOpenCollection(e)
     }
+  }
+
+  handleButtonClick = (href, ev) => {
+    // Call the parent on click handler
+    if (href.length < 6) {
+      return true
+    }
+    ev.stopPropagation()
+    ev.preventDefault()
+    let fullHref = href
+    if (!/^https?:\/\//.test(href)) {
+      fullHref = `http://${href}`
+    }
+    window.location = fullHref
+    return false
   }
 
   onOpenCollection = e => {
@@ -432,10 +454,7 @@ class CollectionCover extends React.Component {
   }
 
   get requiresOverlay() {
-    const { collection } = this.props
-    const { cover } = collection
-
-    return !!(cover && cover.image_url)
+    return !!this.props.card.coverImageUrl
   }
 
   get useTextBackground() {
@@ -443,6 +462,31 @@ class CollectionCover extends React.Component {
       collection: { tag_list },
     } = this.props
     return tag_list && tag_list.includes('case study')
+  }
+
+  get renderSubtitle() {
+    const { subtitle } = this
+    return (
+      <MarkdownStyling>
+        <ReactMarkdown
+          source={subtitle}
+          allowedTypes={['link', 'paragraph', 'text', 'root']}
+          renderers={{
+            link: ({ key, href, children, title } = {}) => {
+              return (
+                <PositionedButton
+                  onClick={ev => this.handleButtonClick(href, ev)}
+                  key={key}
+                  colorScheme={title}
+                >
+                  {children}
+                </PositionedButton>
+              )
+            },
+          }}
+        />
+      </MarkdownStyling>
+    )
   }
 
   render() {
@@ -453,6 +497,7 @@ class CollectionCover extends React.Component {
       searchResult,
       uiStore,
       textItem,
+      card,
       cardId,
       fontColor,
     } = this.props
@@ -467,7 +512,7 @@ class CollectionCover extends React.Component {
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
-        url={this.coverImageUrl}
+        url={card.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
         backgroundColor={this.backgroundColor}
       >
@@ -489,7 +534,7 @@ class CollectionCover extends React.Component {
             color={fontColor}
             useTextBackground={this.useTextBackground}
           >
-            <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {this.requiresOverlay && <div className="overlay" />}
             {show_icon_on_cover && (
               <CoverIconWrapper>
                 <CollectionIcon type={icon} size="xxl" />
@@ -532,8 +577,9 @@ class CollectionCover extends React.Component {
                       >
                         <CollectionCoverTitle
                           collection={collection}
+                          onCollectionClick={this.handleClick}
                           useTextBackground={this.useTextBackground}
-                          title={this.title}
+                          title={this.coverTitle}
                         />
                       </PlainLink>
                       {collIcon && (
@@ -559,9 +605,11 @@ class CollectionCover extends React.Component {
                   {!this.hasLaunchTestButton && this.subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
                       {this.useTextBackground ? (
-                        <TextWithBackground>{this.subtitle}</TextWithBackground>
+                        <TextWithBackground>
+                          {this.renderSubtitle}
+                        </TextWithBackground>
                       ) : (
-                        this.subtitle
+                        this.renderSubtitle
                       )}
                     </Dotdotdot>
                   )}
@@ -585,7 +633,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
-  card: MobxPropTypes.objectOrObservableObject,
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -598,7 +646,6 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
-  card: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

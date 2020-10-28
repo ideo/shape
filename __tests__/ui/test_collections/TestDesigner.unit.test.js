@@ -247,6 +247,7 @@ describe('TestDesigner', () => {
             },
             card_question_type: 'question_useful',
             section_type: 'ideas',
+            stopReplacing: jest.fn(),
           },
         },
       })
@@ -279,6 +280,7 @@ describe('TestDesigner', () => {
         'PATCH',
         expect.any(Object)
       )
+      expect(card.record.name).toEqual('some name')
     })
   })
 

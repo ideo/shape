@@ -16,7 +16,7 @@ describe('CollectionCover', () => {
       width: 2,
       height: 1,
       uiStore: fakeUiStore,
-      card: null,
+      card: { ...fakeCollectionCard, coverImageUrl: 'http://cover.image.url' },
     }
     const { cover } = fakeCollection
     fakeCollection.subtitle = cover.text
@@ -33,18 +33,19 @@ describe('CollectionCover', () => {
 
   it('renders the cover image_url', () => {
     expect(wrapper.find('StyledCollectionCover').props().url).toEqual(
-      props.collection.cover.image_url
+      props.card.coverImageUrl
     )
   })
 
   it('renders cover text', () => {
+    const { cover } = fakeCollection
     expect(
       wrapper
         .find('Dotdotdot')
         .at(1)
-        .children()
-        .text()
-    ).toContain(props.collection.cover.text)
+        .find('ReactMarkdown')
+        .props().source
+    ).toContain(cover.text)
     expect(component.numberOfLinesForDescription).toEqual(3)
   })
 
@@ -195,24 +196,19 @@ describe('CollectionCover', () => {
   describe('with a link card with a cover', () => {
     const card = fakeCollectionCard
     beforeEach(() => {
-      card.type = 'CollectionCard::Link'
-      card.internal_type = 'collection_cards'
-      card.cover = {
-        hardcoded_title: 'My New Title',
-        hardcoded_subtitle: 'A subtitle',
-        subtitle_hidden: false,
-      }
+      card.isLinkCard = true
+      card.titleForEditing = 'My New Title'
       card.subtitle = 'A subtitle'
       props.card = card
       rerender()
     })
 
-    it('should have match the hardcoded_title', () => {
-      expect(component.title).toEqual(props.card.cover.hardcoded_title)
+    it('should match the hardcoded_title', () => {
+      expect(component.coverTitle).toEqual(props.card.titleForEditing)
     })
 
-    it('should have match the hardcoded_subtitle', () => {
-      expect(component.subtitle).toEqual(props.card.cover.hardcoded_subtitle)
+    it('should match the hardcoded_subtitle', () => {
+      expect(component.subtitle).toEqual(props.card.subtitle)
     })
   })
 })

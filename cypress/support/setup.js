@@ -32,6 +32,7 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/collection_cards/move').as(
     'apiMoveCollectionCards'
   )
+  cy.route('POST', '/api/v1/collection_cards/link').as('apiLinkCollectionCards')
   cy.route('PATCH', '/api/v1/collection_cards/*/replace').as(
     'apiReplaceCollectionCard'
   )
@@ -90,6 +91,9 @@ const createNamedRoutes = () => {
   cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
   cy.route('GET', '/api/v1/organizations/*/audiences').as(
     'apiGetOrganizationAudiences'
+  )
+  cy.route('GET', '/api/v1/organizations/*/my_collection*').as(
+    'apiOrganizationMyCollection'
   )
 
   // -- groups

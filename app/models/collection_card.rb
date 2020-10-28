@@ -239,6 +239,16 @@ class CollectionCard < ApplicationRecord
       end
     end
 
+    unless cc.board_placement_is_valid?
+      # adjust dupe's position to be valid on the board
+      CollectionGrid::BoardPlacement.call(
+        to_collection: cc.parent,
+        moving_cards: [cc],
+        row: cc.row,
+        col: cc.col,
+      )
+    end
+
     return cc unless cc.save
 
     # now that the card exists, we can recalculate the breadcrumb

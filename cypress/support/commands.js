@@ -16,6 +16,7 @@ Cypress.Commands.add('loginAndVisitMyCollection', () => {
   cy.visit('/')
   cy.wait('@apiGetCurrentUser')
   cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiOrganizationMyCollection')
 })
 
 Cypress.Commands.add('loginAndVisitAdmin', () => {
