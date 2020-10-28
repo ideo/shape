@@ -30,15 +30,17 @@ const TitleAndCoverEditingMixin = superclass =>
       }
       const data = this.toJsonApi()
       if (this.isLinkCard || this.isCollection) {
-        if (hardcodedTitle !== this.cover.hardcoded_title) {
+        if (this.cover && hardcodedTitle !== this.cover.hardcoded_title) {
           this.cover.hardcoded_title = hardcodedTitle
         }
-        if (hardcodedSubtitle !== this.subtitle) {
+        if (this.cover && hardcodedSubtitle !== this.subtitle) {
           this.cover.hardcoded_subtitle = hardcodedSubtitle
         }
         data.attributes.hardcoded_title = hardcodedTitle
         data.attributes.hardcoded_subtitle = hardcodedSubtitle
-        this.cover.subtitle_hidden = subtitleHidden
+        if (this.cover) {
+          this.cover.subtitle_hidden = subtitleHidden
+        }
         data.attributes.subtitle_hidden = subtitleHidden
       } else if (this.isLink) {
         if (hardcodedSubtitle !== this.content) {

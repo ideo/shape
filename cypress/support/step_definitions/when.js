@@ -433,10 +433,11 @@ When('I click ... in the nav and select {string}', option => {
   cy.locate(`PopoutMenu_${option}`).click()
 })
 
-When('I click the edit collection settings icon', () => {
-  cy.locateDataOrClass('CardAction-edit collection settings')
+When('I click the edit {string} icon at {int},{int}', (name, row, col) => {
+  cy.selectCardAt({ row, col, value: `CardAction-edit ${name}` })
     .first()
-    .click({ force: true })
+    .click()
+  cy.wait(100)
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
 })
