@@ -62,6 +62,9 @@ export default class CollectionCollaborationService {
       if (text_item && text_item.quill_data) {
         this.handleTextItemUpdate(text_item.id, text_item, current_editor)
       }
+      if (text_item && text_item.background_color) {
+        this.handleTextItemUpdate(text_item.id, text_item, current_editor)
+      }
       return
     }
     if (updateData.cards_selected) {
@@ -97,6 +100,11 @@ export default class CollectionCollaborationService {
       if (!objectsEqual(localItem.quill_data, item.quill_data)) {
         localItem.setLatestCollaborator(current_editor)
         localItem.quill_data = item.quill_data
+      }
+      if (!objectsEqual(localItem.background_color, item.background_color)) {
+        localItem.setLatestCollaborator(current_editor)
+        localItem.background_color = item.background_color
+        localItem.background_color_opacity = item.background_color_opacity
       }
     } else if (item.parent_collection_card_id) {
       // we don't have the item, it must be a new card that we need to fetch
