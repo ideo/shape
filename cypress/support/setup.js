@@ -32,6 +32,7 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/collection_cards/move').as(
     'apiMoveCollectionCards'
   )
+  cy.route('POST', '/api/v1/collection_cards/link').as('apiLinkCollectionCards')
   cy.route('PATCH', '/api/v1/collection_cards/*/replace').as(
     'apiReplaceCollectionCard'
   )

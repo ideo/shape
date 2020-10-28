@@ -373,7 +373,7 @@ class CollectionCover extends React.Component {
 
   get subtitle() {
     const { card, collection } = this.props
-    if (card.isLink) {
+    if (card.isLinkCard) {
       // this will already fall back to the collection as needed
       return card.subtitle
     }
@@ -465,8 +465,7 @@ class CollectionCover extends React.Component {
   }
 
   get renderSubtitle() {
-    const { collection } = this.props
-    const { subtitle } = collection
+    const { subtitle } = this
     return (
       <MarkdownStyling>
         <ReactMarkdown
