@@ -1,7 +1,7 @@
 Feature: Editing Cover for Link Card
   Scenario: Opening the CardCoverEditor to edit the title and subtitle
     Given I login and visit My Collection
-    When I click the edit "link settings" icon at 0,1
+    When I click the edit "link settings" icon at 0,0
     Then I should see a 'EditCoverOptions'
     # this should get the cover font color picker (since it's first)
     When I click the "QuickOption-font color"
@@ -10,9 +10,9 @@ Feature: Editing Cover for Link Card
     And I type "Subtitle" in the subtitle textarea
     And I click the 'ModalClose'
     And I wait for "@apiUpdateCollectionCard" to finish
-    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#E27300" at 0,1
+    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#E27300" at 0,0
 
-    When I click the edit "link settings" icon at 0,1
+    When I click the edit "link settings" icon at 0,0
     And I click the "input" located in ".checkbox-hide-subtitle"
     And I click the 'ModalClose'
     And I wait for "@apiUpdateCollectionCard" to finish

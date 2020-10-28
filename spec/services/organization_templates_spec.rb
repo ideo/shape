@@ -66,6 +66,7 @@ RSpec.describe OrganizationTemplates, type: :service do
         ).to be true
       end
     end
+
     context 'with a shell org' do
       let!(:organization) { create(:organization, shell: true) }
       let(:user_collection) {
@@ -84,6 +85,7 @@ RSpec.describe OrganizationTemplates, type: :service do
         card = user_collection.collection_cards.visible.last
         expect(card.record).to eq(template_collection)
         expect(card.parent).to eq(user_collection)
+        expect(card.link?).to be true
       end
     end
   end
