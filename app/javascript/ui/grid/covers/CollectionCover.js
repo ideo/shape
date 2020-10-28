@@ -465,8 +465,7 @@ class CollectionCover extends React.Component {
   }
 
   get renderSubtitle() {
-    const { collection } = this.props
-    const { subtitle } = collection
+    const { subtitle } = this
     return (
       <MarkdownStyling>
         <ReactMarkdown

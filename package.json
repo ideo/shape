@@ -159,7 +159,7 @@
     "react-helmet": "^5.2.1",
     "react-infinite-scroller": "^1.1.3",
     "react-input-autosize": "^2.2.1",
-    "react-markdown": "^3.3.0",
+    "react-markdown": "^5.0.0",
     "react-player": "^1.7.0",
     "react-quill": "^1.3.3",
     "react-rnd": "^7.3.0",
