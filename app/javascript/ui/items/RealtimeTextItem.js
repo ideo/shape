@@ -729,6 +729,7 @@ class RealtimeTextItem extends React.Component {
 
   onColorPickerOpen = ev => {
     ev.preventDefault()
+    ev.stopPropagation()
     runInAction(() => {
       this.colorPickerOpen = !this.colorPickerOpen
     })
