@@ -8,9 +8,11 @@ import {
   COLLECTION_CARD_TYPES,
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
+import FilestackUpload from '~/utils/FilestackUpload'
+import TitleAndCoverEditingMixin from './TitleAndCoverEditingMixin'
 import BaseRecord from './BaseRecord'
 
-class CollectionCard extends BaseRecord {
+class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
   static type = 'collection_cards'
   static endpoint = apiUrl('collection_cards')
 
@@ -34,6 +36,8 @@ class CollectionCard extends BaseRecord {
     'hidden',
     'filter',
     'section_type',
+    'cover_card_id',
+    'cover',
   ]
 
   batchUpdateAttributes = [
@@ -134,6 +138,81 @@ class CollectionCard extends BaseRecord {
       !this.isPinnedAndLocked &&
       (this.can_edit_parent || (this.record && this.record.can_edit))
     )
+  }
+
+  get isLinkCard() {
+    return this.type === COLLECTION_CARD_TYPES.LINK
+  }
+
+  get subtitle() {
+    // Collection cards only show titles for link cards
+    if (!this.isLinkCard) return null
+    const { cover } = this
+    const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+
+    if (coverSubtitle) {
+      return cover.subtitle_hidden ? '' : coverSubtitle
+    }
+
+    return this.linkedCoverSubtitleOrText
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    return cover && cover.subtitle_hidden ? true : false
+  }
+
+  get subtitleForEditing() {
+    if (!this.isLinkCard) return null
+    const { cover } = this
+    const coverSubtitle = _.get(cover, 'hardcoded_subtitle', null)
+    return coverSubtitle || this.linkedCoverSubtitleOrText
+  }
+
+  get titleForEditing() {
+    if (!this.isLinkCard) return null
+    const { cover } = this
+    return (cover && cover.hardcoded_title) || ''
+  }
+
+  get linkedCoverSubtitleOrText() {
+    // used by collection_cards to fall-back to the linked record's subtitle
+    if (!this.isLinkCard) {
+      return null
+    }
+
+    const recordSubtitle = _.get(this, 'record.cover.hardcoded_subtitle', '')
+    const recordText = _.get(this, 'record.cover.text', '')
+
+    return recordSubtitle || recordText || ''
+  }
+
+  get coverImageUrl() {
+    const { record } = this
+    if (record.isCollection) {
+      const collection = record
+      // turn into normal object for overriding later w/out mobx issues
+      const cover = { ...collection.cover }
+      const cardCover = this.cover || {}
+
+      if (this.isLinkCard)
+        _.each(['image_url', 'image_handle'], field => {
+          // allow cardCover to override collection cover if fields are present
+          if (cardCover[field]) {
+            cover[field] = cardCover[field]
+          }
+        })
+
+      if (_.isEmpty(cover)) return null
+
+      if (cover.image_handle) {
+        return FilestackUpload.imageUrl({
+          handle: cover.image_handle,
+        })
+      }
+      return cover.image_url
+    }
+    return record.thumbnail_url
   }
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
@@ -273,7 +352,9 @@ class CollectionCard extends BaseRecord {
       uiStore.trackEvent('replace', this.parentCollection)
       // can get rid of this temp model
       this.apiStore.remove(this)
-      return res.data
+      const card = res.data
+      card.stopReplacing()
+      return card
     } catch (e) {
       console.warn(e)
       uiStore.closeBlankContentTool({ force: true })

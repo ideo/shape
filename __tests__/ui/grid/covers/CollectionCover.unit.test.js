@@ -1,14 +1,6 @@
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollection, fakeTextItem } from '#/mocks/data'
-
-const props = {
-  collection: fakeCollection,
-  width: 2,
-  height: 1,
-  uiStore: fakeUiStore,
-}
-const { cover } = fakeCollection
+import { fakeCollection, fakeTextItem, fakeCollectionCard } from '#/mocks/data'
 
 const fakeEvent = {
   preventDefault: jest.fn(),
@@ -16,9 +8,17 @@ const fakeEvent = {
   metaKey: null,
 }
 
-let wrapper, component, rerender
+let wrapper, component, rerender, props
 describe('CollectionCover', () => {
   beforeEach(() => {
+    props = {
+      collection: fakeCollection,
+      width: 2,
+      height: 1,
+      uiStore: fakeUiStore,
+      card: { ...fakeCollectionCard, coverImageUrl: 'http://cover.image.url' },
+    }
+    const { cover } = fakeCollection
     fakeCollection.subtitle = cover.text
     props.collection = {
       ...fakeCollection,
@@ -33,17 +33,18 @@ describe('CollectionCover', () => {
 
   it('renders the cover image_url', () => {
     expect(wrapper.find('StyledCollectionCover').props().url).toEqual(
-      cover.image_url
+      props.card.coverImageUrl
     )
   })
 
   it('renders cover text', () => {
+    const { cover } = fakeCollection
     expect(
       wrapper
         .find('Dotdotdot')
         .at(1)
-        .children()
-        .text()
+        .find('ReactMarkdown')
+        .props().source
     ).toContain(cover.text)
     expect(component.numberOfLinesForDescription).toEqual(3)
   })
@@ -189,6 +190,25 @@ describe('CollectionCover', () => {
     it('renders xxl icon', () => {
       const icon = wrapper.find('CoverIconWrapper').find('CollectionIcon')
       expect(icon.props().size).toEqual('xxl')
+    })
+  })
+
+  describe('with a link card with a cover', () => {
+    const card = fakeCollectionCard
+    beforeEach(() => {
+      card.isLink = true
+      card.titleForEditing = 'My New Title'
+      card.subtitle = 'A subtitle'
+      props.card = card
+      rerender()
+    })
+
+    it('should match the hardcoded_title', () => {
+      expect(component.coverTitle).toEqual(props.card.titleForEditing)
+    })
+
+    it('should match the hardcoded_subtitle', () => {
+      expect(component.subtitle).toEqual(props.card.subtitle)
     })
   })
 })

@@ -2,12 +2,12 @@ import _ from 'lodash'
 import { action, computed, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import TitleAndCoverEditingMixin from './TitleAndCoverEditingMixin'
 import v from '~/utils/variables'
 
 // This contains some shared methods between Collection and Item
 const SharedRecordMixin = superclass =>
-  class extends superclass {
+  class extends TitleAndCoverEditingMixin(superclass) {
     @observable
     forceMenuDisabled = false
     @observable
@@ -68,51 +68,6 @@ const SharedRecordMixin = superclass =>
         return this.routingStore.pathTo(type, id)
       }
       return this.routingStore.pathTo('homepage')
-    }
-
-    @action
-    API_updateNameAndCover({
-      name,
-      hardcodedSubtitle = '',
-      subtitleHidden = false,
-    }) {
-      const previousName = this.name
-      this.name = name
-      if (name !== previousName) {
-        this.pushUndo({
-          snapshot: { name: previousName },
-          message: `${this.className} name edit undone`,
-          actionType: POPUP_ACTION_TYPES.SNACKBAR,
-          redirectTo: { internalType: null, id: null }, // we don't need to redirect when undoing a cover title edit
-          redoAction: {
-            message: `${this.className} name edit redone`,
-            apiCall: () =>
-              // re-call the same function
-              this.API_updateNameAndCover(name),
-          },
-        })
-      }
-      const data = this.toJsonApi()
-      // see collection_updater.rb for deserialization
-      if (this.internalType === 'collections') {
-        if (hardcodedSubtitle !== this.subtitle) {
-          this.cover.hardcoded_subtitle = hardcodedSubtitle
-        }
-        data.attributes.hardcoded_subtitle = hardcodedSubtitle
-        this.cover.subtitle_hidden = subtitleHidden
-        data.attributes.subtitle_hidden = subtitleHidden
-      } else if (this.isLink) {
-        if (hardcodedSubtitle !== this.content) {
-          this.content = hardcodedSubtitle
-        }
-        data.attributes.content = hardcodedSubtitle
-        data.attributes.subtitle_hidden = subtitleHidden
-        this.subtitle_hidden = subtitleHidden
-      }
-
-      // cancel sync so that name edits don't roundtrip and interfere with your <input>
-      data.cancel_sync = true
-      return this.patch(data)
     }
 
     async API_revertTo({ snapshot } = {}) {
@@ -253,31 +208,6 @@ const SharedRecordMixin = superclass =>
         routingStore.goToPath(this.parentPath)
       }
       uiStore.update('isLoading', false)
-    }
-
-    pushUndo({
-      snapshot,
-      message = '',
-      apiCall,
-      redirectTo = this,
-      redoAction = null,
-      actionType = POPUP_ACTION_TYPES.SNACKBAR,
-    } = {}) {
-      let undoApiCall = apiCall
-      if (!apiCall) {
-        undoApiCall = () => this.API_revertTo({ snapshot })
-      }
-      let redirectPath = null
-      if (redirectTo) {
-        redirectPath = { type: redirectTo.internalType, id: redirectTo.id }
-      }
-      this.undoStore.pushUndoAction({
-        message,
-        apiCall: undoApiCall,
-        redirectPath,
-        redoAction,
-        actionType,
-      })
     }
 
     @action

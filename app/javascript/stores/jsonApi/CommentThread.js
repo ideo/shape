@@ -89,12 +89,17 @@ class CommentThread extends BaseRecord {
       apiStore.update('loadingThreads', true)
     })
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
-    const res = await this.apiStore.request(apiPath, 'GET')
-    runInAction(() => {
-      this.links = res.links
-      this.importComments(res.data)
+    try {
+      const res = await this.apiStore.request(apiPath, 'GET')
+      runInAction(() => {
+        this.links = res.links
+        this.importComments(res.data)
+        apiStore.update('loadingThreads', false)
+      })
+    } catch {
+      // just gracefully ignore (e.g. on dev where it's a thread you don't have access to)
       apiStore.update('loadingThreads', false)
-    })
+    }
   }
 
   async API_saveComment(commentData) {

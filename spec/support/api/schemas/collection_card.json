@@ -23,7 +23,9 @@
     "idea_id": { "type": ["string", "null"] },
     "section_type": { "type": ["string", "null"] },
     "font_color": { "type": ["string", "null"] },
-    "font_background": { "type": ["boolean"] }
+    "font_background": { "type": ["boolean"] },
+    "cover_card_id": { "type": ["integer", "null"] },
+    "cover": { "type": ["object", "null"] }
   },
   "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }

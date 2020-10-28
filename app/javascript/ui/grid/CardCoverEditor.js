@@ -17,7 +17,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, COLLECTION_CARD_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -136,7 +136,7 @@ class CardCoverEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { isEditingCardCover, pageMenu } = this.props
+    const { isEditingCardCover, pageMenu, card } = this.props
     if (prevProps.isEditingCardCover !== isEditingCardCover) {
       const { record } = this
 
@@ -149,19 +149,32 @@ class CardCoverEditor extends React.Component {
         return
       }
 
+      let titleForComparison = record.name
+      let cardOrRecord = record
+      const data = {
+        hardcodedSubtitle: this.hardcodedSubtitle,
+        subtitleHidden: this.subtitleHidden,
+      }
+      if (this.cardIsLink) {
+        cardOrRecord = card
+        titleForComparison = _.get(card, 'cover.hardcoded_title')
+        // editing a link means you're editing the cover.hardcoded_title
+        data.hardcodedTitle = this.cardTitle
+      } else {
+        // editing a record means you're editing the record.name
+        data.name = this.cardTitle
+      }
+
       if (
-        record.name === this.cardTitle &&
-        record.subtitle === this.hardcodedSubtitle &&
-        record.subtitleHidden === this.subtitleHidden
+        titleForComparison === this.cardTitle &&
+        cardOrRecord.subtitle === this.hardcodedSubtitle &&
+        cardOrRecord.subtitleHidden === this.subtitleHidden
       ) {
         return
       }
+
       // only update when you close the editor and there are changes
-      record.API_updateNameAndCover({
-        name: this.cardTitle,
-        hardcodedSubtitle: this.hardcodedSubtitle,
-        subtitleHidden: this.subtitleHidden,
-      })
+      cardOrRecord.API_updateNameAndCover(data)
     }
   }
 
@@ -180,6 +193,13 @@ class CardCoverEditor extends React.Component {
 
   get recordIsCollection() {
     return this.props.card.record.internalType === 'collections'
+  }
+
+  get cardIsLink() {
+    return (
+      this.recordIsCollection &&
+      this.props.card.type === COLLECTION_CARD_TYPES.LINK
+    )
   }
 
   fetchOptions() {
@@ -248,7 +268,7 @@ class CardCoverEditor extends React.Component {
     this.setLoading(false)
 
     let bgOption = null
-    if (this.recordIsCollection) {
+    if (this.recordIsCollection && !this.cardIsLink) {
       bgOption = collectionBackgroundOption
     } else if (record.isLink) {
       bgOption = linkBackgroundOption
@@ -273,7 +293,7 @@ class CardCoverEditor extends React.Component {
     const isCover = type === 'cover'
     const isBackground = type === 'background'
     if (isCover) {
-      await collection.API_clearCollectionCover()
+      await collection.API_clearCover()
     }
     const attrs = {
       item_attributes: {
@@ -372,23 +392,30 @@ class CardCoverEditor extends React.Component {
 
   @action
   setObservableInputs = () => {
+    const { card } = this.props
     const { record } = this
     const { name } = record
-    this.cardTitle = name || record.url
-    if (record.isCollection) {
+    if (this.cardIsLink) {
+      this.cardTitle = card.titleForEditing || name
+      this.hardcodedSubtitle = card.subtitleForEditing
+      this.subtitleHidden = card.subtitleHidden
+    } else if (record.isCollection) {
+      this.cardTitle = name || record.url
       this.hardcodedSubtitle = record.subtitleForEditing
+      this.subtitleHidden = record.subtitleHidden
     } else if (record.isLink) {
+      this.cardTitle = name || record.url
       this.hardcodedSubtitle = record.content
+      this.subtitleHidden = record.subtitleHidden
     }
-    this.subtitleHidden = record.subtitleHidden
   }
 
   async clearCover() {
     const { card } = this.props
     const { recordIsCollection } = this
-    if (recordIsCollection) {
-      const collection = card.record
-      return collection.API_clearCollectionCover()
+    if (this.cardIsLink || recordIsCollection) {
+      const cardOrRecord = this.cardIsLink ? card : card.record
+      return cardOrRecord.API_clearCover()
     }
     const item = card.record
     item.thumbnail_url = ''
@@ -403,8 +430,14 @@ class CardCoverEditor extends React.Component {
   onImageOptionSelect = async option => {
     const { apiStore, card } = this.props
     const { recordIsCollection } = this
+    // if card's cover is already set, then edit its own
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
+      if (this.cardIsLink) {
+        card.cover_card_id = option.cardId
+        card.save()
+        return
+      }
       await selectedCard.patch({ attributes: { is_cover: true } })
     } else if (option.type === 'remove') {
       await this.clearCover()
@@ -618,7 +651,7 @@ class CardCoverEditor extends React.Component {
               </Fragment>
             )}
           </Box>
-          {recordIsCollection && (
+          {recordIsCollection && !this.cardIsLink && (
             <Box w={[1, 0.425]} ml={[0, 64]}>
               <MediumBreak />
               <h3>Background Image</h3>
@@ -659,11 +692,20 @@ class CardCoverEditor extends React.Component {
     )
   }
 
-  render() {
+  get title() {
+    const { card } = this.props
     const { recordIsCollection } = this
+    let type = recordIsCollection ? 'Collection' : 'Cover'
+    if (card.isLinkCard && recordIsCollection) {
+      type = 'Link'
+    }
+    return `${type} Settings`
+  }
+
+  render() {
+    const { title } = this
     const { isEditingCardCover, pageMenu } = this.props
 
-    const title = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (

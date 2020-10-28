@@ -3,6 +3,7 @@ import { Model, initModelRef, setModelMetaKey } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
 
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 // NOTE: DATX_PERSISTED_KEY matches internals in datx, they don't export this;
 // so it is possible that this could change when updating datx.
 const DATX_PERSISTED_KEY = 'jsonapiPersisted'
@@ -137,6 +138,37 @@ class BaseRecord extends jsonapi(Model) {
     this.apiStore.remove(this.internalType, this.id)
     runInAction(() => {
       setModelMetaKey(this, DATX_PERSISTED_KEY, false)
+    })
+  }
+
+  // to be overriden if used
+  API_revertTo() {
+    return null
+  }
+
+  pushUndo({
+    snapshot,
+    message = '',
+    apiCall,
+    redirectTo = this,
+    redoAction = null,
+    actionType = POPUP_ACTION_TYPES.SNACKBAR,
+  } = {}) {
+    let undoApiCall = apiCall
+    if (!apiCall) {
+      // you can pushUndo without an apiCall and it will fallback to API_revertTo
+      undoApiCall = () => this.API_revertTo({ snapshot })
+    }
+    let redirectPath = null
+    if (redirectTo) {
+      redirectPath = { type: redirectTo.internalType, id: redirectTo.id }
+    }
+    this.undoStore.pushUndoAction({
+      message,
+      apiCall: undoApiCall,
+      redirectPath,
+      redoAction,
+      actionType,
     })
   }
 }

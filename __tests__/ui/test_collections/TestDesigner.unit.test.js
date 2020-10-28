@@ -247,6 +247,7 @@ describe('TestDesigner', () => {
             },
             card_question_type: 'question_useful',
             section_type: 'ideas',
+            stopReplacing: jest.fn(),
           },
         },
       })

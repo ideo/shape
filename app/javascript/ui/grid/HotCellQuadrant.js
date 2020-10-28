@@ -11,9 +11,10 @@ import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
 import LinkIcon from '~/ui/icons/htc/LinkIcon'
 import MoreIcon from '~/ui/icons/MoreIcon'
 import ReportIcon from '~/ui/icons/htc/ReportIcon'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
-import { SmallHelperText } from '~/ui/global/styled/typography'
+import { Heading3, SmallHelperText } from '~/ui/global/styled/typography'
 import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
 import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
 import TextIcon from '~/ui/icons/htc/TextIcon'
@@ -58,7 +59,7 @@ const QuadrantIconHolder = styled.div`
   vertical-align: middle;
 `
 
-const More = styled.button`
+const More = styled.div`
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -73,6 +74,11 @@ const More = styled.button`
     right: ${-(props.zoomLevel * 8)}px;
   `}
 `
+More.displayName = 'More'
+
+const HeadingText = styled(Heading3)`
+  margin-bottom: 0;
+`
 
 const nameToIcon = {
   collection: CollectionIcon,
@@ -84,6 +90,7 @@ const nameToIcon = {
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
   template: TemplateIcon,
+  useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
   text: TextIcon,
   video: VideoIcon,
@@ -109,47 +116,60 @@ class HotCellQuadrant extends React.Component {
     onMoreMenuOpen()
   }
 
-  handleNoMore = ev => {
+  handleMoreMenuClose = ev => {
     ev.preventDefault()
     ev.stopPropagation()
     const { onMoreMenuClose } = this.props
     onMoreMenuClose()
   }
 
-  createContent = type => {
+  createContent = (type, opts) => {
     const { onCreateContent } = this.props
-    onCreateContent(type)
+    onCreateContent(type, opts)
   }
 
   get moreMenuItems() {
     const { subTypes } = this.props
-    if (!subTypes()) return []
-    return subTypes().map(({ name, description, isCategory, subTypes }) => {
-      if (isCategory) {
+    if (!subTypes) return []
+    return subTypes.map(
+      ({ name, component, description, isCategory, opts, subTypes }) => {
+        if (isCategory) {
+          return {
+            name: description,
+            onClick: () => {},
+            subItems:
+              subTypes &&
+              subTypes.map(subType => {
+                if (subType.name === 'component')
+                  return { component: subType.component }
+                let TypeIcon = nameToIcon[subType.name]
+                if (subType.description === 'Create New Template')
+                  TypeIcon = PlusIcon
+                return {
+                  name: subType.description,
+                  iconLeft: subType.name !== 'header' && <TypeIcon />,
+                  onClick:
+                    subType.name !== 'header' &&
+                    (() => {
+                      this.createContent(subType.name, subType.opts)
+                    }),
+                  TextComponent: subType.name !== 'header' ? HeadingText : null,
+                }
+              }),
+          }
+        }
+        if (name === 'component') return { component }
+        let TypeIcon = nameToIcon[name] || TemplateIcon
+        if (description === 'Create New Template') TypeIcon = PlusIcon
         return {
           name: description,
-          onClick: () => {},
-          subItems:
-            subTypes() &&
-            subTypes().map(subType => {
-              const TypeIcon = nameToIcon[subType.name]
-              return {
-                name: subType.description,
-                iconLeft: <TypeIcon />,
-                onClick: () => {
-                  this.createContent(subType.name)
-                },
-              }
-            }),
+          iconLeft: name !== 'header' ? <TypeIcon /> : null,
+          onClick:
+            name !== 'header' ? () => this.createContent(name, opts) : null,
+          TextComponent: name === 'header' ? HeadingText : null,
         }
       }
-      const TypeIcon = nameToIcon[name]
-      return {
-        name: description,
-        iconLeft: <TypeIcon />,
-        onClick: () => this.createContent(name),
-      }
-    })
+    )
   }
 
   render() {
@@ -219,8 +239,8 @@ class HotCellQuadrant extends React.Component {
                 mobileFixedMenu
                 menuOpen={currentMenuOpen}
                 menuItems={this.moreMenuItems}
-                onMouseLeave={this.handleNoMore}
-                onClose={this.handleNoMore}
+                onMouseLeave={this.handleMoreMenuClose}
+                onClose={this.handleMoreMenuClose}
                 offsetPosition={{
                   x: 0,
                   y: -40,
@@ -243,7 +263,16 @@ HotCellQuadrant.propTypes = {
   onMoreMenuOpen: PropTypes.func.isRequired,
   onMoreMenuClose: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
-  subTypes: PropTypes.func,
+  subTypes: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      description: PropTypes.string,
+      component: PropTypes.node,
+      opts: PropTypes.shape({
+        templateId: PropTypes.string,
+      }),
+    })
+  ),
   currentMenuOpen: PropTypes.bool,
   displayName: PropTypes.bool,
 }

@@ -129,8 +129,8 @@ class PositionedBlankCard extends React.Component {
           parent={collection}
           emptyRow={emptyRow}
           isFourWideBoard={collection.isFourWideBoard}
-          onCreateContent={contentType => {
-            handleBlankCardClick({ row, col }, contentType)
+          onCreateContent={(contentType, opts) => {
+            handleBlankCardClick({ row, col }, contentType, opts)
           }}
           handleInsertRowClick={handleInsertRowClick}
           handleRemoveRowClick={handleRemoveRowClick}

@@ -23,6 +23,7 @@ class SerializableCollectionCard < BaseJsonSerializer
     :section_type,
     :font_color,
     :font_background,
+    :cover_card_id,
   )
 
   stringified_attributes(
@@ -49,5 +50,9 @@ class SerializableCollectionCard < BaseJsonSerializer
   # for cached rendering this attribute will get added later
   attribute :can_edit_parent, if: -> { @current_ability } do
     @current_ability.can?(:edit_content, (@parent || @object.try(:parent)))
+  end
+
+  attribute :cover do
+    @object.cached_cover || {}
   end
 end
