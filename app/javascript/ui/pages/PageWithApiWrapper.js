@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
@@ -34,6 +34,7 @@ class PageWithApiWrapper extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.requiresFetch(prevProps)) {
+      console.log('got an update, fetching new collection')
       this.fetchData()
     }
   }
@@ -137,9 +138,12 @@ class PageWithApiWrapper extends React.Component {
       ) {
         // mark as !fullyLoaded until we re-fetch the latest data
         // (mostly just used by RealtimeTextItem)
-        record.updateFullyLoaded(false)
-        this.setRecord(record)
-        record.setCollaborators([])
+        runInAction(() => {
+          record.updateFullyLoaded(false)
+          console.log('should already be in here with', record.id, record.name)
+          this.setRecord(record)
+          record.setCollaborators([])
+        })
       }
     }
 

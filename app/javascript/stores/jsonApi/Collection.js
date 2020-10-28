@@ -831,7 +831,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     order,
     hidden = false,
     rows,
-    cols,
     searchTerm,
   } = {}) {
     let orderChanged = false
@@ -858,10 +857,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page
-      params.rows = rows || [0, 5]
-      if (cols) {
-        params.cols = cols
-      }
+      params.rows = rows || [0, 20]
     }
     let apiPath
     if (searchTerm) {
@@ -909,7 +905,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         if (this.isBoard) {
           // reset these to be recalculated in updateMaxLoaded
           this.loadedRows = 0
-          this.loadedCols = 0
         }
       } else {
         if (this.currentPage < page) {
@@ -932,7 +927,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
 
       if (this.isBoard && params.rows) {
-        this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
+        this.updateMaxLoadedRows({ maxRow: params.rows[1] })
       }
     })
     return data
@@ -950,7 +945,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
     // this value is simulated
     this.max_row_index = maxRow
-    this.updateMaxLoadedColsRows({ maxRow })
+    this.updateMaxLoadedRows({ maxRow })
   }
 
   API_fetchCard = async cardId => {
@@ -1041,13 +1036,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  updateMaxLoadedColsRows = ({ maxRow } = {}) => {
-    const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
+  updateMaxLoadedRows = ({ maxRow } = {}) => {
     if (maxRow > this.loadedRows) {
       this.loadedRows = maxRow
-    }
-    if (maxCol > this.loadedCols) {
-      this.loadedCols = maxCol
     }
   }
 

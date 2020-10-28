@@ -218,11 +218,6 @@ describe('FoamcoreInteractionLayer', () => {
         max: 4,
         num: 4,
       }
-      uiStore.visibleCols = {
-        min: 0,
-        max: 4,
-        num: 4,
-      }
       const collection = fakeCollection
       collection.max_row_index = 2
       collection.num_columns = 2

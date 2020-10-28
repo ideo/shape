@@ -41,8 +41,8 @@ import HelperBanner4WFC from '~/ui/global/HelperBanner4WFC'
 class CollectionPage extends React.Component {
   @observable
   currentEditor = {}
-  @observable
-  cardsFetched = false
+  // @observable
+  // cardsFetched = false
 
   updatePoller = null
   editorTimeout = null
@@ -63,7 +63,8 @@ class CollectionPage extends React.Component {
       routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
-    this.loadCollectionCards()
+    // this.loadCollectionCards()
+    this.onAPILoad()
     this.subscribeToChannel(collection.id)
   }
 
@@ -75,18 +76,21 @@ class CollectionPage extends React.Component {
     } = prevProps
     const { id: currentId } = collection
     if (currentId !== previousId) {
+      console.log('navigated to new page', currentId)
+
       runInAction(() => {
-        this.cardsFetched = false
+        // this.cardsFetched = false
+        // unsubscribe from previous collection; subscribe to new one
+        ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
+        this.subscribeToChannel(currentId)
+        // when navigating between collections, close BCT
+        uiStore.closeBlankContentTool()
+        uiStore.resetCardPositions()
+        this.setViewingRecordAndRestoreScrollPosition()
+        // this.loadCollectionCards()
+        this.onAPILoad()
+        routingStore.updateScrollState(previousId, window.pageYOffset)
       })
-      // unsubscribe from previous collection; subscribe to new one
-      ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
-      this.subscribeToChannel(currentId)
-      // when navigating between collections, close BCT
-      uiStore.closeBlankContentTool()
-      uiStore.resetCardPositions()
-      this.setViewingRecordAndRestoreScrollPosition()
-      this.loadCollectionCards()
-      routingStore.updateScrollState(previousId, window.pageYOffset)
     }
   }
 
@@ -145,7 +149,8 @@ class CollectionPage extends React.Component {
         return
       }
       runInAction(() => {
-        this.cardsFetched = true
+        // this.cardsFetched = true
+        // console.log('cardsFetched')
         if (reloading) return
         // this only needs to run on the initial load not when we reload/refetch cards
         this.onAPILoad()
@@ -616,7 +621,7 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
-      (!this.cardsFetched && collection.isEmpty) ||
+      // (!this.cardsFetched && collection.isEmpty) ||
       collection.awaiting_updates ||
       uiStore.isLoading
     const { isTransparentLoading } = uiStore
@@ -667,6 +672,7 @@ class CollectionPage extends React.Component {
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {
+      // NOTE: deprecated now with 4WFC? do we ever land here?
       inner = (
         <CollectionGrid
           {...genericCollectionProps}

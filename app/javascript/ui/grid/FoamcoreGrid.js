@@ -79,6 +79,7 @@ class FoamcoreGrid extends React.Component {
     uiStore.determineZoomLevels(collection)
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
+    this.loadInitialRows()
     if (collection.isSplitLevelBottom) {
       collection.calculateRowsCols()
     }
@@ -125,7 +126,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
-  loadAfterScroll = async () => {
+  @action
+  loadAfterScroll = () => {
     const { collection, uiStore } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) {
@@ -134,15 +136,16 @@ class FoamcoreGrid extends React.Component {
 
     const { zoomLevel } = this
     this.computeVisibleRows()
-    this.computeVisibleCols()
 
     if (!this.showZoomControls && zoomLevel > 1) {
       this.handleZoomIn()
     }
 
+    // loadMoreRows via scrolling is just for infinite scroll / splitLevelBottom
     const visRows = uiStore.visibleRows
-
-    if (!visRows) return
+    if (!collection.isSplitLevelBottom || !visRows) {
+      return
+    }
 
     // Attempt to load more rows if currently loaded rows is less than
     // one full screen out of view
@@ -152,8 +155,31 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  loadInitialRows = () => {
+    const { collection, loadCollectionCards } = this.props
+    const { loadedRows } = collection
+    // const { loadMoreCollectionCards } = this
+    // arbitrary 300 row initial limit?
+    const maxRow = _.min([collection.max_row_index, 300])
+
+    const rowsPerPage = 30
+    let min = loadedRows
+    let max = loadedRows + rowsPerPage
+    console.log({ maxRow })
+    while (min <= maxRow) {
+      // just fire off multiple async requests (without awaiting)
+      console.log('loadCollectionCards', [min, max])
+      loadCollectionCards({
+        // just load by row # downward, and always load all 16 cols
+        rows: [min, max],
+      })
+      min = max + 1
+      max = max + rowsPerPage
+    }
+  }
+
   loadMoreRows = () => {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     const { loadMoreCollectionCards } = this
     if (collection.isSplitLevelBottom) {
       if (collection.hasMore) {
@@ -162,22 +188,22 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    const visRows = uiStore.visibleRows
-    const collectionMaxRow = collection.max_row_index
-    // min row should start with the next row after what's loaded
-    const loadMinRow = collection.loadedRows + 1
-    // add a buffer of 3 more rows (constrained by max row on collection)
-    const loadMaxRow = _.min([
-      collectionMaxRow,
-      Math.ceil(loadMinRow + visRows.num + 3),
-    ])
-    // min and max could be equal if there is one more row to load
-    if (loadMinRow <= loadMaxRow) {
-      return loadMoreCollectionCards({
-        // just load by row # downward, and always load all 16 cols
-        rows: [loadMinRow, loadMaxRow],
-      })
-    }
+    // const visRows = uiStore.visibleRows
+    // const collectionMaxRow = collection.max_row_index
+    // // min row should start with the next row after what's loaded
+    // const loadMinRow = collection.loadedRows + 1
+    // // add a buffer of 3 more rows (constrained by max row on collection)
+    // const loadMaxRow = _.min([
+    //   collectionMaxRow,
+    //   Math.ceil(loadMinRow + visRows.num + 3),
+    // ])
+    // // min and max could be equal if there is one more row to load
+    // if (loadMinRow <= loadMaxRow) {
+    //   return loadMoreCollectionCards({
+    //     // just load by row # downward, and always load all 16 cols
+    //     rows: [loadMinRow, loadMaxRow],
+    //   })
+    // }
   }
 
   loadMoreCollectionCards = async (opts = {}) => {
@@ -269,28 +295,6 @@ class FoamcoreGrid extends React.Component {
     const num = max - min
 
     uiStore.setVisibleRows({
-      min,
-      max,
-      num,
-    })
-  }
-
-  @action
-  computeVisibleCols() {
-    const { pageMargins } = this
-    const { uiStore } = this.props
-    if (!this.gridRef) return { min: null, max: null }
-
-    const left = window.pageXOffset
-    const gridWidth = window.innerWidth - pageMargins.left
-
-    const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
-    const max = parseFloat(
-      ((left + gridWidth) / this.cardAndGutterWidth).toFixed(1)
-    )
-    const num = max - min
-
-    uiStore.setVisibleCols({
       min,
       max,
       num,

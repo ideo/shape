@@ -448,7 +448,6 @@ describe('FoamcoreGrid', () => {
 
     describe('scrolling in loaded bounds', () => {
       beforeEach(() => {
-        props.uiStore.visibleCols = { min: 0, max: 4, num: 5 }
         props.uiStore.visibleRows = { min: 1, max: 4, num: 4 }
       })
 

@@ -288,13 +288,6 @@ export default class UiStore {
     num: 0,
   }
   @observable
-  // track which cols are visible on the page
-  visibleCols = {
-    min: 0,
-    max: 0,
-    num: 0,
-  }
-  @observable
   addedNewRole = false
   @observable
   touchActionMenuOpenId = null
@@ -1804,11 +1797,6 @@ export default class UiStore {
   @action
   setVisibleRows(visibleRows) {
     this.visibleRows = visibleRows
-  }
-
-  @action
-  setVisibleCols(visibleCols) {
-    this.visibleCols = visibleCols
   }
 
   @action
