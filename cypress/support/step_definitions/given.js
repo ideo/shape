@@ -1,5 +1,13 @@
 /* global Given */
 
+const catchCypressException = () => {
+  Cypress.on('uncaught:exception', e => {
+    // returning false here prevents Cypress from failing the test,
+    // otherwise redirects (e.g. loginAndVisit...) seem to cause a strange 4000ms timeout
+    return false
+  })
+}
+
 Given('I visit the Marketing Page', () => {
   // don't login
   cy.visit('/')
@@ -11,13 +19,7 @@ Given('I visit the Marketing Page with query string {string}', queryString => {
 
 Given('I login and visit My Collection', () => {
   cy.loginAndVisitMyCollection()
-  Cypress.on(
-    'uncaught:exception',
-    () =>
-      // returning false here prevents Cypress from
-      // failing the test
-      false
-  )
+  catchCypressException()
 })
 
 Given('I login and visit the Admin area', () => {
@@ -32,13 +34,7 @@ Given('I login and visit the Test Area', () => {
     .click()
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
-  Cypress.on(
-    'uncaught:exception',
-    () =>
-      // returning false here prevents Cypress from
-      // failing the test
-      false
-  )
+  catchCypressException()
 })
 
 Given('I visit the Test Area', () => {
@@ -47,22 +43,12 @@ Given('I visit the Test Area', () => {
     .click()
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
-  Cypress.on(
-    'uncaught:exception',
-    () =>
-      // returning false here prevents Cypress from
-      // failing the test
-      false
-  )
+  catchCypressException()
 })
 
 Given('I login and create an automated challenge', () => {
   cy.loginAndCreateAutomatedChallenge()
-  Cypress.on('uncaught:exception', e => {
-    // returning false here prevents Cypress from
-    // failing the test
-    return false
-  })
+  catchCypressException()
 })
 
 Given('I logout', () => {
