@@ -13,21 +13,13 @@ const ColorPickerStyleWrapper = styled.div`
   }
 `
 const DEFAULT_COLORS = [
-  '#A85751',
-  '#DEA895',
-  '#D6C3C9',
-  '#AE8CA3',
-  '#8B83A2',
-  '#929E9E',
-  '#84AF99',
-  '#88B6C6',
-  '#5473A6',
-  '#DBD3D1',
-  '#C2BBB9',
-  '#A1A6B4',
-  '#738091',
-  '#454545',
-  '#F2F1EE',
+  '#FFFFFF',
+  '#FFD6A5',
+  '#C7CBF0',
+  '#D6D4DF',
+  '#FACFD2',
+  '#FDF7AE',
+  '#CEE2D7',
 ]
 
 const ColorPicker = props => (
