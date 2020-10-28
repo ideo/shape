@@ -1,7 +1,6 @@
-// import _ from 'lodash'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import _ from 'lodash'
 
 import v from '~/utils/variables'
 import CursorIcon from '~/ui/icons/CursorIcon'
@@ -35,6 +34,7 @@ const CollaboratorLabelContainer = styled.div`
   white-space: nowrap;
   padding: 0px 6px;
 `
+CollaboratorLabelContainer.displayName = 'CollaboratorLabelContainer'
 
 class CollaboratorCursor extends React.Component {
   constructor(props) {

@@ -31,15 +31,17 @@ class CollaboratorCursorsLayer extends React.Component {
     const { relativeZoomLevel } = uiStore
     const cursors = _.map(this.collaborators, collaborator => {
       const { coordinates, name, color } = collaborator
-      // adjust for zoomLevel
-      if (coordinates && coordinates.x && coordinates.y) {
-        coordinates.x = coordinates.x / relativeZoomLevel
-        coordinates.y = coordinates.y / relativeZoomLevel
+      if (_.isEmpty(coordinates)) {
+        return null
       }
       return (
         <CollaboratorCursor
           key={collaborator.id}
-          coordinates={coordinates}
+          coordinates={{
+            // adjust for zoomLevel
+            x: coordinates.x / relativeZoomLevel,
+            y: coordinates.y / relativeZoomLevel,
+          }}
           color={color}
           name={name}
         />
