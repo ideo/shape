@@ -414,7 +414,13 @@ class ApiStore extends jsonapi(datxCollection) {
   syncFromFirestore(data) {
     data.data = this.massageFirestoreData(data.data)
     _.each(data.included, (v, k) => {
-      data.included[k] = this.massageFirestoreData(v)
+      const { type, id } = v
+      if (this.find(type, id)) {
+        // only sync things that aren't already in apiStore (as that should already be more accurate)
+        delete data.included[k]
+      } else {
+        data.included[k] = this.massageFirestoreData(v)
+      }
     })
     return this.sync(data)
   }
