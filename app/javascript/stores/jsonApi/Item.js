@@ -11,6 +11,8 @@ import BaseRecord from './BaseRecord'
 import Role from './Role'
 import SharedRecordMixin from './SharedRecordMixin'
 
+export const TEXT_ITEM_DEFAULT_BG_COLOR = 'TextItemDeafultBGColor'
+
 class Item extends SharedRecordMixin(BaseRecord) {
   static type = 'items'
   static endpoint = apiUrl('items')

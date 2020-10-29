@@ -198,6 +198,21 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
+    context 'when copying onto an existing spot on the board' do
+      let!(:additional_cards) { create_list(:collection_card_text, 2, parent: parent) }
+      before do
+        # source card
+        collection_card.update(row: 0, col: 0)
+        additional_cards.first.update(row: 0, col: 1)
+        additional_cards.second.update(row: 0, col: 2)
+      end
+
+      it 'should find an empty spot for the card' do
+        expect(duplicate.row).to eq 0
+        expect(duplicate.col).to eq 3
+      end
+    end
+
     context 'when copying into a collection with no cover set' do
       let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
 

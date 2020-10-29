@@ -281,11 +281,8 @@ class GridCard extends React.Component {
   }
 
   get hasCover() {
-    const { record } = this.props
-    if (record.internalType === 'collections') {
-      return !!record.cover.image_url
-    }
-    return !!record.thumbnail_url
+    const { card } = this.props
+    return !!card.coverImageUrl
   }
 
   @computed

@@ -149,14 +149,24 @@ class CardCoverEditor extends React.Component {
         return
       }
 
-      const cardOrRecord = this.cardIsLink ? card : record
-
-      // if card has a cached cover, modify it instead of record.name
-      const cardName = this.cardIsLink ? null : this.cardTitle
-      const hardCodedTitle = this.cardIsLink ? this.cardTitle : null
+      let titleForComparison = record.name
+      let cardOrRecord = record
+      const data = {
+        hardcodedSubtitle: this.hardcodedSubtitle,
+        subtitleHidden: this.subtitleHidden,
+      }
+      if (this.cardIsLink) {
+        cardOrRecord = card
+        titleForComparison = _.get(card, 'cover.hardcoded_title')
+        // editing a link means you're editing the cover.hardcoded_title
+        data.hardcodedTitle = this.cardTitle
+      } else {
+        // editing a record means you're editing the record.name
+        data.name = this.cardTitle
+      }
 
       if (
-        (cardName === this.cardTitle || hardCodedTitle === this.cardTitle) &&
+        titleForComparison === this.cardTitle &&
         cardOrRecord.subtitle === this.hardcodedSubtitle &&
         cardOrRecord.subtitleHidden === this.subtitleHidden
       ) {
@@ -164,12 +174,7 @@ class CardCoverEditor extends React.Component {
       }
 
       // only update when you close the editor and there are changes
-      cardOrRecord.API_updateNameAndCover({
-        name: cardName,
-        hardcodedTitle: hardCodedTitle,
-        hardcodedSubtitle: this.hardcodedSubtitle,
-        subtitleHidden: this.subtitleHidden,
-      })
+      cardOrRecord.API_updateNameAndCover(data)
     }
   }
 
@@ -687,11 +692,20 @@ class CardCoverEditor extends React.Component {
     )
   }
 
-  render() {
+  get title() {
+    const { card } = this.props
     const { recordIsCollection } = this
+    let type = recordIsCollection ? 'Collection' : 'Cover'
+    if (card.isLinkCard && recordIsCollection) {
+      type = 'Link'
+    }
+    return `${type} Settings`
+  }
+
+  render() {
+    const { title } = this
     const { isEditingCardCover, pageMenu } = this.props
 
-    const title = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (

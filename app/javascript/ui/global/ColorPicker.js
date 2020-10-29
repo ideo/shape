@@ -5,32 +5,28 @@ import { SketchPicker } from 'react-color'
 import v from '~/utils/variables'
 
 const ColorPickerStyleWrapper = styled.div`
+  position: relative;
+  z-index: ${v.zIndex.aboveClickWrapper};
+
   .sketch-picker {
     font-family: ${v.fonts.sans};
   }
 `
 const DEFAULT_COLORS = [
-  '#A85751',
-  '#DEA895',
-  '#D6C3C9',
-  '#AE8CA3',
-  '#8B83A2',
-  '#929E9E',
-  '#84AF99',
-  '#88B6C6',
-  '#5473A6',
-  '#DBD3D1',
-  '#C2BBB9',
-  '#A1A6B4',
-  '#738091',
-  '#454545',
-  '#F2F1EE',
+  '#FFFFFF',
+  '#FFD6A5',
+  '#C7CBF0',
+  '#D6D4DF',
+  '#FACFD2',
+  '#FDF7AE',
+  '#CEE2D7',
 ]
 
 const ColorPicker = props => (
   <ColorPickerStyleWrapper>
     <SketchPicker
       color={props.color}
+      disableAlpha={props.disableAlpha}
       onChange={props.onChange}
       onChangeComplete={props.onChangeComplete}
       presetColors={[
@@ -43,11 +39,14 @@ const ColorPicker = props => (
 
 ColorPicker.propTypes = {
   color: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  onChange: PropTypes.func.isRequired,
+  disableAlpha: PropTypes.bool,
+  onChange: PropTypes.func,
   onChangeComplete: PropTypes.func,
 }
 
 ColorPicker.defaultProps = {
+  disableAlpha: false,
+  onChange: () => {},
   onChangeComplete: () => {},
 }
 

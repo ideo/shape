@@ -1,12 +1,12 @@
 import { useState, Fragment } from 'react'
 import PropTypes from 'prop-types'
-// import styled from 'styled-components'
-import { CompactPicker } from 'react-color'
 
-import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
-import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
-import XIcon from '~/ui/icons/XIcon'
 import CheckboxWithLabel from '~/ui/global/CheckboxWithLabel'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
+import ColorPicker from '~/ui/global/ColorPicker'
+import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
+import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
+import XIcon from '~/ui/icons/XIcon'
 import { MediumBreak } from '~/ui/grid/CardCoverEditor'
 
 const removeOption = {
@@ -54,7 +54,6 @@ const FontColorSelector = ({
   }
 
   const onSelectColor = ({ hex }) => {
-    setColorPickerOpen(false)
     onSelect({ hex })
   }
 
@@ -66,8 +65,10 @@ const FontColorSelector = ({
       />
       {colorPickerOpen && (
         <Fragment>
-          <CompactPicker
+          <ClickWrapper clickHandlers={[() => setColorPickerOpen(false)]} />
+          <ColorPicker
             color={fontColor || defaultFontColor}
+            disableAlpha
             onChangeComplete={onSelectColor}
           />
           <MediumBreak />

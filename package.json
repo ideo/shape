@@ -159,7 +159,7 @@
     "react-helmet": "^5.2.1",
     "react-infinite-scroller": "^1.1.3",
     "react-input-autosize": "^2.2.1",
-    "react-markdown": "^3.3.0",
+    "react-markdown": "^5.0.0",
     "react-player": "^1.7.0",
     "react-quill": "^1.3.3",
     "react-rnd": "^7.3.0",
@@ -188,8 +188,8 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
-    "cypress": "3.4.1",
-    "cypress-cucumber-preprocessor": "^1.16.0",
+    "cypress": "5.5.0",
+    "cypress-cucumber-preprocessor": "4.0.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.3.3",

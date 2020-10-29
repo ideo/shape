@@ -1,11 +1,12 @@
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
-import styled from 'styled-components'
-import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
+import Hypher from 'hypher'
+import styled from 'styled-components'
 import { some } from 'lodash'
+
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { TextWithBackground } from './CollectionCover'
 
 function splitName(name) {
@@ -69,23 +70,12 @@ class CollectionCoverTitle extends React.Component {
     return null
   }
 
-  get name() {
+  get renderTitle() {
     const { title } = this.props
-    const {
-      collection: { name },
-    } = this.props
+    if (!this.hasIcon) return title
 
-    if (title) return title
-
-    return name
-  }
-
-  get renderName() {
-    const { name } = this
-    if (!this.hasIcon) return name
-
-    const nameParts = splitName(name)
-    if (!nameParts) return name
+    const nameParts = splitName(title)
+    if (!nameParts) return title
 
     const lastName = nameParts.pop()
     return (
@@ -107,9 +97,9 @@ class CollectionCoverTitle extends React.Component {
     return (
       <span style={{ hyphens }}>
         {useTextBackground ? (
-          <TextWithBackground>{this.renderName}</TextWithBackground>
+          <TextWithBackground>{this.renderTitle}</TextWithBackground>
         ) : (
-          this.renderName
+          this.renderTitle
         )}
       </span>
     )
@@ -119,11 +109,13 @@ class CollectionCoverTitle extends React.Component {
 CollectionCoverTitle.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   useTextBackground: PropTypes.bool,
+  onCollectionClick: PropTypes.func,
   title: PropTypes.string,
 }
 
 CollectionCoverTitle.defaultProps = {
   useTextBackground: false,
+  onCollectionClick: null,
   title: null,
 }
 

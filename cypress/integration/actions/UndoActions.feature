@@ -36,7 +36,7 @@ Feature: Undo actions
     And I resize the card at 0,2 to 2x2
     Then I should see the card at 0,2 as 2x2
 
-    When I click the edit collection settings icon
+    When I click the edit "collection settings" icon at 0,0
     Then I should see a 'EditCoverOptions'
     # This is testing native browser text editing undo
     When I type "Undo" in the title textarea

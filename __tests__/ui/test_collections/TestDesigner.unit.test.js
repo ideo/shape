@@ -247,6 +247,7 @@ describe('TestDesigner', () => {
             },
             card_question_type: 'question_useful',
             section_type: 'ideas',
+            stopReplacing: jest.fn(),
           },
         },
       })
@@ -267,7 +268,7 @@ describe('TestDesigner', () => {
     })
 
     it('calls CollectionCard.API_replace with params', async () => {
-      await component.createNewQuestionCard({
+      const card = await component.createNewQuestionCard({
         replacingCard: {
           id: '99',
           section_type: 'ideas',
@@ -279,6 +280,7 @@ describe('TestDesigner', () => {
         'PATCH',
         expect.any(Object)
       )
+      expect(card.record.name).toEqual('some name')
     })
   })
 

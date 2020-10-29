@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import localStorage from 'mobx-localstorage'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
@@ -24,6 +25,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import v, { ITEM_CHANNEL_NAME } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { TEXT_ITEM_DEFAULT_BG_COLOR } from '~/stores/jsonApi/Item'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
@@ -345,6 +347,9 @@ class RealtimeTextItem extends React.Component {
     if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
+    if (data.background_color) {
+      this.handleReceivedBackground({ current_editor, data })
+    }
 
     const { item } = this.props
     item.setCollaborators(collaborators)
@@ -356,6 +361,13 @@ class RealtimeTextItem extends React.Component {
     this.createCursor(current_editor)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.moveCursor(current_editor.id, data.range)
+  }
+
+  handleReceivedBackground = ({ current_editor, data }) => {
+    if (current_editor.id === this.props.currentUserId) return
+    const { item } = this.props
+    item.background_color = data.background_color
+    item.background_color_opacity = data.background_color_opacity
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
@@ -727,6 +739,7 @@ class RealtimeTextItem extends React.Component {
 
   onColorPickerOpen = ev => {
     ev.preventDefault()
+    ev.stopPropagation()
     runInAction(() => {
       this.colorPickerOpen = !this.colorPickerOpen
     })
@@ -749,6 +762,7 @@ class RealtimeTextItem extends React.Component {
       background_color: color,
       background_color_opacity: opacity,
     })
+    localStorage.setItem(TEXT_ITEM_DEFAULT_BG_COLOR, { color, opacity })
   }
 
   checkForTitleText = () => {
