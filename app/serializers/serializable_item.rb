@@ -21,6 +21,8 @@ class SerializableItem < BaseJsonSerializer
     :legend_item_id,
     :question_title,
     :question_description,
+    :background_color,
+    :background_color_opacity,
     :archived,
     :unresolved_count,
     :last_unresolved_comment_id,

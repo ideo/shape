@@ -150,6 +150,8 @@ class Api::V1::ItemsController < Api::V1::BaseController
         :legend_search_source,
         :style,
         :subtitle_hidden,
+        :background_color,
+        :background_color_opacity,
         tag_list: [],
         user_tag_list: [],
         filestack_file_attributes: Item.filestack_file_attributes_whitelist,

@@ -26,6 +26,12 @@ class ItemRealtimeChannel < ApplicationCable::Channel
     item.received_changes(data, current_user)
   end
 
+  def background_color(data)
+    return reject if item.nil?
+
+    item.save_and_broadcast_background(current_user, Mashie.new(data))
+  end
+
   private
 
   def item

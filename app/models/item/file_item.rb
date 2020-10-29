@@ -6,6 +6,8 @@
 #  archive_batch              :string
 #  archived                   :boolean          default(FALSE)
 #  archived_at                :datetime
+#  background_color           :string
+#  background_color_opacity   :float            default(1.0)
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  content                    :text

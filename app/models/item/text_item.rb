@@ -6,6 +6,8 @@
 #  archive_batch              :string
 #  archived                   :boolean          default(FALSE)
 #  archived_at                :datetime
+#  background_color           :string
+#  background_color_opacity   :float            default(1.0)
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  content                    :text
@@ -112,6 +114,15 @@ class Item
         id,
         user&.id,
       )
+    end
+
+    def save_and_broadcast_background(user, data)
+      self.background_color = data.background_color
+      self.background_color_opacity = data.background_color_opacity
+      save
+
+      received_changes(data, user)
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
     end
 
     def threadlocked_transform_realtime_delta(user, data)

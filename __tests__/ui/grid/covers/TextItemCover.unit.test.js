@@ -62,6 +62,24 @@ describe('TextItemCover', () => {
     expect(wrapper.find('StyledReadMore').exists()).toBe(false)
   })
 
+  it('renders the background color as white if not set', () => {
+    const cover = wrapper.find('StyledPaddedCover')
+    expect(cover.props().backgroundColor).toEqual('#ffffff')
+  })
+
+  describe('when background color set', () => {
+    beforeEach(() => {
+      props.item.background_color = '#A85751'
+      props.item.background_color_opacity = 1
+      wrapper = shallow(<TextItemCover {...props} />)
+    })
+
+    it('renders the background color as rgba', () => {
+      const cover = wrapper.find('StyledPaddedCover')
+      expect(cover.props().backgroundColor).toEqual('rgb(168, 87, 81)')
+    })
+  })
+
   describe('handleClick', () => {
     let fakeCard
     beforeEach(() => {

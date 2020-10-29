@@ -1,7 +1,9 @@
 import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { action, observable, toJS } from 'mobx'
+import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import localStorage from 'mobx-localstorage'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
@@ -10,6 +12,8 @@ import styled from 'styled-components'
 
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
+import ColorPicker from '~/ui/global/ColorPicker'
+import color from 'color'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
 import QuillClipboard from '~/ui/global/QuillClipboard'
@@ -21,6 +25,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import v, { ITEM_CHANNEL_NAME } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { TEXT_ITEM_DEFAULT_BG_COLOR } from '~/stores/jsonApi/Item'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
@@ -59,7 +64,7 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      width: 220px;
+      width: 250px;
       padding-bottom: 26px;
       transform: scale(${props.zoomLevel});
       background: ${v.colors.commonLightest};
@@ -133,6 +138,8 @@ class RealtimeTextItem extends React.Component {
   initiateHotSwap = false
   @observable
   activeSizeFormat = null
+  @observable
+  colorPickerOpen = false
 
   constructor(props) {
     super(props)
@@ -144,6 +151,10 @@ class RealtimeTextItem extends React.Component {
       30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
+    this.throttleSendBackgroundColorChange = _.throttle(
+      this.sendBackgroundColorChange,
+      1000
+    )
     this.quillData = this.initialQuillData()
   }
 
@@ -336,6 +347,9 @@ class RealtimeTextItem extends React.Component {
     if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
+    if (data.background_color) {
+      this.handleReceivedBackground({ current_editor, data })
+    }
 
     const { item } = this.props
     item.setCollaborators(collaborators)
@@ -347,6 +361,13 @@ class RealtimeTextItem extends React.Component {
     this.createCursor(current_editor)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.moveCursor(current_editor.id, data.range)
+  }
+
+  handleReceivedBackground = ({ current_editor, data }) => {
+    if (current_editor.id === this.props.currentUserId) return
+    const { item } = this.props
+    item.background_color = data.background_color
+    item.background_color_opacity = data.background_color_opacity
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
@@ -502,6 +523,15 @@ class RealtimeTextItem extends React.Component {
     } else {
       return null
     }
+  }
+
+  get backgroundColorWithOpacity() {
+    const { item } = this.props
+    if (!item.background_color) return '#ffffff'
+    const fullColor = color(item.background_color)
+    const rgb = fullColor.object()
+    rgb.a = item.background_color_opacity
+    return rgb
   }
 
   handleTextChange = (_content, delta, source, _editor) => {
@@ -661,6 +691,13 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  handleWrapperClick = ev => {
+    ev.preventDefault()
+    runInAction(() => {
+      this.colorPickerOpen = false
+    })
+  }
+
   onComment = async e => {
     e.preventDefault()
     const { apiStore, uiStore, item } = this.props
@@ -698,6 +735,34 @@ class RealtimeTextItem extends React.Component {
       quillEditor.format('header', header, 'user')
     }
     this.checkActiveSizeFormat()
+  }
+
+  onColorPickerOpen = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    runInAction(() => {
+      this.colorPickerOpen = !this.colorPickerOpen
+    })
+  }
+
+  onSelectColor = colorData => {
+    const color = colorData.hex
+    const opacity = colorData.rgb.a
+    const { item } = this.props
+    item.background_color = color
+    item.background_color_opacity = opacity
+    this.throttleSendBackgroundColorChange({
+      color,
+      opacity,
+    })
+  }
+
+  sendBackgroundColorChange({ color, opacity } = {}) {
+    this.socketSend('background_color', {
+      background_color: color,
+      background_color_opacity: opacity,
+    })
+    localStorage.setItem(TEXT_ITEM_DEFAULT_BG_COLOR, { color, opacity })
   }
 
   checkForTitleText = () => {
@@ -829,13 +894,23 @@ class RealtimeTextItem extends React.Component {
           topAdjust={topAdjustToolbar}
         >
           {canEdit && (
-            <TextItemToolbar
-              onExpand={onExpand}
-              toggleSize={this.toggleSize}
-              toggleHeader={this.toggleHeader}
-              onComment={this.onComment}
-              activeSizeFormat={this.activeSizeFormat}
-            />
+            <Fragment>
+              <TextItemToolbar
+                onExpand={onExpand}
+                toggleSize={this.toggleSize}
+                toggleHeader={this.toggleHeader}
+                onComment={this.onComment}
+                onColorChange={this.onColorPickerOpen}
+                backgroundColor={item.background_color}
+                activeSizeFormat={this.activeSizeFormat}
+              />
+              {this.colorPickerOpen && (
+                <ColorPicker
+                  color={this.backgroundColorWithOpacity}
+                  onChange={this.onSelectColor}
+                />
+              )}
+            </Fragment>
           )}
           <CloseButton
             data-cy="TextItemClose"
@@ -848,6 +923,7 @@ class RealtimeTextItem extends React.Component {
         <QuillStyleWrapper
           hasTitleText={textEditingItemHasTitleText}
           fullPageView={fullPageView}
+          onClick={this.handleWrapperClick}
         >
           <ReactQuill
             {...quillProps}

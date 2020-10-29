@@ -7,6 +7,7 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
+import color from 'color'
 import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
@@ -22,6 +23,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
       : 'none'};
   background: ${props => {
     const { hasTitleText, isTransparent, uneditable } = props
+    if (props.backgroundColor) return props.backgroundColor
     if (hasTitleText && uneditable) {
       // for carousel covers w/ title text
       return `${v.colors.white}`
@@ -32,6 +34,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
     return `${v.colors.white}`
   }};
 `
+StyledPaddedCover.displayName = 'StyledPaddedCover'
 
 const StyledReadMore = styled(ShowMoreButton)`
   z-index: ${v.zIndex.gridCard};
@@ -282,6 +285,15 @@ class TextItemCover extends React.Component {
     return hasTitle
   }
 
+  get backgroundColorWithOpacity() {
+    const { item } = this.props
+    if (!item.background_color) return '#ffffff'
+    const fullColor = color(item.background_color).alpha(
+      item.background_color_opacity
+    )
+    return fullColor.rgb().string()
+  }
+
   render() {
     const { isEditing, hasTitleText, props } = this
     const { isTransparent, uneditable } = props
@@ -300,6 +312,7 @@ class TextItemCover extends React.Component {
         isTransparent={isTransparent}
         uneditable={uneditable}
         isEditing={isEditing}
+        backgroundColor={this.backgroundColorWithOpacity}
       >
         <QuillStyleWrapper
           notEditing={!isEditing}
