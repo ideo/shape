@@ -277,13 +277,8 @@ class FoamcoreInteractionLayer extends React.Component {
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
     const { coordinatesForPosition, uiStore } = this.props
-    let rect = { left: 0, top: 0 }
-    const container = document.querySelector(`.${FOAMCORE_INTERACTION_LAYER}`)
-    if (container) {
-      // just a guard for jest shallow render
-      rect = container.getBoundingClientRect()
-    }
 
+    const rect = uiStore.foamcoreBoundingRectangle
     let { clientX, clientY, target } = ev
     // TouchEnd doesn't give you a clientX, have to get it from start event
     if (type === 'touch') {
@@ -303,16 +298,16 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    const coords = coordinatesForPosition({
+    const rawCoords = {
       x: clientX - rect.left,
       y: clientY - rect.top,
-    })
-
+    }
+    const coords = coordinatesForPosition(rawCoords)
     const { cardMatrix } = this.props.collection
     const { row, col } = coords
 
-    ev.preventDefault()
-    ev.stopPropagation()
+    // ev.preventDefault()
+    // ev.stopPropagation()
     const { blankContentToolState } = uiStore
     // If there's a card already there don't render a positioned blank card
     const cardOrBctOpenAtThisSpot =

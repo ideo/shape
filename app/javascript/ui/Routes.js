@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import _ from 'lodash'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
+import CollaboratorCursorsLayer from '~/ui/global/collaborators/CollaboratorCursorsLayer'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import SelectedArea from '~/ui/global/SelectedArea'
@@ -89,6 +90,10 @@ class Routes extends React.Component {
     super(props)
     this.mouseDownAt = { x: null, y: null }
     this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
+    this.throttledCalculateGridCursorPosition = _.throttle(
+      this._calculateGridCursorPosition,
+      330
+    )
   }
 
   componentDidMount() {
@@ -141,6 +146,11 @@ class Routes extends React.Component {
   }
 
   handleMouseMoveSelection = e => {
+    this.throttledCalculateGridCursorPosition({
+      x: e.clientX,
+      y: e.clientY,
+    })
+
     // Return if mouse is only scrolling, not click-dragging
     if (!this.mouseDownAt.x) return
 
@@ -165,6 +175,20 @@ class Routes extends React.Component {
       },
       e
     )
+  }
+
+  _calculateGridCursorPosition = ({ x, y } = {}) => {
+    const { uiStore } = this.props
+    const { relativeZoomLevel, foamcoreBoundingRectangle } = uiStore
+    const rawCoords = {
+      x: x - foamcoreBoundingRectangle.left,
+      y: y - foamcoreBoundingRectangle.top,
+    }
+    // TODO: for some reason these coordinates get thrown off when resizing a card
+    uiStore.broadcastCursorPosition({
+      x: rawCoords.x * relativeZoomLevel,
+      y: rawCoords.y * relativeZoomLevel,
+    })
   }
 
   handleMouseUpSelection = e => {
@@ -262,6 +286,7 @@ class Routes extends React.Component {
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
+            <CollaboratorCursorsLayer />
             <ZendeskWidget />
 
             <Header />

@@ -4,7 +4,9 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
 import isTouchDevice from 'is-touch-device'
 import { ACTIVITY_LOG_PAGE_KEY } from '~/utils/variables'
+import ChannelManager from '~/utils/ChannelManager'
 
+jest.mock('../../app/javascript/utils/ChannelManager')
 jest.mock('is-touch-device')
 jest.mock('mobx-localstorage')
 
@@ -571,6 +573,57 @@ describe('UiStore', () => {
       })
       expect(record.quill_data).toEqual(fakeQuillData)
       expect(uiStore.hotSwapQuillPosition).toEqual(5)
+    })
+  })
+
+  describe('broadcasting functions', () => {
+    let collaborators = []
+    let fakeChannel
+    beforeEach(() => {
+      fakeChannel = { perform: jest.fn() }
+      ChannelManager.getChannel = jest.fn().mockReturnValue(fakeChannel)
+    })
+
+    describe('with other collaborators', () => {
+      beforeEach(() => {
+        collaborators = [{ id: '1' }]
+        uiStore.setViewingRecord({
+          ...fakeCollection,
+          collaborators,
+        })
+      })
+
+      it('should send the cursor position over the channel', () => {
+        const coordinates = { x: 1, y: 2 }
+        uiStore.broadcastCursorPosition(coordinates)
+        expect(fakeChannel.perform).toHaveBeenCalledWith('cursor', {
+          coordinates,
+        })
+      })
+
+      it('should send the card selection over the channel', () => {
+        const card_ids = [1, 2]
+        uiStore.broadcastCardSelection(card_ids)
+        expect(fakeChannel.perform).toHaveBeenCalledWith('cards_selected', {
+          card_ids,
+        })
+      })
+    })
+
+    describe('without other collaborators', () => {
+      beforeEach(() => {
+        collaborators = []
+        uiStore.setViewingRecord({
+          ...fakeCollection,
+          collaborators,
+        })
+      })
+
+      it('should not send the cursor position over the channel', () => {
+        const coordinates = { x: 1, y: 2 }
+        uiStore.broadcastCursorPosition(coordinates)
+        expect(fakeChannel.perform).not.toHaveBeenCalled()
+      })
     })
   })
 })

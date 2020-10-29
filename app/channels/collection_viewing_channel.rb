@@ -20,6 +20,12 @@ class CollectionViewingChannel < ApplicationCable::Channel
     collection.received_changes({ cards_selected: data['card_ids'] }, current_user)
   end
 
+  def cursor(data)
+    return reject if collection.nil?
+
+    collection.received_changes(data, current_user, include_all_collaborators: false)
+  end
+
   private
 
   def collection

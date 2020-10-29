@@ -240,6 +240,8 @@ const SharedRecordMixin = superclass =>
 
     // this is used to highlight someone making an edit on a card
     setLatestCollaborator(collaborator) {
+      // because this is just setting collaborators on a card.record within the current collection
+      // we just set the 1 collaborator and then remove them after timeout
       this.setCollaborators([collaborator])
       if (this.latestCollaboratorTimeout) {
         clearTimeout(this.latestCollaboratorTimeout)
@@ -247,6 +249,14 @@ const SharedRecordMixin = superclass =>
       this.latestCollaboratorTimeout = setTimeout(() => {
         this.setCollaborators([])
       }, 5000)
+    }
+
+    setCollaboratorCursorPosition({ collaboratorId, coordinates } = {}) {
+      const collaborator = _.find(this.collaborators, { id: collaboratorId })
+      if (!collaborator) return
+      collaborator.coordinates = coordinates
+      // set our array with the new coordinates tacked on to the collaborator
+      this.setCollaborators(this.collaborators)
     }
 
     @computed

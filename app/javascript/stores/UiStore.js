@@ -9,6 +9,7 @@ import v, {
   TOUCH_DEVICE_OS,
   EVENT_SOURCE_TYPES,
   FOAMCORE_MAX_ZOOM,
+  FOAMCORE_INTERACTION_LAYER,
   ACTIVITY_LOG_PAGE_KEY,
   COLLECTION_CHANNEL_NAME,
 } from '~/utils/variables'
@@ -1113,6 +1114,20 @@ export default class UiStore {
     }
   }
 
+  broadcastCursorPosition = coordinates => {
+    const { viewingCollection } = this
+    if (!viewingCollection) {
+      return
+    }
+    const channel = ChannelManager.getChannel(
+      COLLECTION_CHANNEL_NAME,
+      viewingCollection.id
+    )
+    if (channel && viewingCollection.collaborators.length >= 1) {
+      channel.perform('cursor', { coordinates })
+    }
+  }
+
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
     const filteredCards = this.apiStore
       .findAll('collection_cards')
@@ -1885,5 +1900,15 @@ export default class UiStore {
       .catch(err => {
         this.alert(err.error[0])
       })
+  }
+
+  get foamcoreBoundingRectangle() {
+    let rect = { left: 0, top: 0 }
+    const container = document.querySelector(`.${FOAMCORE_INTERACTION_LAYER}`)
+    if (container) {
+      // just a guard for jest shallow render
+      rect = container.getBoundingClientRect()
+    }
+    return rect
   }
 }
