@@ -38,6 +38,8 @@ class CollectionUpdateBroadcaster < SimpleService
       text_item: {
         id: item.id.to_s,
         quill_data: item.quill_data,
+        background_color: item.background_color,
+        background_color_opacity: item.background_color_opacity,
         parent_collection_card_id: item.parent_collection_card&.id&.to_s,
       },
     )

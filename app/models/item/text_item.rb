@@ -122,6 +122,7 @@ class Item
       save
 
       received_changes(data, user)
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
     end
 
     def threadlocked_transform_realtime_delta(user, data)

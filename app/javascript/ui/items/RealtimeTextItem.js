@@ -347,6 +347,9 @@ class RealtimeTextItem extends React.Component {
     if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
+    if (data.background_color) {
+      this.handleReceivedBackground({ current_editor, data })
+    }
 
     const { item } = this.props
     item.setCollaborators(collaborators)
@@ -358,6 +361,13 @@ class RealtimeTextItem extends React.Component {
     this.createCursor(current_editor)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.moveCursor(current_editor.id, data.range)
+  }
+
+  handleReceivedBackground = ({ current_editor, data }) => {
+    if (current_editor.id === this.props.currentUserId) return
+    const { item } = this.props
+    item.background_color = data.background_color
+    item.background_color_opacity = data.background_color_opacity
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
