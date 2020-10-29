@@ -289,7 +289,7 @@ class TextItemCover extends React.Component {
     const { hasTitleText } = this
     const { item } = this.props
     let bg_color = item.background_color
-    let opacity = item.background_color_opacity
+    let opacity = item.background_color_opacity || 1
     if (!bg_color) {
       // default to white bg
       bg_color = v.colors.white
@@ -297,6 +297,9 @@ class TextItemCover extends React.Component {
         // hasTitleText will make it transparent if no color has been defined
         opacity = 0
       }
+    }
+    if (opacity === 1) {
+      return bg_color
     }
     const fullColor = color(bg_color).alpha(opacity)
     return fullColor.rgb().string()
