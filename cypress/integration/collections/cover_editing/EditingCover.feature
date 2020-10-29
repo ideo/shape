@@ -5,12 +5,12 @@ Feature: Editing Cover
     Then I should see a 'EditCoverOptions'
     # this should get the cover font color picker (since it's first)
     When I click the "QuickOption-font color"
-    And I click the "#E27300" font color option
+    And I click the "#FFD6A5" font color option
     And I type "Title" in the title textarea
     And I type "Subtitle" in the subtitle textarea
     And I click the 'ModalClose'
     And I wait for "@apiUpdateCollection" to finish
-    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#E27300" at 0,2
+    Then I should see a collection card title "Title" with a subtitle "Subtitle" and color "#FFD6A5" at 0,2
 
     When I click the edit "collection settings" icon at 0,2
     And I click the "input" located in ".checkbox-hide-subtitle"

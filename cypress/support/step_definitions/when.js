@@ -443,7 +443,7 @@ When('I click the edit {string} icon at {int},{int}', (name, row, col) => {
 })
 
 When('I click the {string} font color option', hex => {
-  cy.get(`.compact-picker div[title="${hex}"]`)
+  cy.get(`[data-cy="ColorPicker"] div[title="${hex}"]`)
     .first()
     .click({ force: true })
   cy.wait('@apiUpdateCollectionCard')
