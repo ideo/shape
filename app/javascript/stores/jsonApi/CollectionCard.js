@@ -336,8 +336,18 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     try {
       // NOTE: in this context, `this` is a new CollectionCard model
       // that has the data we want to send for replacing the card
-      const replacing =
-        replacingCard || this.apiStore.find('collection_cards', replacingId)
+      let replacing = null
+
+      if (replacingCard) {
+        replacing = replacingCard
+      } else if (replacingId) {
+        replacing = this.apiStore.find('collection_cards', replacingId)
+      }
+
+      if (!replacing) {
+        return
+      }
+
       const data = this.toJsonApi()
       // need to remove the item to reset its type (in case it changed)
       this.apiStore.remove(replacing.record)

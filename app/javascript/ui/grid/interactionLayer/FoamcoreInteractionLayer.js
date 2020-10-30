@@ -106,29 +106,23 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const { blankContentToolState } = uiStore
     const { replacingId } = blankContentToolState
-    let placeholderCards = []
-    let count = files.length
-    if (replacingId) {
-      count -= 1
-      placeholderCards.push({
-        id: replacingId,
-        row: blankContentToolState.row,
-        col: blankContentToolState.col,
-      })
-    }
 
-    if (count) {
-      const data = {
-        row,
-        col,
-        count,
-        parent_id: collection.id,
-      }
-      const newPlaceholderCards = await apiStore.createPlaceholderCards({
-        data,
-      })
-      placeholderCards = placeholderCards.concat(newPlaceholderCards)
+    if (!!replacingId) return
+
+    // only create placeholders not replacing and when dropping files into foamcore
+    let placeholderCards = []
+
+    const data = {
+      row,
+      col,
+      count: files.length,
+      parent_id: collection.id,
     }
+    placeholderCards = await apiStore.createPlaceholderCards({
+      data,
+    })
+
+    if (_.isEmpty(placeholderCards)) return
 
     _.each(placeholderCards, placeholderCard => {
       // track placeholder cards that were created in order to create primary cards once filestack succeeds
@@ -141,47 +135,38 @@ class FoamcoreInteractionLayer extends React.Component {
       // add placeholders to the collection cards store
       collection.addCard(placeholderCard)
     })
-
-    uiStore.setDroppingFilesCount(0)
-    runInAction(() => (this.fileDropProgress = null))
   }
 
   handleSuccess = async res => {
     if (res.length > 0) {
       const files = await FilestackUpload.processFiles(res)
-      this.createCardsForFiles(files)
+      if (files.length > 0) {
+        const { uiStore } = this.props
+        const replacingId = _.get(uiStore, 'blankContentToolState.replacingId')
+        if (!!replacingId) {
+          this.replaceFileCard(files[0], replacingId)
+        } else {
+          this.createCardsFromPlaceholders(files)
+        }
+      }
     }
   }
 
-  createCardsForFiles = files => {
-    const { collection, apiStore, uiStore } = this.props
-
+  createCardsFromPlaceholders = files => {
     _.each(files, async (file, idx) => {
       // get row and col from placeholders
       const placeholder = this.placeholderCards[idx]
 
-      const attrs = {
-        order: idx,
-        col: placeholder.col,
-        row: placeholder.row,
-        width: placeholder.width,
-        height: placeholder.height,
-        parent_id: collection.id,
-        item_attributes: {
-          type: ITEM_TYPES.FILE,
-          filestack_file_attributes: {
-            url: file.url,
-            handle: file.handle,
-            filename: file.filename,
-            size: file.size,
-            mimetype: file.mimetype,
-            docinfo: file.docinfo,
-          },
-        },
-      }
-      const card = new CollectionCard(attrs, apiStore)
-      card.parent = parent // Assign parent so store can get access to it
-      await card.API_createFromPlaceholderId(placeholder.id)
+      if (!placeholder) return
+
+      const fileCardFromPlaceholder = this.createFileCardFromPosition({
+        ...placeholder,
+        file,
+      })
+
+      if (!fileCardFromPlaceholder) return
+
+      await fileCardFromPlaceholder.API_createFromPlaceholderId(placeholder.id)
 
       googleTagManager.push({
         event: 'formSubmission',
@@ -192,7 +177,54 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // clear placeholder card ids for next upload
     this.clearPlaceholderCards()
+    this.resetDroppingFiles()
+  }
+
+  replaceFileCard = async (file, replacingId) => {
+    const { uiStore } = this.props
+    const fileCardFromBct = this.createFileCardFromPosition({
+      ...uiStore.blankContentToolState,
+      file,
+    })
+    if (!fileCardFromBct) return
+    await fileCardFromBct.API_replace({ replacingId })
     uiStore.closeBlankContentTool()
+    this.resetDroppingFiles()
+  }
+
+  resetDroppingFiles = () => {
+    const { uiStore } = this.props
+    uiStore.setDroppingFilesCount(0)
+    runInAction(() => (this.fileDropProgress = null))
+  }
+
+  // creates collection card for serialization
+  createFileCardFromPosition = ({ order, col, row, width, height, file }) => {
+    const { apiStore, collection } = this.props
+
+    if (col === null || row === null || !file) return null
+
+    const attrs = {
+      order,
+      col,
+      row,
+      width,
+      height,
+      parent_id: collection.id,
+      item_attributes: {
+        type: ITEM_TYPES.FILE,
+        filestack_file_attributes: {
+          url: file.url,
+          handle: file.handle,
+          filename: file.filename,
+          size: file.size,
+          mimetype: file.mimetype,
+          docinfo: file.docinfo,
+        },
+      },
+    }
+
+    return new CollectionCard(attrs, apiStore)
   }
 
   createTemplateInstance = async ({ col, row, templateId }) => {
@@ -479,7 +511,7 @@ class FoamcoreInteractionLayer extends React.Component {
         collection={collection}
         position={position}
         interactionType={interactionType}
-        showDropzoneIcon={showDropzoneIcon}
+        showDropzoneIcon={!!replacingId || showDropzoneIcon}
         key={`blank-${interactionType}-${row}:${col}`}
         row={row}
         col={col}
