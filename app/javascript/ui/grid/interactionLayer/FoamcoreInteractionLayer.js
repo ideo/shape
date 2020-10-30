@@ -124,6 +124,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
     if (_.isEmpty(placeholderCards)) return
 
+    console.log({ placeholderCards })
+
     _.each(placeholderCards, placeholderCard => {
       // track placeholder cards that were created in order to create primary cards once filestack succeeds
       this.addPlaceholderCard({
@@ -134,6 +136,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
       // add placeholders to the collection cards store
       collection.addCard(placeholderCard)
+      console.log('adding placeholder card')
     })
   }
 
