@@ -81,6 +81,8 @@ RSpec.describe CollectionUpdateBroadcaster, type: :service do
           text_item: {
             id: text_item.id.to_s,
             quill_data: text_item.quill_data,
+            background_color: text_item.background_color,
+            background_color_opacity: text_item.background_color_opacity,
             parent_collection_card_id: text_item.parent_collection_card.id.to_s,
           },
         },

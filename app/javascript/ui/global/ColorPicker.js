@@ -23,7 +23,7 @@ const DEFAULT_COLORS = [
 ]
 
 const ColorPicker = props => (
-  <ColorPickerStyleWrapper>
+  <ColorPickerStyleWrapper data-cy="ColorPicker">
     <SketchPicker
       color={props.color}
       disableAlpha={props.disableAlpha}

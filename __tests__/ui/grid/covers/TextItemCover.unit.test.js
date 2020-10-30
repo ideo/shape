@@ -70,13 +70,20 @@ describe('TextItemCover', () => {
   describe('when background color set', () => {
     beforeEach(() => {
       props.item.background_color = '#A85751'
-      props.item.background_color_opacity = 1
-      wrapper = shallow(<TextItemCover {...props} />)
     })
 
-    it('renders the background color as rgba', () => {
+    it('renders the background color with hex if opacity = 1', () => {
+      props.item.background_color_opacity = 1
+      wrapper = shallow(<TextItemCover {...props} />)
       const cover = wrapper.find('StyledPaddedCover')
-      expect(cover.props().backgroundColor).toEqual('rgb(168, 87, 81)')
+      expect(cover.props().backgroundColor).toEqual('#A85751')
+    })
+
+    it('renders the background color with rgba for opacity', () => {
+      props.item.background_color_opacity = 0.5
+      wrapper = shallow(<TextItemCover {...props} />)
+      const cover = wrapper.find('StyledPaddedCover')
+      expect(cover.props().backgroundColor).toEqual('rgba(168, 87, 81, 0.5)')
     })
   })
 

@@ -390,7 +390,7 @@ Cypress.Commands.add(
   (subject, string) => {
     return cy
       .wrap(subject)
-      .clear()
+      .clear({ force: true })
       .wait(25)
       .type(string)
       .wait(25)
