@@ -153,7 +153,7 @@ class HotCellQuadrant extends React.Component {
                     (() => {
                       this.createContent(subType.name, subType.opts)
                     }),
-                  TextComponent: subType.name !== 'header' ? HeadingText : null,
+                  TextComponent: subType.name === 'header' ? HeadingText : null,
                 }
               }),
           }
