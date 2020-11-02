@@ -94,9 +94,10 @@ describe('CollectionPage', () => {
         expect(uiStore.resetCardPositions).toHaveBeenCalled()
       })
 
-      it('should reload the data', () => {
-        expect(collection.API_fetchCards).toHaveBeenCalled()
-        expect(component.cardsFetched).toBe(true)
+      it('should setupCommentThreadAndMenusForPage', () => {
+        expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
+          collection
+        )
       })
 
       it('should have a different viewingRecord', () => {
@@ -197,9 +198,15 @@ describe('CollectionPage', () => {
 
   describe('receivedChannelData()', () => {
     describe('when an update happens on the current collection', () => {
+      const loadedRows = 8
       beforeEach(() => {
         wrapper.setProps({
-          collection: { ...collection, id: 99, loadedRows: [0, 8] },
+          collection: {
+            ...collection,
+            isBoard: true,
+            id: 99,
+            loadedRows,
+          },
         })
         wrapper.instance().receivedChannelData({
           record_id: 99,
@@ -210,8 +217,9 @@ describe('CollectionPage', () => {
       })
 
       it('should reload the data', () => {
+        expect(collection.refetch).toHaveBeenCalled()
         expect(collection.API_fetchCards).toHaveBeenCalledWith({
-          rows: collection.loadedRows,
+          rows: [0, loadedRows],
         })
       })
 
@@ -232,6 +240,8 @@ describe('CollectionPage', () => {
           }}
         />
       )
+      component = wrapper.instance()
+      component.loadCollectionCards()
     })
 
     it('should clear out collection cards on loadCollectionCards', () => {

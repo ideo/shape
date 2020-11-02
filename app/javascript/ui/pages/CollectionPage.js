@@ -73,8 +73,6 @@ class CollectionPage extends React.Component {
     } = prevProps
     const { id: currentId } = collection
     if (currentId !== previousId) {
-      console.log('navigated to new page', currentId)
-
       runInAction(() => {
         // unsubscribe from previous collection; subscribe to new one
         ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
@@ -386,14 +384,14 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    const per_page =
-      collection.collection_cards.length || collection.recordsPerPage
     if (collection.isBoard) {
       this.loadCollectionCards({
         reloading: true,
         rows: [0, collection.loadedRows],
       })
     } else {
+      const per_page =
+        collection.collection_cards.length || collection.recordsPerPage
       this.loadCollectionCards({ reloading: true, per_page })
     }
     if (this.collection.submissions_collection) {

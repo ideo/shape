@@ -36,6 +36,7 @@ describe('FoamcoreGrid', () => {
     const collection = fakeCollection
 
     collection.num_columns = 16
+    collection.max_row_index = 25
     collection.cardMatrix = [[], [], []]
     collection.cardMatrix[1][5] = cardA
     collection.cardMatrix[0][1] = cardB
@@ -73,6 +74,11 @@ describe('FoamcoreGrid', () => {
     rerender()
     cards = props.collection.collection_cards
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
+  })
+
+  it('loads initial rows of cards', () => {
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [0, 30] })
+    expect(props.collection.replaceCardsIfDifferent).toHaveBeenCalled()
   })
 
   it('renders MovableGridCards', () => {

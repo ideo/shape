@@ -462,6 +462,7 @@ export const fakeCollection = {
     {label: 'pajamas', type: 'tag_list'},
     {label: 'shape-test-user', type: 'user_tag_list', user: null}
   ],
+  activeFilters: [],
   addTag: jest.fn(),
   removeTag: jest.fn(),
   API_archive: jest.fn(),
@@ -498,6 +499,7 @@ export const fakeCollection = {
   clearCollectionCards: jest.fn(),
   toJsonApiWithCards: jest.fn(),
   mergeCards: jest.fn(),
+  replaceCardsIfDifferent: jest.fn(),
   revertToSnapshot: jest.fn(),
   removeCardIds: jest.fn(),
   setCarouselIdx: jest.fn(),
@@ -510,6 +512,7 @@ export const fakeCollection = {
   loadPhaseSubCollections: jest.fn().mockReturnValue(Promise.resolve([])),
   setPhaseSubCollections: jest.fn(),
   applyRemoteUpdates: jest.fn(),
+  max_row_index: 20,
   meta: {
     snapshot: {
       can_edit: false,
