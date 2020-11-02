@@ -574,7 +574,7 @@ class MovableGridCard extends React.Component {
         transition = cardHoverTransition
       }
     } else if (uiStore.textEditingItem === record) {
-      _zIndex = cardHovering
+      _zIndex = cardDragging
     } else if (hoveringOverLeft) {
       _zIndex = cardHovering
       const amount = 32 / zoomLevel
