@@ -162,7 +162,7 @@ PositionedBlankCard.propTypes = {
   handleBlankCardClick: PropTypes.func,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
-  fileDropProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.null]),
+  fileDropProgress: PropTypes.number,
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
   replacingId: PropTypes.string,

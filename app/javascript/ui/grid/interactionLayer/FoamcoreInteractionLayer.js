@@ -506,6 +506,8 @@ class FoamcoreInteractionLayer extends React.Component {
     // could be drag or drag-overflow
     const isDrag = _.includes(interactionType, 'drag')
 
+    if (!interactionType) return null
+
     return (
       <PositionedBlankCard
         collection={collection}

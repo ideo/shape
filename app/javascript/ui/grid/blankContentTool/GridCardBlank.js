@@ -658,10 +658,8 @@ class GridCardBlank extends React.Component {
     const { creating, loading } = this.state
     const { isBoard } = parent
     const isReplacing = !!this.replacingId
-    let { gridW, gridH } = gridSettings
-    if (isBoard) {
-      ;({ gridW, gridH } = v.defaultGridSettings)
-    }
+    const { gridW, gridH } = isBoard ? v.defaultGridSettings : gridSettings
+
     const showCloseButton =
       !this.emptyState &&
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
