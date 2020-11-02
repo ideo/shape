@@ -1881,24 +1881,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
+  // which would normally take place via RND
   @action
   async API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
-    const jsonData = this.toJsonApiWithCards()
+    const jsonData = this.toJsonApiWithCards([card.id])
     this.pushUndo({
-      snapshot: jsonData.attributes,
+      // clone to prevent later _.assign from affecting the same snapshot
+      snapshot: _.cloneDeep(jsonData.attributes),
       message: undoMessage,
       actionType: POPUP_ACTION_TYPES.SNACKBAR,
     })
-    // now make the local change to the card
-    _.assign(card, updates)
-    const data = this.toJsonApiWithCards()
+    // update our jsonData with the new attributes for this card
+    _.assign(jsonData.attributes.collection_cards_attributes[0], updates)
     // we don't want to receive updates which are just going to try to re-render
-    data.cancel_sync = true
-    await this.apiStore.request(this.baseApiPath, 'PATCH', { data })
-    // force rendering?
-    this.mergeCards([card])
+    jsonData.cancel_sync = true
+    await this.apiStore.request(this.baseApiPath, 'PATCH', { data: jsonData })
+    runInAction(() => {
+      // now make the local change to the card, which should also render it in the new position
+      _.assign(card, { ...updates, updated_at: new Date() })
+    })
   }
 
   async API_manipulateRow({ row, action, pushUndo = true } = {}) {
