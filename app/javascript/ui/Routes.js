@@ -1,3 +1,4 @@
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
@@ -135,6 +136,7 @@ class Routes extends React.Component {
     })
   }
 
+  @action
   handleWindowResize = ({ windowWidth }) => {
     // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
     const { uiStore } = this.props
