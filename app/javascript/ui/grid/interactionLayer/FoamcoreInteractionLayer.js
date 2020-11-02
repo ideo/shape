@@ -380,13 +380,7 @@ class FoamcoreInteractionLayer extends React.Component {
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
     if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotcell) {
-      runInAction(() => {
-        uiStore.blankContentToolState = {
-          ...uiStore.blankContentToolState,
-          blankType: contentType,
-        }
-      })
-      return
+      uiStore.closeBlankContentTool()
     }
 
     uiStore.openBlankContentTool({
@@ -404,17 +398,17 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
-    if (hotcell) {
-      const placeholder = new CollectionCard(
-        {
-          row,
-          col,
-          parent_id: collection.id,
-        },
-        apiStore
-      )
-      await placeholder.API_createBct()
-      uiStore.setBctPlaceholderCard(placeholder)
+    const placeholder = new CollectionCard(
+      {
+        row,
+        col,
+        parent_id: collection.id,
+      },
+      apiStore
+    )
+    await placeholder.API_createBct()
+    uiStore.setBctPlaceholderCard(placeholder)
+    if (this.creatingHotEdge) {
       runInAction(() => (this.creatingHotEdge = false))
     }
   }

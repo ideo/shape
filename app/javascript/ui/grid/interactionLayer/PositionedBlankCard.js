@@ -157,6 +157,7 @@ PositionedBlankCard.propTypes = {
     'unrendered',
     'resize',
     'bct',
+    'hotcell',
   ]).isRequired,
   onCloseHtc: PropTypes.func.isRequired,
   handleBlankCardClick: PropTypes.func,

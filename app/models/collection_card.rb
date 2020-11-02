@@ -349,7 +349,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def bct_placeholder?
-    is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
+    is_a?(CollectionCard::Placeholder)
   end
 
   def copy_into_new_link_card
@@ -627,6 +627,10 @@ class CollectionCard < ApplicationRecord
     self.cached_cover = nil
     self.cover_card_id = nil
     save
+  end
+
+  def parent_snapshot?
+    parent_snapshot.present?
   end
 
   private

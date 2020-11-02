@@ -172,9 +172,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def destroy
     if @collection_card.destroy
       if @collection_card.bct_placeholder?
-        CollectionGrid::BctRemover.call(
-          placeholder_card: @collection_card,
-        )
+        if @collection_card.parent_snapshot?
+          CollectionGrid::BctRemover.call(
+            placeholder_card: @collection_card,
+          )
+        else
+          collection_broadcaster(@collection_card.parent).cards_archived([@collection_card.id])
+        end
       end
       @collection_card.parent.reorder_cards!
       head :no_content
