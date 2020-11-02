@@ -116,6 +116,15 @@ class Routes extends React.Component {
     })
   }
 
+  componentDidUpdate(prevProps) {
+    const { uiStore } = this.props
+    if (this.props.location !== prevProps.location) {
+      uiStore.update('isRouting', true)
+    } else if (uiStore.isRouting) {
+      uiStore.update('isRouting', false)
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
     document.removeEventListener('touchmove', this.handleTouchMove, {

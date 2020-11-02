@@ -133,6 +133,7 @@ class RoutingStore extends RouterStore {
     this.push(path)
   }
 
+  @action
   beforeRouting() {
     const { uiStore } = this
     // close the org/roles menus if either are open when we route to a new page

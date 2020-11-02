@@ -90,6 +90,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     if (collection.id !== prevProps.collection.id) {
       uiStore.determineZoomLevels(collection)
+      this.loadInitialRows()
     }
 
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
@@ -141,9 +142,8 @@ class FoamcoreGrid extends React.Component {
       this.handleZoomIn()
     }
 
-    // loadMoreRows via scrolling is just for infinite scroll / splitLevelBottom
     const visRows = uiStore.visibleRows
-    if (!collection.isSplitLevelBottom || !visRows) {
+    if (!visRows) {
       return
     }
 
@@ -155,31 +155,44 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  loadInitialRows = () => {
+  loadInitialRows = async () => {
     const { collection, loadCollectionCards } = this.props
-    const { loadedRows } = collection
-    // const { loadMoreCollectionCards } = this
+    if (collection.isSplitLevelBottom) {
+      // this is only used for "normal" grids
+      return
+    }
+
     // arbitrary 300 row initial limit?
     const maxRow = _.min([collection.max_row_index, 300])
 
     const rowsPerPage = 30
-    let min = loadedRows
-    let max = loadedRows + rowsPerPage
-    console.log({ maxRow })
+    let min = 0
+    let max = rowsPerPage
+    const requests = []
     while (min <= maxRow) {
       // just fire off multiple async requests (without awaiting)
-      console.log('loadCollectionCards', [min, max])
-      loadCollectionCards({
-        // just load by row # downward, and always load all 16 cols
-        rows: [min, max],
+      const promise = new Promise(resolve => {
+        const rows = [min, max]
+        return resolve(
+          loadCollectionCards({
+            // just load by row # downward, and always load all 16 cols
+            rows,
+          })
+        )
       })
+      requests.push(promise)
       min = max + 1
       max = max + rowsPerPage
     }
+    const data = await Promise.all(requests)
+    runInAction(() => {
+      const newCards = _.flatten(data)
+      collection.replaceCardsIfDifferent(newCards)
+    })
   }
 
   loadMoreRows = () => {
-    const { collection } = this.props
+    const { collection, uiStore } = this.props
     const { loadMoreCollectionCards } = this
     if (collection.isSplitLevelBottom) {
       if (collection.hasMore) {
@@ -188,22 +201,23 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    // const visRows = uiStore.visibleRows
-    // const collectionMaxRow = collection.max_row_index
-    // // min row should start with the next row after what's loaded
-    // const loadMinRow = collection.loadedRows + 1
-    // // add a buffer of 3 more rows (constrained by max row on collection)
-    // const loadMaxRow = _.min([
-    //   collectionMaxRow,
-    //   Math.ceil(loadMinRow + visRows.num + 3),
-    // ])
-    // // min and max could be equal if there is one more row to load
-    // if (loadMinRow <= loadMaxRow) {
-    //   return loadMoreCollectionCards({
-    //     // just load by row # downward, and always load all 16 cols
-    //     rows: [loadMinRow, loadMaxRow],
-    //   })
-    // }
+    // NOTE: you should really only get into here if you go past row 300+
+    const visRows = uiStore.visibleRows
+    const collectionMaxRow = collection.max_row_index
+    // min row should start with the next row after what's loaded
+    const loadMinRow = collection.loadedRows + 1
+    // add a buffer of 3 more rows (constrained by max row on collection)
+    const loadMaxRow = _.min([
+      collectionMaxRow,
+      Math.ceil(loadMinRow + visRows.num + 3),
+    ])
+    // min and max could be equal if there is one more row to load
+    if (loadMinRow <= loadMaxRow) {
+      return loadMoreCollectionCards({
+        // just load by row # downward, and always load all 16 cols
+        rows: [loadMinRow, loadMaxRow],
+      })
+    }
   }
 
   loadMoreCollectionCards = async (opts = {}) => {

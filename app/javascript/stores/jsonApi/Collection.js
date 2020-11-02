@@ -22,11 +22,14 @@ import SharedRecordMixin from './SharedRecordMixin'
 import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
+import { objectsEqual } from '~/utils/objectUtils'
 
 export const ROW_ACTIONS = {
   INSERT: 'insert_row',
   REMOVE: 'remove_row',
 }
+
+const CARD_PROPERTIES = ['id', 'updated_at', 'order', 'row', 'col']
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -621,9 +624,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardProperties() {
-    return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'updated_at', 'order', 'row', 'col'])
-    )
+    return this.collection_cards.map(c => _.pick(c, CARD_PROPERTIES))
+  }
+
+  @action
+  replaceCardsIfDifferent(newCards) {
+    const newProperties = newCards.map(c => _.pick(c, CARD_PROPERTIES))
+    if (objectsEqual(newProperties, this.cardProperties)) {
+      return
+    }
+    this.collection_cards.replace(newCards)
   }
 
   get allowsCollectionTypeSelector() {
@@ -840,6 +850,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.currentOrder = order
       }
     })
+    const { uiStore } = this
     const params = {
       page,
       per_page,
@@ -861,6 +872,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
     let apiPath
     if (searchTerm) {
+      uiStore.update('isTransparentLoading', true)
       params.query = searchTerm
       if (this.collectionFilterQuery.q) {
         params.query += ` ${this.collectionFilterQuery.q}`
@@ -886,12 +898,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {
+      uiStore.update('isTransparentLoading', false)
       if (searchTerm) {
         this.totalPages = (meta && meta.total_pages) || 1
       } else {
         this.totalPages = links.last
       }
-      const firstPage = page === 1 && (!rows || rows[0] === 0)
+      // NOTE: firstPage doesn't happen when loading rows
+      const firstPage = page === 1
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
@@ -910,16 +924,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         if (this.currentPage < page) {
           this.currentPage = page
         }
-        const newData = _.reverse(
-          // de-dupe merged data (deferring to new cards first)
-          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
-          _.unionBy(
-            _.reverse([...data]),
-            _.reverse([...this.collection_cards]),
-            'id'
-          )
-        )
-        this.collection_cards.replace(newData)
+        this.mergeCards(data)
       }
 
       if (this.isSplitLevelBottom) {
@@ -959,9 +964,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   mergeCards = cards => {
-    // de-dupe merged data (deferring to new cards first)
-    const newData = _.unionBy(cards, this.collection_cards, 'id')
-    this.collection_cards.replace(_.sortBy(newData, 'order'))
+    const newData = _.reverse(
+      // de-dupe merged data (deferring to new cards first)
+      // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
+      _.unionBy(
+        _.reverse([...cards]),
+        _.reverse([...this.collection_cards]),
+        'id'
+      )
+    )
+    this.collection_cards.replace(newData)
   }
 
   API_fetchCardOrders = async () => {

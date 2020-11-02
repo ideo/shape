@@ -100,6 +100,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  isRouting = false
+  @observable
   isTransparentLoading = false
   @observable
   isLoadingMoveAction = false
