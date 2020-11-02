@@ -70,16 +70,12 @@ class CollectionCreator extends React.Component {
     switch (type) {
       case 'submissionBox':
         return 'Collection::SubmissionBox'
-        break
       case 'testCollection':
         return 'Collection::TestCollection'
-        break
       case 'foamcoreBoard':
         return 'Collection::Board'
-        break
       case 'searchCollection':
         return 'Collection::SearchCollection'
-        break
       case 'collection':
       case 'template':
         return null
