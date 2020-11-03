@@ -87,8 +87,11 @@ export default class CollectionCollaborationService {
   }
 
   setCollaborator(card, current_editor) {
-    if (card && card.record && !_.isEmpty(current_editor)) {
+    if (!_.isEmpty(card.record)) {
       card.record.setLatestCollaborator(current_editor)
+    } else if (card) {
+      // FIXME: collection card collaborators will only have 1 collaborator, see if having a mixin is a good idea
+      card.setCollaborators([current_editor])
     }
   }
 

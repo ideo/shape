@@ -104,6 +104,16 @@ class GridCard extends React.Component {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
   }
 
+  get collaboratorColor() {
+    const { record, card } = this.props
+    const cardOrRecord = card.isBctPlaceholder ? card : record
+    if (!_.isEmpty(cardOrRecord) && cardOrRecord.collaborators.length > 0) {
+      const { color } = _.last(cardOrRecord.collaborators)
+      return v.colors[`collaboratorPrimary${color}`]
+    }
+    return null
+  }
+
   renderTopRightActions() {
     const { menuOpen } = this
     const {
@@ -583,7 +593,11 @@ class GridCard extends React.Component {
       }
 
       contents = (
-        <PlaceholderCard card={card} warnBeforeLeaving={warnBeforeLeaving} />
+        <PlaceholderCard
+          card={card}
+          warnBeforeLeaving={warnBeforeLeaving}
+          backgroundColor={this.collaboratorColor}
+        />
       )
     } else {
       contents = (
@@ -647,18 +661,12 @@ class GridCard extends React.Component {
       )
     }
 
-    let collaboratorColor = null
-    if (!_.isEmpty(record.collaborators)) {
-      const { color } = _.last(record.collaborators)
-      collaboratorColor = v.colors[`collaboratorPrimary${color}`]
-    }
-
     return (
       <StyledGridCard
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
-        collaboratorColor={collaboratorColor}
+        collaboratorColor={this.collaboratorColor}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}

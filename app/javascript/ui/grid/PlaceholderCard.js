@@ -53,8 +53,9 @@ class PlaceholderCard extends React.Component {
   }
 
   render() {
+    const { backgroundColor } = this.props
     return (
-      <StyledGridCardPrivate>
+      <StyledGridCardPrivate backgroundColor={backgroundColor}>
         <CardLoader />
       </StyledGridCardPrivate>
     )
@@ -64,6 +65,11 @@ class PlaceholderCard extends React.Component {
 PlaceholderCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   warnBeforeLeaving: PropTypes.bool.isRequired,
+  backgroundColor: PropTypes.string,
+}
+
+PlaceholderCard.defaultProps = {
+  backgroundColor: null,
 }
 
 export default PlaceholderCard

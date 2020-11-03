@@ -40,7 +40,7 @@ const IconHolder = styled.div`
 `
 
 export const StyledGridCardPrivate = styled.div`
-  background: ${v.colors.commonMedium};
+  background: ${props => props.backgroundColor};
   text-align: center;
   color: ${v.colors.collectionCover};
   width: 100%;
@@ -51,6 +51,9 @@ export const StyledGridCardPrivate = styled.div`
     margin: auto;
   }
 `
+StyledGridCardPrivate.defaultProps = {
+  backgroundColor: `${v.colors.commonMedium}`,
+}
 StyledGridCardPrivate.displayName = 'StyledGridCardPrivate'
 
 export const highlightedCardCss = css`

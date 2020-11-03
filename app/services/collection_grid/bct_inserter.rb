@@ -6,11 +6,13 @@ module CollectionGrid
     def initialize(
       row: 0,
       col: 0,
-      collection:
+      collection:,
+      user: nil
     )
       @row = row
       @col = col
       @collection = collection
+      @user = user
 
       @card_attributes_was = []
       @card_attributes = []
@@ -77,7 +79,7 @@ module CollectionGrid
     end
 
     def broadcaster
-      CollectionUpdateBroadcaster.new(@collection)
+      CollectionUpdateBroadcaster.new(@collection, @user)
     end
 
     def select_cards_after

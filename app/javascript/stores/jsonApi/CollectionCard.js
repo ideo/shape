@@ -9,10 +9,13 @@ import {
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import FilestackUpload from '~/utils/FilestackUpload'
-import TitleAndCoverEditingMixin from './TitleAndCoverEditingMixin'
+import TitleAndCoverEditingMixin from '~/stores/jsonApi/mixins/TitleAndCoverEditingMixin'
+import CollaboratingMixin from '~/stores/jsonApi/mixins/CollaboratingMixin'
 import BaseRecord from './BaseRecord'
 
-class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
+class CollectionCard extends CollaboratingMixin(
+  TitleAndCoverEditingMixin(BaseRecord)
+) {
   static type = 'collection_cards'
   static endpoint = apiUrl('collection_cards')
 
@@ -56,6 +59,8 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
   maxHeight = this.height || 1
   @observable
   currentlyReplacing = false
+  @observable
+  collaborators = []
 
   constructor(...args) {
     super(...args)
