@@ -1107,9 +1107,13 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { collection, canEditCollection } = this.props
+    const { collection, canEditCollection, uiStore } = this.props
     const { isSplitLevelBottom } = collection
 
+    // don't show the interactionLayer if we're initially loading cards
+    const initialLoading =
+      collection.collection_cards.length === 0 && uiStore.isTransparentLoading
+    const showInteractionLayer = canEditCollection && !initialLoading
     const gridSize = this.totalGridSize
 
     return (
@@ -1134,7 +1138,7 @@ class FoamcoreGrid extends React.Component {
         {this.renderVisibleCards()}
         {collection.isSubmissionsCollection && this.renderAddSubmission()}
         {collection.isSubmissionsCollection && this.renderSubmissionBct()}
-        {canEditCollection && (
+        {showInteractionLayer && (
           <FoamcoreInteractionLayer
             collection={collection}
             hoveringOverCollection={!!this.hoveringOverCollection}

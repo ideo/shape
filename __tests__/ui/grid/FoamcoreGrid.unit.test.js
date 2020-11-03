@@ -1,5 +1,6 @@
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
+import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -83,6 +84,26 @@ describe('FoamcoreGrid', () => {
 
   it('renders MovableGridCards', () => {
     expect(wrapper.find('MovableGridCard').length).toEqual(3)
+  })
+
+  describe('before cards have loaded', () => {
+    beforeEach(() => {
+      props.collection.collection_cards = []
+      props.uiStore.isTransparentLoading = true
+      rerender()
+    })
+
+    it('does not render the FoamcoreInteractionLayer', () => {
+      expect(props.collection.collection_cards.length).toEqual(0)
+      expect(wrapper.find(FoamcoreInteractionLayer).exists()).toBeFalsy()
+    })
+  })
+
+  describe('after cards have loaded', () => {
+    it('renders the FoamcoreInteractionLayer', () => {
+      expect(props.collection.collection_cards.length).toEqual(3)
+      expect(wrapper.find(FoamcoreInteractionLayer).exists()).toBeTruthy()
+    })
   })
 
   describe('findOverlap', () => {
