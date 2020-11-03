@@ -186,7 +186,10 @@ class PageWithApiWrapper extends React.Component {
     }
 
     record.updateFullyLoaded(true)
-    uiStore.update('isTransparentLoading', false)
+    if (!record.isCollection) {
+      // if it's a collection, this will get set false after API_fetchCards
+      uiStore.update('isTransparentLoading', false)
+    }
     uiStore.update('isRouting', false)
     // url could be null which will reset it
     uiStore.setBodyBackgroundImage(record.backgroundImageUrl)
