@@ -40,6 +40,7 @@ beforeEach(() => {
     isHomepage: false,
   }
   collection.API_fetchCards.mockClear()
+  uiStore.update.mockClear()
   wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
   component = wrapper.instance()
 })
@@ -66,6 +67,31 @@ describe('CollectionPage', () => {
     expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
       collection
     )
+  })
+
+  describe('with a non-board collection', () => {
+    it('calls API_fetchCards on initialLoad', () => {
+      expect(collection.API_fetchCards).toHaveBeenCalled()
+      expect(uiStore.update).toHaveBeenCalledWith('isLoading', true)
+    })
+  })
+
+  describe('with a board collection', () => {
+    beforeEach(() => {
+      collection.API_fetchCards.mockClear()
+      uiStore.update.mockClear()
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{ ...collection, isBoard: true }}
+        />
+      )
+    })
+
+    it('does not call API_fetchCards on initialLoad', () => {
+      expect(collection.API_fetchCards).not.toHaveBeenCalled()
+      expect(uiStore.update).not.toHaveBeenCalledWith('isLoading', true)
+    })
   })
 
   describe('componentDidUpdate()', () => {

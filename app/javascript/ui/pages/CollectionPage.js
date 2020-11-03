@@ -61,7 +61,7 @@ class CollectionPage extends React.Component {
       routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
-    this.onAPILoad()
+    this.initialLoad()
     this.subscribeToChannel(collection.id)
   }
 
@@ -81,7 +81,7 @@ class CollectionPage extends React.Component {
         uiStore.closeBlankContentTool()
         uiStore.resetCardPositions()
         this.setViewingRecordAndRestoreScrollPosition()
-        this.onAPILoad()
+        this.initialLoad()
         routingStore.updateScrollState(previousId, window.pageYOffset)
       })
     }
@@ -96,6 +96,18 @@ class CollectionPage extends React.Component {
   get collection() {
     // TODO: replace all references to this.collection with this.props.collection
     return this.props.collection
+  }
+
+  initialLoad() {
+    const { collection, uiStore } = this.props
+    if (collection.isBoard) {
+      // skip straight to this, because FoamcoreGrid will load the initial cards
+      this.onAPILoad()
+      return
+    }
+    uiStore.update('isLoading', true)
+    // other collections e.g. TestCollection load as usual
+    this.loadCollectionCards()
   }
 
   setViewingRecordAndRestoreScrollPosition() {
@@ -114,7 +126,7 @@ class CollectionPage extends React.Component {
     cols,
     reloading = false,
   } = {}) => {
-    const { collection, undoStore } = this.props
+    const { collection, uiStore, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
       this.pollForUpdates()
@@ -144,6 +156,10 @@ class CollectionPage extends React.Component {
     }
     if (reloading) {
       return cards
+    }
+    if (uiStore.isLoading) {
+      // non board collections e.g. TestDesigner don't load until the initial cards have loaded
+      uiStore.update('isLoading', false)
     }
     // this only needs to run on the initial load not when we reload/refetch cards
     this.onAPILoad()
