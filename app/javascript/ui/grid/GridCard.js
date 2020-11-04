@@ -18,8 +18,8 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
   StyledGridCardPrivate,
-  CardLoader,
 } from '~/ui/grid/shared'
+import CardLoader from '~/ui/grid/loader/CardLoader'
 import PlaceholderCard from '~/ui/grid/PlaceholderCard'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
@@ -36,7 +36,9 @@ import HiddenIcon from '~/ui/icons/HiddenIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import EditButton from '~/ui/reporting/EditButton'
+import propShapes from '~/utils/propShapes'
 import v from '~/utils/variables'
+import { getCollaboratorColor } from '~/utils/colorUtils'
 import { linkOffsite } from '~/utils/url'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -102,16 +104,6 @@ class GridCard extends React.Component {
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
-  }
-
-  get collaboratorColor() {
-    const { record, card } = this.props
-    const cardOrRecord = card.isBctPlaceholder ? card : record
-    if (!_.isEmpty(cardOrRecord) && cardOrRecord.collaborators.length > 0) {
-      const { color } = _.last(cardOrRecord.collaborators)
-      return v.colors[`collaboratorPrimary${color}`]
-    }
-    return null
   }
 
   renderTopRightActions() {
@@ -516,9 +508,10 @@ class GridCard extends React.Component {
   }
 
   get transparentBackground() {
-    const { cardType, record } = this.props
-    // If a data item and is a collection cover, it's transparent
-    if (record.coverItem && record.coverItem.isData) return true
+    const { cardType, record, card } = this.props
+    // If a data item and is a collection cover, or it's a placeholder it's transparent
+    if ((record.coverItem && record.coverItem.isData) || card.isBctPlaceholder)
+      return true
     // If this is a legend, data or text item it's transparent
     if (
       cardType === 'items' &&
@@ -563,6 +556,7 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
       zoomLevel,
+      collaborator,
     } = this.props
     const showHotEdge =
       this.props.showHotEdge && canEditCollection && !card.isLoadingPlaceholder
@@ -596,7 +590,7 @@ class GridCard extends React.Component {
         <PlaceholderCard
           card={card}
           warnBeforeLeaving={warnBeforeLeaving}
-          backgroundColor={this.collaboratorColor}
+          collaborator={collaborator}
         />
       )
     } else {
@@ -666,7 +660,7 @@ class GridCard extends React.Component {
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
-        collaboratorColor={this.collaboratorColor}
+        collaboratorColor={getCollaboratorColor(collaborator)}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
@@ -694,6 +688,7 @@ GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  collaborator: PropTypes.shape(propShapes.collaborator),
   height: PropTypes.number,
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
@@ -722,6 +717,7 @@ GridCard.defaultProps = {
   searchResult: false,
   showHotEdge: true,
   zoomLevel: 1,
+  collaborator: null,
 }
 
 export default GridCard

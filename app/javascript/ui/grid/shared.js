@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
-import Loader from '~/ui/layout/Loader'
 
 const Container = styled.div`
   align-items: center;
@@ -396,22 +395,4 @@ export class GridCardIconWithName extends React.PureComponent {
 GridCardIconWithName.propTypes = {
   text: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
-}
-
-export const CardLoader = () => {
-  return (
-    <div
-      style={{
-        top: 0,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        zIndex: v.zIndex.gridCardTop,
-        background: hexToRgba(v.colors.commonDark, 0.5),
-        color: 'white',
-      }}
-    >
-      <Loader size={30} containerHeight="100%" animation="circular" />
-    </div>
-  )
 }

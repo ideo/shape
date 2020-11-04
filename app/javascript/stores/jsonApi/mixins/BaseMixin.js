@@ -208,6 +208,34 @@ const BaseMixin = superclass =>
       uiStore.update('isLoading', false)
     }
 
+    @action
+    setCollaborators(collaborators) {
+      const { collaboratorColors } = this.uiStore
+      const { currentUserId } = this.apiStore
+      const otherCollaborators = _.reject(
+        collaborators,
+        c => c.id === currentUserId
+      )
+      const sorted =
+        // sort by most recent first
+        _.reverse(
+          _.sortBy(otherCollaborators, e => {
+            return new Date(e.timestamp)
+          })
+        )
+
+      _.each(sorted, collaborator => {
+        if (!collaboratorColors.has(collaborator.id)) {
+          // size starts at 0 before any are added, this should get the first color
+          const nextColor =
+            v.collaboratorColorNames[collaboratorColors.size % 10]
+          collaboratorColors.set(collaborator.id, nextColor)
+        }
+        collaborator.color = collaboratorColors.get(collaborator.id)
+      })
+      this.collaborators.replace(sorted)
+    }
+
     // this is used to highlight someone making an edit on a card
     setLatestCollaborator(collaborator) {
       // because this is just setting collaborators on a card.record within the current collection

@@ -17,8 +17,14 @@ const muiBackdrop = {
   classes: PropTypes.object,
 }
 
+const collaborator = {
+  color: PropTypes.string.isRequired,
+  name: PropTypes.string,
+}
+
 export default {
   position,
   xy,
   muiBackdrop,
+  collaborator,
 }

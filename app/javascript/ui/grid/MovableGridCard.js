@@ -121,6 +121,21 @@ class MovableGridCard extends React.Component {
     )
   }
 
+  get collaborator() {
+    const { record, card, parent } = this.props
+    const recordOrParent = card.isBctPlaceholder ? parent : record
+    if (!_.isEmpty(recordOrParent) && recordOrParent.collaborators.length > 0) {
+      const mostRecentCollaborator = _.last(recordOrParent.collaborators)
+      const { color, name } = mostRecentCollaborator
+
+      return {
+        name,
+        color,
+      }
+    }
+    return null
+  }
+
   handleStart = (e, data) => {
     e.preventDefault()
     pageBoundsScroller.setScrolling(false)
@@ -516,6 +531,7 @@ class MovableGridCard extends React.Component {
       card,
       cardType,
       record,
+      collaborator: this.collaborator,
       // useful for sub-components to know about the card's height
       height,
       // we want to track "dragging" until the transition is complete

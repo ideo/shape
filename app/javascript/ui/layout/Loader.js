@@ -36,13 +36,13 @@ CircularLoader.propTypes = {
 
 class Loader extends React.PureComponent {
   render() {
-    const { containerHeight, animation, size } = this.props
+    const { containerHeight, animation, size, color } = this.props
     // note "circular" SVG does not respect "size" prop
     const LoaderAnimation = animation === 'circular' ? CircularLoader : CubeGrid
     return (
       <Flex style={{ height: containerHeight }} align="center" justify="center">
         <Box>
-          <LoaderAnimation color={v.colors.commonDark} size={`${size}px`} />
+          <LoaderAnimation color={color} size={`${size}px`} />
         </Box>
       </Flex>
     )
@@ -53,11 +53,13 @@ Loader.propTypes = {
   containerHeight: PropTypes.string,
   size: PropTypes.number,
   animation: PropTypes.oneOf(['cube', 'circular']),
+  color: PropTypes.string,
 }
 Loader.defaultProps = {
   containerHeight: '50vh',
   size: 100,
-  animation: 'cube',
+  animation: 'circular',
+  color: v.colors.commonDark,
 }
 
 export default Loader

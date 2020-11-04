@@ -29,7 +29,7 @@ export default class CollectionCollaborationService {
       if (updateData.collection_cards_attributes) {
         _.each(updateData.collection_cards_attributes, cardData => {
           const card = apiStore.find('collection_cards', cardData.id)
-          this.setCollaborator(card, current_editor)
+          this.setCollaborator({ card, current_editor })
         })
       }
       return
@@ -37,14 +37,14 @@ export default class CollectionCollaborationService {
     if (updateData.card_id) {
       // a card has been created or updated, so fetch that individual card
       const card = await collection.API_fetchCard(updateData.card_id)
-      this.setCollaborator(card, current_editor)
+      this.setCollaborator({ card, current_editor, parent: collection })
       return
     }
     if (updateData.card_ids) {
       // a card has been created or updated, so fetch those cards
       const cards = collection.API_fetchAndMergeCards(updateData.card_ids)
       _.each(cards, card => {
-        this.setCollaborator(card, current_editor)
+        this.setCollaborator({ card, current_editor })
       })
       return
     }
@@ -70,7 +70,7 @@ export default class CollectionCollaborationService {
     if (updateData.cards_selected) {
       _.each(updateData.cards_selected, cardId => {
         const card = apiStore.find('collection_cards', cardId)
-        this.setCollaborator(card, current_editor)
+        this.setCollaborator({ card, current_editor })
       })
     }
     if (updateData.coordinates) {
@@ -86,12 +86,14 @@ export default class CollectionCollaborationService {
     }
   }
 
-  setCollaborator(card, current_editor) {
+  setCollaborator({ card, current_editor, parent = null }) {
     if (!_.isEmpty(card.record)) {
       card.record.setLatestCollaborator(current_editor)
-    } else if (card) {
-      // FIXME: collection card collaborators will only have 1 collaborator, see if having a mixin is a good idea
-      card.setCollaborators([current_editor])
+      return
+    }
+    if (parent) {
+      // FIXME: this overrides the collaborators array
+      parent.setCollaborators([current_editor])
     }
   }
 

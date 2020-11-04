@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import Grid from '@material-ui/core/Grid'
 import { Flex } from 'reflexbox'
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
