@@ -30,10 +30,10 @@ class DataItemCover extends React.Component {
     }
   }
 
-  async loadDatasets() {
+  loadDatasets() {
     const { item } = this.props
     if (!item.loadingDatasets) {
-      await item.API_fetchDatasets()
+      item.API_fetchDatasets()
     }
   }
 

@@ -79,6 +79,7 @@ class FoamcoreGrid extends React.Component {
     uiStore.determineZoomLevels(collection)
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
+    this.loadInitialRows()
     if (collection.isSplitLevelBottom) {
       collection.calculateRowsCols()
     }
@@ -89,6 +90,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     if (collection.id !== prevProps.collection.id) {
       uiStore.determineZoomLevels(collection)
+      this.loadInitialRows()
     }
 
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
@@ -125,7 +127,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
-  loadAfterScroll = async () => {
+  @action
+  loadAfterScroll = () => {
     const { collection, uiStore } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) {
@@ -134,15 +137,15 @@ class FoamcoreGrid extends React.Component {
 
     const { zoomLevel } = this
     this.computeVisibleRows()
-    this.computeVisibleCols()
 
     if (!this.showZoomControls && zoomLevel > 1) {
       this.handleZoomIn()
     }
 
     const visRows = uiStore.visibleRows
-
-    if (!visRows) return
+    if (!visRows) {
+      return
+    }
 
     // Attempt to load more rows if currently loaded rows is less than
     // one full screen out of view
@@ -150,6 +153,42 @@ class FoamcoreGrid extends React.Component {
     if (willLoadMoreRows) {
       this.loadMoreRows()
     }
+  }
+
+  loadInitialRows = async () => {
+    const { collection, loadCollectionCards } = this.props
+    if (collection.isSplitLevelBottom) {
+      // this is only used for "normal" grids
+      return
+    }
+
+    // arbitrary 300 row initial limit?
+    const maxRow = _.min([collection.max_row_index, 300])
+
+    const rowsPerPage = 30
+    let min = 0
+    let max = rowsPerPage
+    const requests = []
+    while (min <= maxRow) {
+      // just fire off multiple async requests (without awaiting)
+      const promise = new Promise(resolve => {
+        const rows = [min, max]
+        return resolve(
+          loadCollectionCards({
+            // just load by row # downward, and always load all 16 cols
+            rows,
+          })
+        )
+      })
+      requests.push(promise)
+      min = max + 1
+      max = max + rowsPerPage
+    }
+    const data = await Promise.all(requests)
+    runInAction(() => {
+      const newCards = _.flatten(data)
+      collection.replaceCardsIfDifferent(newCards)
+    })
   }
 
   loadMoreRows = () => {
@@ -162,6 +201,7 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
+    // NOTE: you should really only get into here if you go past row 300+
     const visRows = uiStore.visibleRows
     const collectionMaxRow = collection.max_row_index
     // min row should start with the next row after what's loaded
@@ -269,28 +309,6 @@ class FoamcoreGrid extends React.Component {
     const num = max - min
 
     uiStore.setVisibleRows({
-      min,
-      max,
-      num,
-    })
-  }
-
-  @action
-  computeVisibleCols() {
-    const { pageMargins } = this
-    const { uiStore } = this.props
-    if (!this.gridRef) return { min: null, max: null }
-
-    const left = window.pageXOffset
-    const gridWidth = window.innerWidth - pageMargins.left
-
-    const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
-    const max = parseFloat(
-      ((left + gridWidth) / this.cardAndGutterWidth).toFixed(1)
-    )
-    const num = max - min
-
-    uiStore.setVisibleCols({
       min,
       max,
       num,
@@ -1089,9 +1107,13 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { collection, canEditCollection } = this.props
+    const { collection, canEditCollection, uiStore } = this.props
     const { isSplitLevelBottom } = collection
 
+    // don't show the interactionLayer if we're initially loading cards
+    const initialLoading =
+      collection.collection_cards.length === 0 && uiStore.isTransparentLoading
+    const showInteractionLayer = canEditCollection && !initialLoading
     const gridSize = this.totalGridSize
 
     return (
@@ -1116,7 +1138,7 @@ class FoamcoreGrid extends React.Component {
         {this.renderVisibleCards()}
         {collection.isSubmissionsCollection && this.renderAddSubmission()}
         {collection.isSubmissionsCollection && this.renderSubmissionBct()}
-        {canEditCollection && (
+        {showInteractionLayer && (
           <FoamcoreInteractionLayer
             collection={collection}
             hoveringOverCollection={!!this.hoveringOverCollection}

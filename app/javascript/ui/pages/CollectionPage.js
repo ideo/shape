@@ -41,8 +41,6 @@ import HelperBanner4WFC from '~/ui/global/HelperBanner4WFC'
 class CollectionPage extends React.Component {
   @observable
   currentEditor = {}
-  @observable
-  cardsFetched = false
 
   updatePoller = null
   editorTimeout = null
@@ -63,7 +61,7 @@ class CollectionPage extends React.Component {
       routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
-    this.loadCollectionCards()
+    this.initialLoad()
     this.subscribeToChannel(collection.id)
   }
 
@@ -76,17 +74,16 @@ class CollectionPage extends React.Component {
     const { id: currentId } = collection
     if (currentId !== previousId) {
       runInAction(() => {
-        this.cardsFetched = false
+        // unsubscribe from previous collection; subscribe to new one
+        ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
+        this.subscribeToChannel(currentId)
+        // when navigating between collections, close BCT
+        uiStore.closeBlankContentTool()
+        uiStore.resetCardPositions()
+        this.setViewingRecordAndRestoreScrollPosition()
+        this.initialLoad()
+        routingStore.updateScrollState(previousId, window.pageYOffset)
       })
-      // unsubscribe from previous collection; subscribe to new one
-      ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
-      this.subscribeToChannel(currentId)
-      // when navigating between collections, close BCT
-      uiStore.closeBlankContentTool()
-      uiStore.resetCardPositions()
-      this.setViewingRecordAndRestoreScrollPosition()
-      this.loadCollectionCards()
-      routingStore.updateScrollState(previousId, window.pageYOffset)
     }
   }
 
@@ -101,6 +98,18 @@ class CollectionPage extends React.Component {
     return this.props.collection
   }
 
+  initialLoad() {
+    const { collection, uiStore } = this.props
+    if (collection.isBoard) {
+      // skip straight to this, because FoamcoreGrid will load the initial cards
+      this.onAPILoad()
+      return
+    }
+    uiStore.update('isLoading', true)
+    // other collections e.g. TestCollection load as usual
+    this.loadCollectionCards()
+  }
+
   setViewingRecordAndRestoreScrollPosition() {
     const { collection, uiStore } = this.props
     // setViewingRecord has to happen first bc we use it in openBlankContentTool
@@ -109,6 +118,7 @@ class CollectionPage extends React.Component {
     this.restoreWindowScrollPosition()
   }
 
+  @action
   loadCollectionCards = async ({
     page,
     per_page,
@@ -116,11 +126,11 @@ class CollectionPage extends React.Component {
     cols,
     reloading = false,
   } = {}) => {
-    const { collection, undoStore } = this.props
+    const { collection, uiStore, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
       this.pollForUpdates()
-      return
+      return []
     }
 
     let params = { page, per_page }
@@ -139,18 +149,21 @@ class CollectionPage extends React.Component {
       // make sure to get refetch the latest collection info as well
       await collection.refetch()
     }
-    return collection.API_fetchCards(params).then(() => {
-      if (collection.id !== this.props.collection.id) {
-        // this may have changed during the course of the request if we navigated
-        return
-      }
-      runInAction(() => {
-        this.cardsFetched = true
-        if (reloading) return
-        // this only needs to run on the initial load not when we reload/refetch cards
-        this.onAPILoad()
-      })
-    })
+    const cards = await collection.API_fetchCards(params)
+    if (collection.id !== this.props.collection.id) {
+      // this may have changed during the course of the request if we navigated
+      return []
+    }
+    if (reloading) {
+      return cards
+    }
+    if (uiStore.isLoading) {
+      // non board collections e.g. TestDesigner don't load until the initial cards have loaded
+      uiStore.update('isLoading', false)
+    }
+    // this only needs to run on the initial load not when we reload/refetch cards
+    this.onAPILoad()
+    return cards
   }
 
   loadSubmissionsCollectionCards = async ({
@@ -387,14 +400,14 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    const per_page =
-      collection.collection_cards.length || collection.recordsPerPage
     if (collection.isBoard) {
       this.loadCollectionCards({
         reloading: true,
         rows: [0, collection.loadedRows],
       })
     } else {
+      const per_page =
+        collection.collection_cards.length || collection.recordsPerPage
       this.loadCollectionCards({ reloading: true, per_page })
     }
     if (this.collection.submissions_collection) {
@@ -616,7 +629,6 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
-      (!this.cardsFetched && collection.isEmpty) ||
       collection.awaiting_updates ||
       uiStore.isLoading
     const { isTransparentLoading } = uiStore
@@ -667,6 +679,7 @@ class CollectionPage extends React.Component {
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {
+      // NOTE: deprecated now with 4WFC? do we ever land here?
       inner = (
         <CollectionGrid
           {...genericCollectionProps}
@@ -674,7 +687,6 @@ class CollectionPage extends React.Component {
           {...gridSettings}
           // don't add the extra row for submission box
           shouldAddEmptyRow={!isSubmissionBox}
-          cardsFetched={this.cardsFetched}
         />
       )
     }

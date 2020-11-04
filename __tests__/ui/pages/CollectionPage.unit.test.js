@@ -40,6 +40,7 @@ beforeEach(() => {
     isHomepage: false,
   }
   collection.API_fetchCards.mockClear()
+  uiStore.update.mockClear()
   wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
   component = wrapper.instance()
 })
@@ -68,6 +69,31 @@ describe('CollectionPage', () => {
     )
   })
 
+  describe('with a non-board collection', () => {
+    it('calls API_fetchCards on initialLoad', () => {
+      expect(collection.API_fetchCards).toHaveBeenCalled()
+      expect(uiStore.update).toHaveBeenCalledWith('isLoading', true)
+    })
+  })
+
+  describe('with a board collection', () => {
+    beforeEach(() => {
+      collection.API_fetchCards.mockClear()
+      uiStore.update.mockClear()
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{ ...collection, isBoard: true }}
+        />
+      )
+    })
+
+    it('does not call API_fetchCards on initialLoad', () => {
+      expect(collection.API_fetchCards).not.toHaveBeenCalled()
+      expect(uiStore.update).not.toHaveBeenCalledWith('isLoading', true)
+    })
+  })
+
   describe('componentDidUpdate()', () => {
     describe('on a different collection', () => {
       beforeEach(() => {
@@ -94,9 +120,10 @@ describe('CollectionPage', () => {
         expect(uiStore.resetCardPositions).toHaveBeenCalled()
       })
 
-      it('should reload the data', () => {
-        expect(collection.API_fetchCards).toHaveBeenCalled()
-        expect(component.cardsFetched).toBe(true)
+      it('should setupCommentThreadAndMenusForPage', () => {
+        expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
+          collection
+        )
       })
 
       it('should have a different viewingRecord', () => {
@@ -197,9 +224,15 @@ describe('CollectionPage', () => {
 
   describe('receivedChannelData()', () => {
     describe('when an update happens on the current collection', () => {
+      const loadedRows = 8
       beforeEach(() => {
         wrapper.setProps({
-          collection: { ...collection, id: 99, loadedRows: [0, 8] },
+          collection: {
+            ...collection,
+            isBoard: true,
+            id: 99,
+            loadedRows,
+          },
         })
         wrapper.instance().receivedChannelData({
           record_id: 99,
@@ -210,8 +243,9 @@ describe('CollectionPage', () => {
       })
 
       it('should reload the data', () => {
+        expect(collection.refetch).toHaveBeenCalled()
         expect(collection.API_fetchCards).toHaveBeenCalledWith({
-          rows: collection.loadedRows,
+          rows: [0, loadedRows],
         })
       })
 
@@ -232,6 +266,8 @@ describe('CollectionPage', () => {
           }}
         />
       )
+      component = wrapper.instance()
+      component.loadCollectionCards()
     })
 
     it('should clear out collection cards on loadCollectionCards', () => {

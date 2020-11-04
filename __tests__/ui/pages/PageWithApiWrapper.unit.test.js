@@ -7,12 +7,13 @@ jest.mock('../../../app/javascript/stores')
 let wrapper, location, match, props, instance, rerender
 let fakeCollection
 beforeEach(() => {
+  fakeCollection = { id: '123', updateFullyLoaded: jest.fn() }
   location = {}
   match = {
     path: '/collections/:id',
     url: '/collections',
     params: {
-      id: 1,
+      id: fakeCollection.id,
       org: 'ideo',
     },
   }
@@ -27,7 +28,6 @@ beforeEach(() => {
     render: () => null,
   }
 
-  fakeCollection = { id: '123', updateFullyLoaded: jest.fn() }
   apiStore.request = jest
     .fn()
     .mockReturnValue(Promise.resolve({ data: fakeCollection }))
@@ -143,6 +143,22 @@ describe('PageWithApiWrapper', () => {
       expect(wrapper.find('FakeComponent').props().collection).toEqual(
         fakeCollection
       )
+    })
+
+    describe('if mid-routing transition (match.params.id !== collection.id)', () => {
+      beforeEach(() => {
+        wrapper = shallow(
+          <PageWithApiWrapper.wrappedComponent
+            {...props}
+            match={{ params: { id: '999' } }}
+            render={collection => <FakeComponent collection={collection} />}
+          />
+        )
+      })
+
+      it('does not render the component', () => {
+        expect(wrapper.find('FakeComponent').exists()).toBeFalsy()
+      })
     })
 
     describe('organization is deactivated and you get a 404 as a result', () => {
