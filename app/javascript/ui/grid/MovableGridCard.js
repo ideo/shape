@@ -94,8 +94,8 @@ class MovableGridCard extends React.Component {
       resizeWidth: 0,
       resizeHeight: 0,
       allowTouchDeviceDragging: false,
-      // if we're mid-routing change, then set to preloading gray square
-      preloading: uiStore.isRouting,
+      // if the card was marked to preload in Collection#API_fetchCards
+      preloading: !!props.card.preload,
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return

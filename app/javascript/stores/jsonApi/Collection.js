@@ -898,6 +898,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {
+      // mark each card for preloading in MovableGridCard
+      _.each(data, cc => {
+        cc.preload = true
+      })
+
       uiStore.update('isTransparentLoading', false)
       if (searchTerm) {
         this.totalPages = (meta && meta.total_pages) || 1
@@ -905,7 +910,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.totalPages = links.last
       }
       // NOTE: firstPage doesn't happen when loading rows
-      const firstPage = page === 1
+      const firstPage = params.page === 1
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||

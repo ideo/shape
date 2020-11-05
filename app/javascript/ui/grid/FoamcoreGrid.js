@@ -78,8 +78,8 @@ class FoamcoreGrid extends React.Component {
     uiStore.update('selectedAreaEnabled', true)
     uiStore.determineZoomLevels(collection)
     this.updateCollectionScrollBottom()
-    this.loadAfterScroll()
     this.loadInitialRows()
+    this.computeRowsAndZoomLevel()
     if (collection.isSplitLevelBottom) {
       collection.calculateRowsCols()
     }
@@ -91,12 +91,13 @@ class FoamcoreGrid extends React.Component {
     if (collection.id !== prevProps.collection.id) {
       uiStore.determineZoomLevels(collection)
       this.loadInitialRows()
+      this.computeRowsAndZoomLevel()
     }
 
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
       // trigger this in case we are viewing further down the page
-      this.throttledLoadAfterScroll()
+      // this.throttledLoadAfterScroll()
       if (collection.isSplitLevelBottom) {
         collection.calculateRowsCols()
       }
@@ -126,10 +127,8 @@ class FoamcoreGrid extends React.Component {
     return (_.maxBy(collection_cards, 'row') || { row: 0 }).row
   }
 
-  // Load more cards if we are approaching a boundary of what we have loaded
-  @action
-  loadAfterScroll = () => {
-    const { collection, uiStore } = this.props
+  computeRowsAndZoomLevel = () => {
+    const { collection } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) {
       return
@@ -141,6 +140,13 @@ class FoamcoreGrid extends React.Component {
     if (!this.showZoomControls && zoomLevel > 1) {
       this.handleZoomIn()
     }
+  }
+
+  // Load more cards if we are approaching a boundary of what we have loaded
+  @action
+  loadAfterScroll = () => {
+    const { collection, uiStore } = this.props
+    this.computeRowsAndZoomLevel()
 
     const visRows = uiStore.visibleRows
     if (!visRows) {
@@ -165,28 +171,29 @@ class FoamcoreGrid extends React.Component {
     // arbitrary 300 row initial limit?
     const maxRow = _.min([collection.max_row_index, 300])
 
-    const rowsPerPage = 30
+    const rowsPerPage = 15
     let min = 0
-    let max = rowsPerPage
-    const requests = []
+    let max = 5
+    let newCards = []
+    newCards = await loadCollectionCards({
+      rows: [min, max],
+    })
+
+    min = max + 1
+    max = max + rowsPerPage
+
+    // const requests = []
     while (min <= maxRow) {
-      // just fire off multiple async requests (without awaiting)
-      const promise = new Promise(resolve => {
-        const rows = [min, max]
-        return resolve(
-          loadCollectionCards({
-            // just load by row # downward, and always load all 16 cols
-            rows,
-          })
-        )
+      const rows = [min, max]
+      const cards = await loadCollectionCards({
+        // just load by row # downward, and always load all 16 cols
+        rows,
       })
-      requests.push(promise)
+      newCards = _.concat(newCards, cards)
       min = max + 1
       max = max + rowsPerPage
     }
-    const data = await Promise.all(requests)
     runInAction(() => {
-      const newCards = _.flatten(data)
       collection.replaceCardsIfDifferent(newCards)
     })
   }
