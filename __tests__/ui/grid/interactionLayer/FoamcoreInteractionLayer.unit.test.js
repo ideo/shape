@@ -396,8 +396,7 @@ describe('FoamcoreInteractionLayer', () => {
 
     describe('when dragging to upload to an empty spot', () => {
       beforeEach(() => {
-        props.uiStore.blankContentToolState.replacingId = null
-        rerender()
+        component.placeholderCards = [{ id: 1, col: 1, row: 1 }]
         component.createCardsFromPlaceholders = jest.fn()
         component.handleSuccess([{ id: 1 }])
       })
@@ -409,8 +408,7 @@ describe('FoamcoreInteractionLayer', () => {
 
     describe('when replacing using the bct', () => {
       beforeEach(() => {
-        props.uiStore.blankContentToolState.replacingId = 123
-        rerender()
+        component.replacingCard = { id: 1, col: 1, row: 1 }
         component.replaceFileCard = jest.fn()
         component.handleSuccess([{ id: 1 }])
       })
