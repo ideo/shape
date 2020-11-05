@@ -256,11 +256,12 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get collectionsAndItemsControls() {
     const { item } = this.props
-    const { timeframe } = item.primaryDataset
+    const { primaryDataset } = item
+    const { timeframe } = primaryDataset
     if (timeframe === 'ever') {
       return (
         <span className="titleAndControls">
-          within {!item.datasets[0].data_source_id ? 'the ' : ''}
+          within {!primaryDataset.data_source_id ? 'the ' : ''}
           {this.targetControl}
           {this.groupingControl} {this.timeframeControl}
         </span>
