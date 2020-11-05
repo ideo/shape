@@ -69,6 +69,7 @@ class PositionedBlankCard extends React.Component {
       uiStore,
       blocked,
       interactionType,
+      showDropzoneIcon,
     } = this.props
     const { droppingFilesCount } = uiStore
 
@@ -84,8 +85,11 @@ class PositionedBlankCard extends React.Component {
       zoomLevel: uiStore.relativeZoomLevel,
     }
 
-    if (droppingFilesCount > 0) {
-      const { fileDropProgress, showDropzoneIcon } = this.props
+    if (
+      droppingFilesCount > 0 ||
+      (interactionType === 'unrendered' && showDropzoneIcon)
+    ) {
+      const { fileDropProgress } = this.props
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone
@@ -165,7 +169,6 @@ PositionedBlankCard.propTypes = {
   fileDropProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.null]),
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
-  replacingId: PropTypes.string,
   showDropzoneIcon: PropTypes.bool,
 }
 
@@ -176,7 +179,6 @@ PositionedBlankCard.defaultProps = {
   fileDropProgress: null,
   blocked: false,
   emptyRow: false,
-  replacingId: null,
   showDropzoneIcon: false,
 }
 

@@ -44,7 +44,7 @@ class GridCardDropzone extends React.Component {
             <CloudIcon />
             <DisplayText fontSize={'.75em'} textTransform="uppercase">
               {isUploading
-                ? `Uploading ${droppingFilesCount} files`
+                ? `Uploading ${droppingFilesCount || 1} file(s)`
                 : 'Drag & Drop'}
             </DisplayText>
           </StyledIconAndHeadingHolder>

@@ -57,6 +57,8 @@ class FoamcoreInteractionLayer extends React.Component {
   fileDropProgress = null
   @observable
   loadingCell = null
+  @observable
+  replacingCard = null
 
   componentDidMount() {
     this.createDropPane()
@@ -70,13 +72,13 @@ class FoamcoreInteractionLayer extends React.Component {
     const dropPaneOpts = {
       onDragLeave: this.handleDragLeave,
       onDrop: this.handleDrop,
-      onProgress: this.handleDropStart,
+      onProgress: this.handleOnProgress,
       onSuccess: this.handleSuccess,
     }
     FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
   }
 
-  handleDropStart = progress => {
+  handleOnProgress = progress => {
     runInAction(() => (this.fileDropProgress = progress))
   }
 
@@ -107,7 +109,21 @@ class FoamcoreInteractionLayer extends React.Component {
     const { blankContentToolState } = uiStore
     const { replacingId } = blankContentToolState
 
-    if (!!replacingId) return
+    if (!!replacingId) {
+      const { order, col, row, width, height } = blankContentToolState
+      runInAction(() => {
+        this.replacingCard = {
+          id: replacingId,
+          order,
+          col,
+          row,
+          width,
+          height,
+        }
+      })
+      this.resetUploading()
+      return
+    }
 
     // only create placeholders not replacing and when dropping files into foamcore
     let placeholderCards = []
@@ -135,17 +151,16 @@ class FoamcoreInteractionLayer extends React.Component {
       // add placeholders to the collection cards store
       collection.addCard(placeholderCard)
     })
+    this.resetUploading()
   }
 
   handleSuccess = async res => {
     if (res.length > 0) {
       const files = await FilestackUpload.processFiles(res)
       if (files.length > 0) {
-        const { uiStore } = this.props
-        const replacingId = _.get(uiStore, 'blankContentToolState.replacingId')
-        if (!!replacingId) {
-          this.replaceFileCard(files[0], replacingId)
-        } else {
+        if (!_.isEmpty(this.replacingCard)) {
+          this.replaceFileCard(files[0])
+        } else if (this.placeholderCards.length > 0) {
           this.createCardsFromPlaceholders(files)
         }
       }
@@ -160,7 +175,7 @@ class FoamcoreInteractionLayer extends React.Component {
       if (!placeholder) return
 
       const fileCardFromPlaceholder = this.createFileCardFromPosition({
-        ...placeholder,
+        position: placeholder,
         file,
       })
 
@@ -177,30 +192,41 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // clear placeholder card ids for next upload
     this.clearPlaceholderCards()
-    this.resetDroppingFiles()
+    this.resetFileDropProgress()
+    this.resetUploading()
   }
 
-  replaceFileCard = async (file, replacingId) => {
-    const { uiStore } = this.props
+  replaceFileCard = async file => {
+    const { order, col, row, width, height, id } = this.replacingCard
     const fileCardFromBct = this.createFileCardFromPosition({
-      ...uiStore.blankContentToolState,
+      position: { order, col, row, width, height },
       file,
     })
+
     if (!fileCardFromBct) return
-    await fileCardFromBct.API_replace({ replacingId })
-    uiStore.closeBlankContentTool()
-    this.resetDroppingFiles()
+    await fileCardFromBct.API_replace({ replacingId: id })
+    this.resetReplacingCard()
+    this.resetFileDropProgress()
   }
 
-  resetDroppingFiles = () => {
+  resetUploading = () => {
     const { uiStore } = this.props
     uiStore.setDroppingFilesCount(0)
+    uiStore.closeBlankContentTool()
+  }
+
+  resetReplacingCard = () => {
+    runInAction(() => (this.replacingCard = null))
+  }
+
+  resetFileDropProgress = () => {
     runInAction(() => (this.fileDropProgress = null))
   }
 
   // creates collection card for serialization
-  createFileCardFromPosition = ({ order, col, row, width, height, file }) => {
+  createFileCardFromPosition = ({ position, file }) => {
     const { apiStore, collection } = this.props
+    const { order, col, row, width, height } = position
 
     if (col === null || row === null || !file) return null
 
@@ -802,6 +828,8 @@ class FoamcoreInteractionLayer extends React.Component {
       const interactionType =
         blankContentToolState.blankType === 'hotcell' ? 'hotcell' : 'bct'
       return this.positionBlank({ ...blankContentToolState }, interactionType)
+    } else if (!_.isEmpty(this.replacingCard)) {
+      return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
     }
 
     return null
@@ -824,6 +852,7 @@ class FoamcoreInteractionLayer extends React.Component {
     if (resizing) {
       return this.renderInnerDragLayer
     }
+
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
