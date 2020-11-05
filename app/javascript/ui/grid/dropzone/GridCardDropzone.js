@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import IconHolder from '~/ui/icons/IconHolder'
 
@@ -33,14 +34,17 @@ class GridCardDropzone extends React.Component {
     const { fileDropProgress, showDropzoneIcon, uiStore } = this.props
     const { droppingFilesCount } = uiStore
 
+    const isUploading = _.isNumber(fileDropProgress)
+
     return (
       <StyledGridCardDropzone className={'gridCardDropzone'}>
+        {isUploading && <InlineLoader />}
         {showDropzoneIcon && (
           <StyledIconAndHeadingHolder display={'inline-block'}>
             <CloudIcon />
             <DisplayText fontSize={'.75em'} textTransform="uppercase">
-              {_.isNumber(fileDropProgress)
-                ? `Uploading ${droppingFilesCount} files`
+              {isUploading
+                ? `Uploading ${droppingFilesCount || 1} file(s)`
                 : 'Drag & Drop'}
             </DisplayText>
           </StyledIconAndHeadingHolder>
