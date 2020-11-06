@@ -100,6 +100,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  isRouting = false
+  @observable
   isTransparentLoading = false
   @observable
   isLoadingMoveAction = false
@@ -283,13 +285,6 @@ export default class UiStore {
   @observable
   // track which rows are visible on the page
   visibleRows = {
-    min: 0,
-    max: 0,
-    num: 0,
-  }
-  @observable
-  // track which cols are visible on the page
-  visibleCols = {
     min: 0,
     max: 0,
     num: 0,
@@ -1804,11 +1799,6 @@ export default class UiStore {
   @action
   setVisibleRows(visibleRows) {
     this.visibleRows = visibleRows
-  }
-
-  @action
-  setVisibleCols(visibleCols) {
-    this.visibleCols = visibleCols
   }
 
   @action

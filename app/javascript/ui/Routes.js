@@ -1,3 +1,4 @@
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
@@ -116,6 +117,15 @@ class Routes extends React.Component {
     })
   }
 
+  componentDidUpdate(prevProps) {
+    const { uiStore } = this.props
+    if (this.props.location !== prevProps.location) {
+      uiStore.update('isRouting', true)
+    } else if (uiStore.isRouting) {
+      uiStore.update('isRouting', false)
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
     document.removeEventListener('touchmove', this.handleTouchMove, {
@@ -126,6 +136,7 @@ class Routes extends React.Component {
     })
   }
 
+  @action
   handleWindowResize = ({ windowWidth }) => {
     // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
     const { uiStore } = this.props

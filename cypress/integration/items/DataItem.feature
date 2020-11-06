@@ -14,7 +14,7 @@ Feature: Data Item
 
     When I click the "EditableButton"
     And I select "month" on the "timeframe" select on the report item
-    And I wait for "@apiGetItemDataset" to finish
+    And I wait for "@apiUpdateDataset" to finish
     Then I should see an svg on the report item
 
     When I click the ".editableMetric StyledFilterIcon"

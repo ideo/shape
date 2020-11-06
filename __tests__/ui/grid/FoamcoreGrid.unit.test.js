@@ -1,5 +1,6 @@
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
+import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -36,6 +37,7 @@ describe('FoamcoreGrid', () => {
     const collection = fakeCollection
 
     collection.num_columns = 16
+    collection.max_row_index = 25
     collection.cardMatrix = [[], [], []]
     collection.cardMatrix[1][5] = cardA
     collection.cardMatrix[0][1] = cardB
@@ -75,8 +77,35 @@ describe('FoamcoreGrid', () => {
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
+  it('loads initial rows of cards', () => {
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [0, 12] })
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [13, 24] })
+    expect(props.collection.API_preloadCardLayout).toHaveBeenCalled()
+    expect(props.collection.replaceCardsIfDifferent).toHaveBeenCalled()
+  })
+
   it('renders MovableGridCards', () => {
     expect(wrapper.find('MovableGridCard').length).toEqual(3)
+  })
+
+  describe('before cards have loaded', () => {
+    beforeEach(() => {
+      props.collection.collection_cards = []
+      props.uiStore.isTransparentLoading = true
+      rerender()
+    })
+
+    it('does not render the FoamcoreInteractionLayer', () => {
+      expect(props.collection.collection_cards.length).toEqual(0)
+      expect(wrapper.find(FoamcoreInteractionLayer).exists()).toBeFalsy()
+    })
+  })
+
+  describe('after cards have loaded', () => {
+    it('renders the FoamcoreInteractionLayer', () => {
+      expect(props.collection.collection_cards.length).toEqual(3)
+      expect(wrapper.find(FoamcoreInteractionLayer).exists()).toBeTruthy()
+    })
   })
 
   describe('findOverlap', () => {
@@ -448,31 +477,12 @@ describe('FoamcoreGrid', () => {
 
     describe('scrolling in loaded bounds', () => {
       beforeEach(() => {
-        props.uiStore.visibleCols = { min: 0, max: 4, num: 5 }
         props.uiStore.visibleRows = { min: 1, max: 4, num: 4 }
       })
 
       it('does not call loadCards if all in view', () => {
         component.loadAfterScroll()
         expect(component.loadCards).not.toHaveBeenCalled()
-      })
-    })
-
-    describe('scrolling out of bounds vertically', () => {
-      beforeEach(() => {
-        // re-set visible rows to go out of bounds
-        props.uiStore.visibleRows = { min: 1, max: 6, num: 6 }
-      })
-
-      it('calls loadMoreRows', () => {
-        component.computeVisibleRows()
-        component.loadAfterScroll()
-        const minRow = props.collection.loadedRows + 1
-        const expectedRows = {
-          // ceil needed because visibleRows.num may be fractional
-          rows: [minRow, Math.ceil(minRow + props.uiStore.visibleRows.num + 3)],
-        }
-        expect(props.loadCollectionCards).toHaveBeenCalledWith(expectedRows)
       })
     })
   })

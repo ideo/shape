@@ -657,24 +657,6 @@ class FoamcoreInteractionLayer extends React.Component {
     return null
   }
 
-  cardWithinViewPlusPage = card => {
-    const { uiStore } = this.props
-    // Select all cards that are within view,
-    // plus half a screen on any side
-    const rows = uiStore.visibleRows
-    const cols = uiStore.visibleCols
-
-    const numRows = Math.ceil(rows.num)
-    const numCols = Math.ceil(cols.num)
-
-    const withinCols =
-      card.col > cols.min - numCols && card.col < cols.max + numCols
-    const withinRows =
-      card.row > rows.min - numRows && card.row < rows.max + numRows
-
-    return withinRows && withinCols
-  }
-
   get renderDropSpots() {
     const blankCards = []
     const { uiStore } = this.props

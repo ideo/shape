@@ -64,8 +64,11 @@ GridCardDropzone.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
   showDropzoneIcon: PropTypes.bool.isRequired,
-  fileDropProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.null])
-    .isRequired,
+  fileDropProgress: PropTypes.number,
+}
+
+GridCardDropzone.defaultProps = {
+  fileDropProgress: null,
 }
 
 GridCardDropzone.displayName = 'GridCardDropzone'

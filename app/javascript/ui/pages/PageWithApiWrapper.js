@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { action, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
@@ -22,6 +22,7 @@ class PageWithApiWrapper extends React.Component {
   @observable
   pathRequested = ''
 
+  @action
   componentDidMount() {
     const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
@@ -60,8 +61,10 @@ class PageWithApiWrapper extends React.Component {
     }
   }
 
+  @computed
   get fetchId() {
     const { id } = this.props.match.params
+    if (!id) return null
     // strip non-numeric characters from id
     return parseInt(id).toString()
   }
@@ -114,14 +117,15 @@ class PageWithApiWrapper extends React.Component {
     })
   }
 
+  @action
   fetchData = () => {
     const { apiStore, uiStore, routingStore, match, fetchType } = this.props
     const { requestPath, cachedFetchId } = this
 
     uiStore.update('pageError', null)
-    uiStore.update('isTransparentLoading', true)
     uiStore.setBodyBackgroundImage(null)
     uiStore.setBodyFontColor(null)
+    uiStore.update('isTransparentLoading', true)
 
     if (fetchType && cachedFetchId) {
       // First check if we already have this record in the local store
@@ -160,6 +164,7 @@ class PageWithApiWrapper extends React.Component {
       })
   }
 
+  @action
   afterFetchData = (res, requestPath) => {
     if (this.unmounted) return
 
@@ -181,7 +186,11 @@ class PageWithApiWrapper extends React.Component {
     }
 
     record.updateFullyLoaded(true)
-    uiStore.update('isTransparentLoading', false)
+    if (!record.isCollection) {
+      // if it's a collection, this will get set false after API_fetchCards
+      uiStore.update('isTransparentLoading', false)
+    }
+    uiStore.update('isRouting', false)
     // url could be null which will reset it
     uiStore.setBodyBackgroundImage(record.backgroundImageUrl)
     uiStore.setBodyFontColor(record.fontColor)
@@ -213,7 +222,14 @@ class PageWithApiWrapper extends React.Component {
     if (pageError) {
       return <PageError error={pageError} />
     }
-    if (!record) return ''
+    if (!record) {
+      return null
+    }
+
+    if (this.fetchId && record.id !== this.fetchId) {
+      // in this case we are mid-transition to a new record, so no need to render
+      return null
+    }
 
     return this.props.render(record)
   }
@@ -240,9 +256,7 @@ export const CollectionApiWrapper = routerProps => (
   <PageWithApiWrapper
     {...routerProps}
     fetchType="collections"
-    render={collection => (
-      <CollectionPage {...routerProps} collection={collection} />
-    )}
+    render={collection => <CollectionPage collection={collection} />}
   />
 )
 
