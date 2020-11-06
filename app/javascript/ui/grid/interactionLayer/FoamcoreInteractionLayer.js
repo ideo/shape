@@ -59,6 +59,7 @@ class FoamcoreInteractionLayer extends React.Component {
   loadingCell = null
   @observable
   replacingCard = null
+  picker = null
 
   constructor(props) {
     super(props)
@@ -80,11 +81,16 @@ class FoamcoreInteractionLayer extends React.Component {
       onProgress: this.handleOnProgress,
       onSuccess: this.handleSuccess,
     }
-    FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
+    this.picker = FilestackUpload.makeDropPane(
+      container,
+      dropPaneOpts,
+      uploadOpts
+    )
   }
 
+  @action
   handleOnProgress = progress => {
-    runInAction(() => (this.fileDropProgress = progress))
+    this.fileDropProgress = progress
   }
 
   handleDrop = async e => {
@@ -93,7 +99,19 @@ class FoamcoreInteractionLayer extends React.Component {
     const { files } = dataTransfer
     const { row, col } = this.hoveringRowCol
     const { collection, apiStore, uiStore } = this.props
+
+    const { blankContentToolState } = uiStore
+    const { replacingId } = blankContentToolState
     const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+
+    if (!replacingId && (row === null || col === null)) {
+      // the case where you drop over an existing card
+      if (this.picker) {
+        this.picker.cancel()
+      }
+      this.resetUploading()
+      return
+    }
 
     if (filesThatFit.length < files.length) {
       uiStore.setDroppingFilesCount(0)
@@ -111,10 +129,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     if (_.isEmpty(files)) return
 
-    const { blankContentToolState } = uiStore
-    const { replacingId } = blankContentToolState
-
-    if (!!replacingId) {
+    if (replacingId) {
       const { order, col, row, width, height } = blankContentToolState
       runInAction(() => {
         this.replacingCard = {
