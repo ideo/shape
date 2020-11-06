@@ -100,12 +100,12 @@ const nameToIcon = {
 @observer
 class HotCellQuadrant extends React.Component {
   handleClick = ev => {
-    const { name } = this.props
+    const { name, opts } = this.props
     if (name === 'more') {
       const { onMoreMenuOpen } = this.props
       onMoreMenuOpen()
     } else {
-      this.createContent(name)
+      this.createContent(name, opts)
     }
   }
 
@@ -263,6 +263,9 @@ HotCellQuadrant.propTypes = {
   onMoreMenuOpen: PropTypes.func.isRequired,
   onMoreMenuClose: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
+  opts: PropTypes.shape({
+    templateId: PropTypes.string,
+  }),
   subTypes: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,

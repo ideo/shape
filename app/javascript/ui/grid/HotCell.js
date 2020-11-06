@@ -119,12 +119,15 @@ class HotCell extends React.Component {
     onCreateContent(type, opts)
     const hotCellType = type
     if (type === 'useTemplate') {
-      localStorage.setItem(HOT_CELL_DEFAULT_TEMPLATE_TYPE, {
-        name: 'useTemplate',
-        description: opts.templateName,
-        opts: {
-          templateId: opts.templateId,
-        },
+      runInAction(() => {
+        localStorage.setItem(HOT_CELL_DEFAULT_TEMPLATE_TYPE, {
+          name: 'useTemplate',
+          description: opts.templateName,
+          opts: {
+            templateId: opts.templateId,
+            templateName: opts.templateName,
+          },
+        })
       })
       return
     }
@@ -353,11 +356,12 @@ class HotCell extends React.Component {
               <CloseIcon />
             </CloseButton>
           )}
-          {primaryTypes.map(({ name, description, subTypes }, idx) => (
+          {primaryTypes.map(({ name, description, opts, subTypes }, idx) => (
             <HotCellQuadrant
               name={name}
               key={name + idx}
               description={description}
+              opts={opts}
               subTypes={subTypes}
               onCreateContent={this.onCreateContent}
               onMoreMenuOpen={() => this.onMoreMenuOpen(idx)}
