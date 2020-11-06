@@ -78,7 +78,9 @@ describe('FoamcoreGrid', () => {
   })
 
   it('loads initial rows of cards', () => {
-    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [0, 30] })
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [0, 12] })
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({ rows: [13, 24] })
+    expect(props.collection.API_preloadCardLayout).toHaveBeenCalled()
     expect(props.collection.replaceCardsIfDifferent).toHaveBeenCalled()
   })
 
@@ -481,24 +483,6 @@ describe('FoamcoreGrid', () => {
       it('does not call loadCards if all in view', () => {
         component.loadAfterScroll()
         expect(component.loadCards).not.toHaveBeenCalled()
-      })
-    })
-
-    describe('scrolling out of bounds vertically', () => {
-      beforeEach(() => {
-        // re-set visible rows to go out of bounds
-        props.uiStore.visibleRows = { min: 1, max: 6, num: 6 }
-      })
-
-      it('calls loadMoreRows', () => {
-        component.computeVisibleRows()
-        component.loadAfterScroll()
-        const minRow = props.collection.loadedRows + 1
-        const expectedRows = {
-          // ceil needed because visibleRows.num may be fractional
-          rows: [minRow, Math.ceil(minRow + props.uiStore.visibleRows.num + 3)],
-        }
-        expect(props.loadCollectionCards).toHaveBeenCalledWith(expectedRows)
       })
     })
   })

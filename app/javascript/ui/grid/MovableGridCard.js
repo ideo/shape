@@ -22,7 +22,7 @@ import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 const GridCardPreload = styled.div`
   height: 100%;
   width: 100%;
-  background: ${v.colors.commonMedium};
+  background: ${v.colors.commonMediumTint};
 `
 
 const StyledResizeIcon = styled.div`
@@ -94,8 +94,8 @@ class MovableGridCard extends React.Component {
       resizeWidth: 0,
       resizeHeight: 0,
       allowTouchDeviceDragging: false,
-      // if we're mid-routing change, then set to preloading gray square
-      preloading: uiStore.isRouting,
+      // if the card was marked to preload in Collection#API_fetchCards
+      preloading: !!props.card.preload,
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
@@ -104,17 +104,22 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidMount() {
+    const { record } = this.props.card
     if (!this.state.preloading) {
       return
     }
-    setTimeout(() => {
-      if (this.unmounted) return
-      // after a slight delay, turn preloading off and render the actual GridCard
-      this.setState({ preloading: false })
-    }, 150)
+    if (this.state.preloading && _.isEmpty(record)) {
+      // when we've just loaded the initial layout (no card.record), preserve the preloading state
+      return
+    }
+    this.finishPreloading()
   }
 
   componentDidUpdate(prevProps) {
+    const { record } = this.props.card
+    if (this.state.preloading && !_.isEmpty(record)) {
+      this.finishPreloading()
+    }
     if (this.state.dragging || this.unmounted) {
       return
     }
@@ -131,6 +136,14 @@ class MovableGridCard extends React.Component {
   componentWillUnmount() {
     this.unmounted = true
     this.clearDragTimeout()
+  }
+
+  finishPreloading() {
+    setTimeout(() => {
+      if (this.unmounted) return
+      // after a slight delay, turn preloading off and render the actual GridCard
+      this.setState({ preloading: false })
+    }, 150)
   }
 
   get shouldDragCard() {

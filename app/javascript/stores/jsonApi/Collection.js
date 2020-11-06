@@ -633,7 +633,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (objectsEqual(newProperties, this.cardProperties)) {
       return
     }
-    this.collection_cards.replace(newCards)
+    this.replaceCards(newCards)
   }
 
   get allowsCollectionTypeSelector() {
@@ -898,6 +898,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {
+      // mark each card for preloading in MovableGridCard
+      _.each(data, cc => {
+        cc.preload = true
+      })
+
       uiStore.update('isTransparentLoading', false)
       if (searchTerm) {
         this.totalPages = (meta && meta.total_pages) || 1
@@ -905,7 +910,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.totalPages = links.last
       }
       // NOTE: firstPage doesn't happen when loading rows
-      const firstPage = page === 1
+      const firstPage = params.page === 1
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
@@ -914,7 +919,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           orderChanged)
       ) {
         this.storedCacheKey = this.cache_key
-        this.collection_cards.replace(data)
+        this.replaceCards(data)
         this.currentPage = 1
         if (this.isBoard) {
           // reset these to be recalculated in updateMaxLoaded
@@ -936,6 +941,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
     })
     return data
+  }
+
+  async API_preloadCardLayout() {
+    if (this.collection_cards.length > 0) {
+      return
+    }
+
+    const layout = await this.API_fetchAllCardIds()
+    const cards = _.map(layout, data => {
+      const { id } = data
+      delete data.id
+      return {
+        id,
+        type: 'collection_cards',
+        attributes: {
+          ...data,
+          parent_id: this.id,
+          // mark for preloading aka "gray square"
+          preload: true,
+        },
+      }
+    })
+    this.replaceCards(cards)
   }
 
   @action
@@ -963,6 +991,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
+  replaceCards(cards) {
+    this.collection_cards.replace(cards)
+  }
+
+  @action
   mergeCards = cards => {
     const newData = _.reverse(
       // de-dupe merged data (deferring to new cards first)
@@ -973,7 +1006,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         'id'
       )
     )
-    this.collection_cards.replace(newData)
+    this.replaceCards(newData)
   }
 
   API_fetchCardOrders = async () => {
@@ -985,7 +1018,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           card.order = orderData.order
         }
       })
-      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+      this.replaceCards(_.sortBy(this.collection_cards, 'order'))
     })
   }
 

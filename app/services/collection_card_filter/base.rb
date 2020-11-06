@@ -50,6 +50,8 @@ module CollectionCardFilter
             order: cc.order,
             row: cc.row,
             col: cc.col,
+            height: cc.height,
+            width: cc.width,
           }
         end
       end
@@ -204,6 +206,8 @@ module CollectionCardFilter
           'collection_cards.order',
           'collection_cards.row',
           'collection_cards.col',
+          'collection_cards.height',
+          'collection_cards.width',
         ]
       else
         arr = ['collection_cards.*']

@@ -178,6 +178,8 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
               order: cc.order,
               row: cc.row,
               col: cc.col,
+              height: cc.height,
+              width: cc.width,
             }
           end
           subject
