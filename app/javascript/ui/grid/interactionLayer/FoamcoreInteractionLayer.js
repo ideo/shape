@@ -381,7 +381,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  onCreateBct = async ({ row, col, hotcell = false }, contentType, opts) => {
+  onCreateBct = async ({ row, col, hotEdge = false }, contentType, opts) => {
     const { apiStore, uiStore, collection } = this.props
 
     if (contentType === 'useTemplate') {
@@ -395,17 +395,17 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // If we're already in the process of creating a hot edge and placeholder
     // don't create another one.
-    if (hotcell && this.creatingHotEdge) return
+    if (hotEdge && this.creatingHotEdge) return
 
     // If opening one from a hot edge make sure to not allow opening them again
     // until again.
-    if (hotcell) {
+    if (hotEdge) {
       runInAction(() => (this.creatingHotEdge = true))
     }
 
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
-    if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotcell) {
+    if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotEdge) {
       uiStore.closeBlankContentTool()
     }
 
@@ -413,7 +413,7 @@ class FoamcoreInteractionLayer extends React.Component {
       row,
       col,
       collectionId: collection.id,
-      blankType: hotcell ? 'hotcell' : contentType,
+      blankType: hotEdge ? 'hotcell' : contentType,
     })
     if (!uiStore.isTouchDevice) {
       runInAction(() => {
@@ -434,6 +434,8 @@ class FoamcoreInteractionLayer extends React.Component {
     )
     await placeholder.API_createBct()
     uiStore.setBctPlaceholderCard(placeholder)
+    // add placeholder to datx store to trigger warning before unload
+    collection.addCard(placeholder)
     if (this.creatingHotEdge) {
       runInAction(() => (this.creatingHotEdge = false))
     }
@@ -786,7 +788,7 @@ class FoamcoreInteractionLayer extends React.Component {
               col={col}
               horizontal={false}
               onClick={() => {
-                this.onCreateBct({ col, row, hotcell: true })
+                this.onCreateBct({ col, row, hotEdge: true })
               }}
             />
           )

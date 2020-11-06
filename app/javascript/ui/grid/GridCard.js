@@ -121,7 +121,7 @@ class GridCard extends React.Component {
       record.menuDisabled ||
       uiStore.textEditingItem === record ||
       record.archived ||
-      card.isLoadingPlaceholder
+      (card.isLoadingPlaceholder && !card.isBctPlaceholder)
     ) {
       return null
     }
@@ -579,19 +579,22 @@ class GridCard extends React.Component {
       let warnBeforeLeaving = false
 
       if (row === card.row && col === card.col) {
+        // when it's user initiated; placeholder and bct are on the same spot
         warnBeforeLeaving = true
       } else if (droppingFilesCount > 0) {
-        // will technically mark other collaborator's placeholders as true
-        // but this is still correct when the user is dropping files
+        // when user is uploading
         warnBeforeLeaving = true
       }
 
       contents = (
-        <PlaceholderCard
-          card={card}
-          warnBeforeLeaving={warnBeforeLeaving}
-          collaborator={collaborator}
-        />
+        <Fragment>
+          <PlaceholderCard
+            card={card}
+            warnBeforeLeaving={warnBeforeLeaving}
+            collaborator={collaborator}
+          />
+          {this.renderTopRightActions()}
+        </Fragment>
       )
     } else {
       contents = (

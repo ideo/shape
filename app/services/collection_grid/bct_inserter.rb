@@ -19,8 +19,9 @@ module CollectionGrid
     end
 
     def call
+      existing_card = @collection.collection_cards.select { |cc| cc.row == @row && cc.col == @col }
       insert_bct_square
-      move_other_cards
+      move_other_cards if existing_card.present?
       @placeholder
     end
 

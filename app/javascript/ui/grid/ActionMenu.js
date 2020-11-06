@@ -258,7 +258,9 @@ class ActionMenu extends React.Component {
         onClick: this.openSubmissionBoxSettings,
       })
     }
-    if (canEdit && !card.isPinnedAndLocked) {
+    if (card.isBctPlaceholder) {
+      items = _.filter(items, i => ['Move', 'Delete'].includes(i.name))
+    } else if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(items, { name: 'Replace' })
       if (

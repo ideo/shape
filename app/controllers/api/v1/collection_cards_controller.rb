@@ -354,7 +354,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder_id = params[:placeholder_id]
     placeholder = CollectionCard::Placeholder.find placeholder_id
 
-    placeholder.delete if placeholder.present?
+    if placeholder.present?
+      parent = placeholder.parent
+      placeholder.delete
+      collection_broadcaster(parent).cards_archived([placeholder_id])
+    end
 
     head :no_content
   end
