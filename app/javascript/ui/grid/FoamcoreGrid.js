@@ -33,6 +33,7 @@ function getMapKey({ col, row }) {
 
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
+const LOAD_INITIAL_ROWS = 300
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'uiStore')
@@ -95,9 +96,6 @@ class FoamcoreGrid extends React.Component {
     }
 
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
-      // e.g. if API_fetchCards has reset the loaded cards, we may want to
-      // trigger this in case we are viewing further down the page
-      // this.throttledLoadAfterScroll()
       if (collection.isSplitLevelBottom) {
         collection.calculateRowsCols()
       }
@@ -169,21 +167,16 @@ class FoamcoreGrid extends React.Component {
     }
 
     // arbitrary 300 row initial limit?
-    const maxRow = _.min([collection.max_row_index, 300])
+    const maxRow = _.min([collection.max_row_index, LOAD_INITIAL_ROWS])
 
-    const rowsPerPage = 15
+    await collection.API_preloadCardLayout()
+
+    const rowsPerPage = 12
     let min = 0
-    let max = 5
+    let max = rowsPerPage
     let newCards = []
-    newCards = await loadCollectionCards({
-      rows: [min, max],
-    })
-
-    min = max + 1
-    max = max + rowsPerPage
-
-    // const requests = []
-    while (min <= maxRow) {
+    // props.collection check is if we have navigated away from the current collection
+    while (min <= maxRow && collection.id === this.props.collection.id) {
       const rows = [min, max]
       const cards = await loadCollectionCards({
         // just load by row # downward, and always load all 16 cols
@@ -208,7 +201,6 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    // NOTE: you should really only get into here if you go past row 300+
     const visRows = uiStore.visibleRows
     const collectionMaxRow = collection.max_row_index
     // min row should start with the next row after what's loaded
@@ -218,6 +210,12 @@ class FoamcoreGrid extends React.Component {
       collectionMaxRow,
       Math.ceil(loadMinRow + visRows.num + 3),
     ])
+
+    if (loadMinRow < LOAD_INITIAL_ROWS) {
+      // NOTE: you should really only get into "infinite scroll" for Foamcore
+      // if you go past LOAD_INITIAL_ROWS (300+)
+      return
+    }
     // min and max could be equal if there is one more row to load
     if (loadMinRow <= loadMaxRow) {
       return loadMoreCollectionCards({
