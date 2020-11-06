@@ -75,6 +75,17 @@ describe('UiStore', () => {
     })
 
     describe('#closeBlankContentTool', () => {
+      const stopReplacing = jest.fn()
+      beforeEach(() => {
+        uiStore.apiStore = fakeApiStore()
+        uiStore.apiStore.findAll = jest
+          .fn()
+          .mockReturnValue([
+            { id: '10', currentlyReplacing: true, stopReplacing },
+            { id: '11' },
+          ])
+      })
+
       it('should set blankContentToolState back to the defaults', () => {
         uiStore.openBlankContentTool({
           order: 2,
@@ -86,6 +97,11 @@ describe('UiStore', () => {
         expect(blankContentToolState.order).toBe(null)
         expect(blankContentToolState.row).toBe(null)
         expect(blankContentToolState.col).toBe(null)
+      })
+
+      it('should turn off currentlyReplacing card', () => {
+        uiStore.closeBlankContentTool()
+        expect(stopReplacing).toHaveBeenCalled()
       })
 
       describe('with placeholderCard', () => {
