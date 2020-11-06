@@ -319,11 +319,10 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
-  handleDragOver = e => {
+  handleDragOver = (e, numFiles) => {
     const { uiStore } = this.props
     this.onCursorMove('mouse')(e)
-    const numItems = _.get(e, 'dataTransfer.items.length', 0)
-    uiStore.setDroppingFilesCount(numItems)
+    uiStore.setDroppingFilesCount(numFiles)
   }
 
   onCursorMove = type => ev => {
@@ -859,7 +858,8 @@ class FoamcoreInteractionLayer extends React.Component {
         onDragOver={e => {
           e.preventDefault()
           e.persist()
-          this.throttledHandleDragOver(e)
+          const numFiles = _.get(e, 'dataTransfer.items.length', 0)
+          this.throttledHandleDragOver(e, numFiles)
         }}
         onDragLeave={e => {
           e.preventDefault()
