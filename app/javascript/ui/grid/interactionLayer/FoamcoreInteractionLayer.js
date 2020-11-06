@@ -60,6 +60,11 @@ class FoamcoreInteractionLayer extends React.Component {
   @observable
   replacingCard = null
 
+  constructor(props) {
+    super(props)
+    this.throttledHandleDragOver = _.throttle(this.handleDragOver, 250)
+  }
+
   componentDidMount() {
     this.createDropPane()
   }
@@ -314,10 +319,17 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
+  handleDragOver = e => {
+    const { uiStore } = this.props
+    this.onCursorMove('mouse')(e)
+    const numItems = _.get(e, 'dataTransfer.items.length', 0)
+    uiStore.setDroppingFilesCount(numItems)
+  }
+
   onCursorMove = type => ev => {
     const { hasSelectedArea } = this
-    if (hasSelectedArea) {
-      // ignore these interactions when you're already dragging a selection square
+    if (hasSelectedArea || !ev || !ev.target) {
+      // ignore these interactions when you're already dragging a selection square or don't have a target
       return
     }
 
@@ -846,9 +858,8 @@ class FoamcoreInteractionLayer extends React.Component {
         onTouchEnd={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
-          this.onCursorMove('mouse')(e)
-          const numItems = _.get(e, 'dataTransfer.items.length', 0)
-          uiStore.setDroppingFilesCount(numItems)
+          e.persist()
+          this.throttledHandleDragOver(e)
         }}
         onDragLeave={e => {
           e.preventDefault()
