@@ -63,7 +63,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   constructor(props) {
     super(props)
-    this.throttledHandleDragOver = _.throttle(this.handleDragOver, 250)
+    this.throttledOnCursorMove = _.throttle(this.onCursorMove, 250)
   }
 
   componentDidMount() {
@@ -334,10 +334,8 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
-  handleDragOver = (e, numFiles) => {
-    const { uiStore } = this.props
+  handleDragOver = e => {
     this.onCursorMove('mouse')(e)
-    uiStore.setDroppingFilesCount(numFiles)
   }
 
   onCursorMove = type => ev => {
@@ -836,8 +834,6 @@ class FoamcoreInteractionLayer extends React.Component {
       const interactionType =
         blankContentToolState.blankType === 'hotcell' ? 'hotcell' : 'bct'
       return this.positionBlank({ ...blankContentToolState }, interactionType)
-    } else if (!_.isEmpty(this.replacingCard)) {
-      return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
     }
 
     return null
@@ -852,6 +848,18 @@ class FoamcoreInteractionLayer extends React.Component {
       return null
     }
     return this.positionBlank({ ...this.loadingCell }, 'unrendered')
+  }
+
+  get renderReplacing() {
+    if (
+      _.isEmpty(this.replacingCard) ||
+      !_.isNumber(this.replacingCard.col) ||
+      !_.isNumber(this.replacingCard.row)
+    ) {
+      return null
+    }
+
+    return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
   }
 
   render() {
@@ -872,9 +880,11 @@ class FoamcoreInteractionLayer extends React.Component {
         onTouchEnd={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
-          e.persist()
+          const { uiStore } = this.props
           const numFiles = _.get(e, 'dataTransfer.items.length', 0)
-          this.throttledHandleDragOver(e, numFiles)
+          uiStore.setDroppingFilesCount(numFiles)
+          e.persist()
+          this.throttledOnCursorMove(e)
         }}
         onDragLeave={e => {
           e.preventDefault()
@@ -900,6 +910,7 @@ class FoamcoreInteractionLayer extends React.Component {
         {this.renderHotEdges}
         {this.renderBct}
         {this.renderLoading}
+        {this.renderReplacing}
         {this.renderRightBlankActions}
       </DragLayerWrapper>
     )
