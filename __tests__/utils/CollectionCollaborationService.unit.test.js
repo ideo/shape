@@ -56,9 +56,9 @@ describe('CollectionCollaborationService', () => {
         const parent = fakeCollection
         const current_editor = { id: '1', name: 'Lala' }
         service.setCollaborator({ card, current_editor, parent })
-        expect(fakeCollection.setCollaborators).toHaveBeenCalledWith(
-          [current_editor]
-        )
+        expect(fakeCollection.setCollaborators).toHaveBeenCalledWith([
+          current_editor,
+        ])
       })
     })
   })
