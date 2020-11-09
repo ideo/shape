@@ -1,0 +1,2 @@
+class DeserializableItem < BaseJsonDeserializer
+end

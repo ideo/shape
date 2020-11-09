@@ -91,6 +91,9 @@ Rails.application.routes.draw do
           end
         end
       end
+      resources :sections do
+
+      end
       resources :datasets, only: %i[index show create update destroy] do
         resources :roles, only: %i[index create destroy] do
           collection do
