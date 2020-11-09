@@ -52,8 +52,6 @@ class FoamcoreGrid extends React.Component {
   @observable
   disableHorizontalScroll = false
   @observable
-  uploading = false
-  @observable
   draggingCardMasterPosition = {}
   draggingMap = []
   // track whether drag movement is blocked because of overlapping cards

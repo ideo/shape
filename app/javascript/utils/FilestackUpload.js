@@ -146,7 +146,10 @@ class FilestackUpload {
       },
       ...uploadConfig,
     }
-    return this.client.picker(options).open()
+    const picker = this.client.picker(options)
+    picker.open()
+
+    return picker
   }
 
   static filestackFileAttrs(file) {

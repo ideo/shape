@@ -950,6 +950,14 @@ export default class UiStore {
       // don't over-eagerly set this observable if it's already closed
       if (this.blankContentToolIsOpen) {
         runInAction(() => {
+          const replacingCard = _.first(
+            this.apiStore
+              .findAll('collection_cards')
+              .filter(cc => cc.currentlyReplacing)
+          )
+          if (replacingCard) {
+            replacingCard.stopReplacing()
+          }
           this.blankContentToolState = { ...this.defaultBCTState }
         })
       }

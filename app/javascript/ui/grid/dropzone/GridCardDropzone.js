@@ -5,15 +5,17 @@ import PropTypes from 'prop-types'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import IconHolder from '~/ui/icons/IconHolder'
 
 const StyledIconAndHeadingHolder = styled(IconHolder)`
-  width: 45%;
-  height: auto;
-  position: absolute;
+  display: block;
+  position: relative;
   top: 20%;
-  left: 25%;
+  width: 140px;
+  height: auto;
+  margin: 0 auto;
   color: ${v.colors.secondaryMedium};
   pointer-events: none;
   text-align: center;
@@ -33,14 +35,17 @@ class GridCardDropzone extends React.Component {
     const { fileDropProgress, showDropzoneIcon, uiStore } = this.props
     const { droppingFilesCount } = uiStore
 
+    const isUploading = _.isNumber(fileDropProgress)
+
     return (
       <StyledGridCardDropzone className={'gridCardDropzone'}>
+        {isUploading && <InlineLoader />}
         {showDropzoneIcon && (
-          <StyledIconAndHeadingHolder display={'inline-block'}>
+          <StyledIconAndHeadingHolder>
             <CloudIcon />
             <DisplayText fontSize={'.75em'} textTransform="uppercase">
-              {_.isNumber(fileDropProgress)
-                ? `Uploading ${droppingFilesCount} files`
+              {isUploading
+                ? `Uploading ${droppingFilesCount || 1} file(s)`
                 : 'Drag & Drop'}
             </DisplayText>
           </StyledIconAndHeadingHolder>

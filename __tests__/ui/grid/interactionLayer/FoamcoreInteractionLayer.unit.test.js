@@ -7,9 +7,11 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
+import FilestackUpload from '~/utils/FilestackUpload'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('~/stores/jsonApi/CollectionCard')
+jest.mock('../../../../app/javascript/utils/FilestackUpload')
 // also allows us to mock + test that the model constructor was called
 CollectionCard.mockImplementation((data, apiStore) => {
   return data
@@ -328,6 +330,86 @@ describe('FoamcoreInteractionLayer', () => {
         // 1 vertical edge and 3 row hotspots
         expect(hotspotProps.filter(p => p.horizontal).length).toEqual(3)
         expect(hotspotProps.filter(p => !p.horizontal).length).toEqual(1)
+      })
+    })
+  })
+
+  describe('handleDrop', () => {
+    const files = [
+      {
+        id: 1,
+        size: 1024,
+      },
+    ]
+    const row = 0
+    const col = 0
+    beforeEach(() => {
+      // set hoveringRowCol
+      component.repositionBlankCard({ row, col })
+    })
+
+    describe('dropping over at any space', () => {
+      it('should create placeholder cards', () => {
+        component.handleDrop({
+          preventDefault: jest.fn(),
+          dataTransfer: {
+            files,
+          },
+        })
+        expect(props.apiStore.createPlaceholderCards).toHaveBeenCalledWith({
+          data: {
+            row,
+            col,
+            count: files.length,
+            parent_id: props.collection.id,
+          },
+        })
+      })
+    })
+
+    describe('replacing a file card', () => {
+      beforeEach(() => {
+        props.uiStore.blankContentToolState.replacingId = 123
+        rerender()
+      })
+      it('should not create placeholder cards', () => {
+        component.handleDrop({
+          preventDefault: jest.fn(),
+          dataTransfer: {
+            files,
+          },
+        })
+        expect(props.apiStore.createPlaceholderCards).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('handleSuccess', () => {
+    beforeEach(() => {
+      FilestackUpload.processFiles = jest.fn().mockReturnValue([{ id: 1 }])
+    })
+
+    describe('when dragging to upload to an empty spot', () => {
+      beforeEach(() => {
+        component.placeholderCards = [{ id: 1, col: 1, row: 1 }]
+        component.createCardsFromPlaceholders = jest.fn()
+        component.handleSuccess([{ id: 1 }])
+      })
+
+      it('should call createCardsFromPlaceholders', () => {
+        expect(component.createCardsFromPlaceholders).toHaveBeenCalled()
+      })
+    })
+
+    describe('when replacing using the bct', () => {
+      beforeEach(() => {
+        component.replacingCard = { id: 1, col: 1, row: 1 }
+        component.replaceFileCard = jest.fn()
+        component.handleSuccess([{ id: 1 }])
+      })
+
+      it('should call createCardsFromPlaceholders', () => {
+        expect(component.replaceFileCard).toHaveBeenCalled()
       })
     })
   })

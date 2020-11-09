@@ -6,6 +6,7 @@ let wrapper, props, rerender
 describe('GridCardDropzone', () => {
   beforeEach(() => {
     props = {
+      apiStore: {},
       uiStore: fakeUiStore,
       collection: fakeCollection,
     }

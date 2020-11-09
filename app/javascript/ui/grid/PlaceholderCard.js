@@ -8,14 +8,24 @@ class PlaceholderCard extends React.Component {
 
     if (warnBeforeLeaving) {
       window.addEventListener('beforeunload', this.onBeforeUnload)
-      window.addEventListener('onunload', this.onUnload)
+      window.addEventListener('unload', this.onUnload)
     }
   }
+
+  componentDidUpdate(prevProps) {
+    const { warnBeforeLeaving } = this.props
+    if (warnBeforeLeaving) {
+      // re-add event listener since we've removed it during unmount
+      window.addEventListener('beforeunload', this.onBeforeUnload)
+      window.addEventListener('unload', this.onUnload)
+    }
+  }
+
   componentWillUnmount() {
     const { warnBeforeLeaving } = this.props
     if (warnBeforeLeaving) {
       window.removeEventListener('beforeunload', this.onBeforeUnload)
-      window.removeEventListener('onunload', this.onUnload)
+      window.removeEventListener('unload', this.onUnload)
     }
   }
 
@@ -23,8 +33,6 @@ class PlaceholderCard extends React.Component {
     e.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
     // Chrome requires returnValue to be set
     e.returnValue = ''
-    // FIXME: will still clean up placeholders when cancelling
-    // this.cleanupPlaceholders()
   }
 
   onUnload = e => {
