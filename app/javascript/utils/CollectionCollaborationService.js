@@ -92,8 +92,7 @@ export default class CollectionCollaborationService {
       return
     }
     if (parent) {
-      // FIXME: this overrides the collaborators array
-      parent.setCollaborators([current_editor])
+      parent.setCollaborators([current_editor, ...parent.collaborators])
     }
   }
 
