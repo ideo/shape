@@ -63,6 +63,8 @@ class ActionMenu extends React.Component {
     uiStore.selectCardId(card.id)
     if (cardAction === 'move') {
       uiStore.reselectOnlyMovableCards()
+    } else {
+      uiStore.reselectWithoutPlaceholders()
     }
     uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
@@ -93,7 +95,8 @@ class ActionMenu extends React.Component {
   }
 
   archiveCard = async () => {
-    const { afterArchive } = this.props
+    const { afterArchive, uiStore } = this.props
+    uiStore.reselectWithoutPlaceholders()
     const result = await this.callCardAction('Delete', 'API_archive')
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }

@@ -1161,6 +1161,22 @@ export default class UiStore {
     return removedCount
   }
 
+  reselectWithoutPlaceholders(cardIds = this.selectedCardIds) {
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && card.isBctPlaceholder
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
   @action
   async selectAll({ location, card = null } = {}) {
     const { viewingCollection } = this
