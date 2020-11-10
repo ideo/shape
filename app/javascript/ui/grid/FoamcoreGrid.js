@@ -490,6 +490,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, trackCollectionUpdated, uiStore } = this.props
     let { height, width } = uiStore.placeholderSpot
     // Some double-checking validations
+    // TODO: allow sections to be as big as you want?
     const maxHeight = this.calcEdgeRow(card)
     const maxWidth = this.calcEdgeCol(card)
     if (height > maxHeight) height = maxHeight

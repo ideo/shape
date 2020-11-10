@@ -37,6 +37,7 @@ class JsonapiMappings
     'CollectionCard::Primary': SerializableCollectionCard,
     'CollectionCard::Link': SerializableCollectionCard,
     'CollectionCard::Placeholder': SerializableCollectionCard,
+    'CollectionCard::Section': SerializableCollectionCard,
     'Dataset::CollectionsAndItems': SerializableDataset,
     'Dataset::Empty': SerializableDataset,
     'Dataset::External': SerializableDataset,

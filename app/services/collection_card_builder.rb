@@ -36,9 +36,9 @@ class CollectionCardBuilder
 
   def create
     hide_helper_for_user
-    if @collection_card.record.present?
+    if @collection_card.record.present? || @collection_card.section?
       # capture this here before `save` is called at which point the accessor will be nil
-      @external_id = @collection_card.record.external_id
+      @external_id = @collection_card&.record&.external_id
       create_collection_card
     else
       @collection_card.errors.add(:record, "can't be blank")

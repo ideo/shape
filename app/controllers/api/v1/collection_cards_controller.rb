@@ -783,6 +783,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       show_replace
       card_type
       section_type
+      section_name
       font_color
       font_background
     ]

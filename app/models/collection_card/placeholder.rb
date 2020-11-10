@@ -21,6 +21,7 @@
 #  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_name      :string
 #  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string

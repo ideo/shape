@@ -49,6 +49,7 @@ export const COLLECTION_CARD_TYPES = {
   PRIMARY: 'CollectionCard::Primary',
   LINK: 'CollectionCard::Link',
   PLACEHOLDER: 'CollectionCard::Placeholder',
+  SECTION: 'CollectionCard::Section',
 }
 
 export const DATASET_CHART_TYPES = {

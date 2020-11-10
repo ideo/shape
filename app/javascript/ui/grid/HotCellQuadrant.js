@@ -92,6 +92,8 @@ const nameToIcon = {
   template: TemplateIcon,
   useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
+  // TODO: section icon
+  section: TemplateIcon,
   text: TextIcon,
   video: VideoIcon,
 }

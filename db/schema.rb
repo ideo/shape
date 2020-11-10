@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_21_200558) do
+ActiveRecord::Schema.define(version: 2020_11_10_210451) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_200558) do
     t.boolean "is_background", default: false
     t.jsonb "cached_attributes", default: {}
     t.integer "cover_card_id"
+    t.string "section_name"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"

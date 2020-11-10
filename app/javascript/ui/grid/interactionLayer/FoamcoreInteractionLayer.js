@@ -14,7 +14,10 @@ import RowActions from './RowActions'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
-import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
+import v, {
+  FOAMCORE_INTERACTION_LAYER,
+  ITEM_TYPES,
+} from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
@@ -301,6 +304,23 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
+  createSection = async ({ col, row, height = 3, width = 3 } = {}) => {
+    const { collection, apiStore } = this.props
+    const attrs = {
+      col,
+      row,
+      width,
+      height,
+      section_name: 'New Section',
+      card_type: 'section',
+      parent_id: collection.id,
+    }
+
+    const card = new CollectionCard(attrs, apiStore)
+    console.log('creating new section at', row, col)
+    card.API_create()
+  }
+
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
@@ -411,6 +431,12 @@ class FoamcoreInteractionLayer extends React.Component {
     if (contentType === 'useTemplate') {
       this.createTemplateInstance({
         ...opts,
+        row,
+        col,
+      })
+      return
+    } else if (contentType === 'section') {
+      this.createSection({
         row,
         col,
       })

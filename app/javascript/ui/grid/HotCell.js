@@ -175,13 +175,19 @@ class HotCell extends React.Component {
   }
 
   get collectionTypes() {
-    return [
+    const { isFourWideBoard } = this.props
+    let types = [
       { name: 'collection', description: 'Create Collection' },
       { name: 'foamcoreBoard', description: 'Create Foamcore Board' },
       { name: 'searchCollection', description: 'Create Search Collection' },
       { name: 'submissionBox', description: 'Create Submission Box' },
+      { name: 'section', description: 'Create Section' },
       { name: 'testCollection', description: 'Get Feedback' },
     ]
+    if (isFourWideBoard) {
+      types = _.reject(types, t => t.name === 'section')
+    }
+    return types
   }
 
   get textTypes() {

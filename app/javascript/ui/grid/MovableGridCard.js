@@ -288,6 +288,7 @@ class MovableGridCard extends React.Component {
       width: card.width + Math.floor(delta.width / gridW + pad),
       height: card.height + Math.floor(delta.height / gridH + pad),
     }
+    // TODO: allow sections to be as big as you want?
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
     newSize.width = Math.max(Math.min(newSize.width, cols), 1)
     // always max out height at 2

@@ -21,6 +21,7 @@
 #  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_name      :string
 #  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
@@ -83,6 +84,7 @@ class CollectionCard < ApplicationRecord
   validates :parent, presence: true
   validate :single_item_or_collection_is_present
   validate :parent_is_not_readonly, on: :create
+  # section_type is used by TestCollections e.g. for the "ideas section"
   validates :section_type, presence: true, if: :parent_test_collection?
 
   delegate :board_collection?, :test_collection?,
@@ -329,6 +331,10 @@ class CollectionCard < ApplicationRecord
 
   def placeholder?
     is_a? CollectionCard::Placeholder
+  end
+
+  def section?
+    is_a? CollectionCard::Section
   end
 
   def master_template_card?
