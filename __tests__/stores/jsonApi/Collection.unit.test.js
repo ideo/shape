@@ -661,6 +661,38 @@ describe('Collection', () => {
     })
   })
 
+  describe('API_preloadCardLayout', () => {
+    const data = [{ id: '11', row: 2, col: 0 }, { id: '12', row: 1, col: 0 }]
+    beforeEach(() => {
+      collection.API_fetchAllCardIds = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(data))
+      collection.replaceCards([])
+    })
+
+    it('should call replace cards with the data', async () => {
+      expect(collection.collection_cards.length).toEqual(0)
+      await collection.API_preloadCardLayout()
+      const mapping = _.map(collection.collection_cards, cc => {
+        return _.pick(cc, 'id', 'row', 'col', 'preload')
+      })
+      expect(mapping).toEqual([
+        {
+          id: '11',
+          row: 2,
+          col: 0,
+          preload: true,
+        },
+        {
+          id: '12',
+          row: 1,
+          col: 0,
+          preload: true,
+        },
+      ])
+    })
+  })
+
   describe('API_fetchCardOrders', () => {
     const data = [{ id: '1', order: 2 }, { id: '2', order: 1 }]
     beforeEach(() => {

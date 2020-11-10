@@ -22,11 +22,14 @@ import SharedRecordMixin from './SharedRecordMixin'
 import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
+import { objectsEqual } from '~/utils/objectUtils'
 
 export const ROW_ACTIONS = {
   INSERT: 'insert_row',
   REMOVE: 'remove_row',
 }
+
+const CARD_PROPERTIES = ['id', 'updated_at', 'order', 'row', 'col']
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -621,9 +624,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardProperties() {
-    return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'updated_at', 'order', 'row', 'col'])
-    )
+    return this.collection_cards.map(c => _.pick(c, CARD_PROPERTIES))
+  }
+
+  @action
+  replaceCardsIfDifferent(newCards) {
+    const newProperties = newCards.map(c => _.pick(c, CARD_PROPERTIES))
+    if (objectsEqual(newProperties, this.cardProperties)) {
+      return
+    }
+    this.replaceCards(newCards)
   }
 
   get allowsCollectionTypeSelector() {
@@ -831,7 +841,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     order,
     hidden = false,
     rows,
-    cols,
     searchTerm,
   } = {}) {
     let orderChanged = false
@@ -841,6 +850,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.currentOrder = order
       }
     })
+    const { uiStore } = this
     const params = {
       page,
       per_page,
@@ -858,13 +868,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page
-      params.rows = rows || [0, 5]
-      if (cols) {
-        params.cols = cols
-      }
+      params.rows = rows || [0, 20]
     }
     let apiPath
     if (searchTerm) {
+      uiStore.update('isTransparentLoading', true)
       params.query = searchTerm
       if (this.collectionFilterQuery.q) {
         params.query += ` ${this.collectionFilterQuery.q}`
@@ -890,12 +898,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {
+      // mark each card for preloading in MovableGridCard
+      _.each(data, cc => {
+        cc.preload = true
+      })
+
+      uiStore.update('isTransparentLoading', false)
       if (searchTerm) {
         this.totalPages = (meta && meta.total_pages) || 1
       } else {
         this.totalPages = links.last
       }
-      const firstPage = page === 1 && (!rows || rows[0] === 0)
+      // NOTE: firstPage doesn't happen when loading rows
+      const firstPage = params.page === 1
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
@@ -904,27 +919,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           orderChanged)
       ) {
         this.storedCacheKey = this.cache_key
-        this.collection_cards.replace(data)
+        this.replaceCards(data)
         this.currentPage = 1
         if (this.isBoard) {
           // reset these to be recalculated in updateMaxLoaded
           this.loadedRows = 0
-          this.loadedCols = 0
         }
       } else {
         if (this.currentPage < page) {
           this.currentPage = page
         }
-        const newData = _.reverse(
-          // de-dupe merged data (deferring to new cards first)
-          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
-          _.unionBy(
-            _.reverse([...data]),
-            _.reverse([...this.collection_cards]),
-            'id'
-          )
-        )
-        this.collection_cards.replace(newData)
+        this.mergeCards(data)
       }
 
       if (this.isSplitLevelBottom) {
@@ -932,10 +937,33 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
 
       if (this.isBoard && params.rows) {
-        this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
+        this.updateMaxLoadedRows({ maxRow: params.rows[1] })
       }
     })
     return data
+  }
+
+  async API_preloadCardLayout() {
+    if (this.collection_cards.length > 0) {
+      return
+    }
+
+    const layout = await this.API_fetchAllCardIds()
+    const cards = _.map(layout, data => {
+      const { id } = data
+      delete data.id
+      return {
+        id,
+        type: 'collection_cards',
+        attributes: {
+          ...data,
+          parent_id: this.id,
+          // mark for preloading aka "gray square"
+          preload: true,
+        },
+      }
+    })
+    this.replaceCards(cards)
   }
 
   @action
@@ -950,7 +978,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
     // this value is simulated
     this.max_row_index = maxRow
-    this.updateMaxLoadedColsRows({ maxRow })
+    this.updateMaxLoadedRows({ maxRow })
   }
 
   API_fetchCard = async cardId => {
@@ -963,10 +991,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
+  replaceCards(cards) {
+    this.collection_cards.replace(cards)
+  }
+
+  @action
   mergeCards = cards => {
-    // de-dupe merged data (deferring to new cards first)
-    const newData = _.unionBy(cards, this.collection_cards, 'id')
-    this.collection_cards.replace(_.sortBy(newData, 'order'))
+    const newData = _.reverse(
+      // de-dupe merged data (deferring to new cards first)
+      // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
+      _.unionBy(
+        _.reverse([...cards]),
+        _.reverse([...this.collection_cards]),
+        'id'
+      )
+    )
+    this.replaceCards(newData)
   }
 
   API_fetchCardOrders = async () => {
@@ -978,7 +1018,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           card.order = orderData.order
         }
       })
-      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+      this.replaceCards(_.sortBy(this.collection_cards, 'order'))
     })
   }
 
@@ -1041,13 +1081,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  updateMaxLoadedColsRows = ({ maxRow } = {}) => {
-    const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
+  updateMaxLoadedRows = ({ maxRow } = {}) => {
     if (maxRow > this.loadedRows) {
       this.loadedRows = maxRow
-    }
-    if (maxCol > this.loadedCols) {
-      this.loadedCols = maxCol
     }
   }
 
@@ -1878,24 +1914,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
+  // which would normally take place via RND
   @action
   async API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
-    const jsonData = this.toJsonApiWithCards()
+    const jsonData = this.toJsonApiWithCards([card.id])
     this.pushUndo({
-      snapshot: jsonData.attributes,
+      // clone to prevent later _.assign from affecting the same snapshot
+      snapshot: _.cloneDeep(jsonData.attributes),
       message: undoMessage,
       actionType: POPUP_ACTION_TYPES.SNACKBAR,
     })
-    // now make the local change to the card
-    _.assign(card, updates)
-    const data = this.toJsonApiWithCards()
+    // update our jsonData with the new attributes for this card
+    _.assign(jsonData.attributes.collection_cards_attributes[0], updates)
     // we don't want to receive updates which are just going to try to re-render
-    data.cancel_sync = true
-    await this.apiStore.request(this.baseApiPath, 'PATCH', { data })
-    // force rendering?
-    this.mergeCards([card])
+    jsonData.cancel_sync = true
+    await this.apiStore.request(this.baseApiPath, 'PATCH', { data: jsonData })
+    runInAction(() => {
+      // now make the local change to the card, which should also render it in the new position
+      _.assign(card, { ...updates, updated_at: new Date() })
+    })
   }
 
   async API_manipulateRow({ row, action, pushUndo = true } = {}) {

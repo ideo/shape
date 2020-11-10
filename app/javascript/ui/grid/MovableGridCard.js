@@ -19,6 +19,12 @@ import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
+const GridCardPreload = styled.div`
+  height: 100%;
+  width: 100%;
+  background: ${v.colors.commonMediumTint};
+`
+
 const StyledResizeIcon = styled.div`
   position: absolute;
   /* hide the resize icon while the menu is open so they don't overlap */
@@ -88,6 +94,8 @@ class MovableGridCard extends React.Component {
       resizeWidth: 0,
       resizeHeight: 0,
       allowTouchDeviceDragging: false,
+      // if the card was marked to preload in Collection#API_fetchCards
+      preloading: !!props.card.preload,
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
@@ -95,7 +103,23 @@ class MovableGridCard extends React.Component {
     }, v.touchDeviceHoldToDragTime)
   }
 
+  componentDidMount() {
+    const { record } = this.props.card
+    if (!this.state.preloading) {
+      return
+    }
+    if (this.state.preloading && _.isEmpty(record)) {
+      // when we've just loaded the initial layout (no card.record), preserve the preloading state
+      return
+    }
+    this.finishPreloading()
+  }
+
   componentDidUpdate(prevProps) {
+    const { record } = this.props.card
+    if (this.state.preloading && !_.isEmpty(record)) {
+      this.finishPreloading()
+    }
     if (this.state.dragging || this.unmounted) {
       return
     }
@@ -112,6 +136,14 @@ class MovableGridCard extends React.Component {
   componentWillUnmount() {
     this.unmounted = true
     this.clearDragTimeout()
+  }
+
+  finishPreloading() {
+    setTimeout(() => {
+      if (this.unmounted) return
+      // after a slight delay, turn preloading off and render the actual GridCard
+      this.setState({ preloading: false })
+    }, 150)
   }
 
   get shouldDragCard() {
@@ -472,6 +504,7 @@ class MovableGridCard extends React.Component {
       resizeHeight,
       x,
       y,
+      preloading,
     } = this.state
 
     const {
@@ -580,7 +613,9 @@ class MovableGridCard extends React.Component {
     const adjustedWidth = (width + resizeWidth) / zoomLevel
     const adjustedHeight = (height + resizeHeight) / zoomLevel
     let transition =
-      dragging || resizing || currentlyZooming ? 'none' : cardCSSTransition
+      dragging || resizing || currentlyZooming || preloading
+        ? 'none'
+        : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget
     if (dragging && this.state.allowTouchDeviceDragging) {
@@ -721,12 +756,16 @@ class MovableGridCard extends React.Component {
             transform={transform}
             zoomLevel={zoomLevel}
           >
-            <GridCard
-              {...cardProps}
-              draggingMultiple={draggingMultiple}
-              hoveringOver={hoveringOverRight}
-              zoomLevel={zoomLevel}
-            />
+            {/* During preload we just render a gray square to simplify initial render */}
+            {preloading && <GridCardPreload />}
+            {!preloading && (
+              <GridCard
+                {...cardProps}
+                draggingMultiple={draggingMultiple}
+                hoveringOver={hoveringOverRight}
+                zoomLevel={zoomLevel}
+              />
+            )}
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>

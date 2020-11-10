@@ -278,6 +278,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           order: cc.order,
           row: cc.row,
           col: cc.col,
+          height: cc.height,
+          width: cc.width,
         }
       end
       expect(json).to eq data.as_json

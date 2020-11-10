@@ -130,7 +130,6 @@ const fakeUiStore = {
   reselectOnlyMovableCards: jest.fn(),
   reselectWithoutPlaceholders: jest.fn(),
   setMovingCards: jest.fn(),
-  setVisibleCols: jest.fn(),
   setVisibleRows: jest.fn(),
   setPlaceholderSpot: jest.fn(),
   setDroppingFilesCount: jest.fn(),

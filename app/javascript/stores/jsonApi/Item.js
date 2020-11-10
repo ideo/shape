@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -206,9 +206,19 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  @computed
   get primaryDataset() {
-    const { datasets } = this
-    if (!datasets) return null
+    const { apiStore } = this
+    let { datasets } = this
+    if (!datasets || datasets.length === 0) {
+      // look in apiStore for any datasets that we set ds.item === this
+      datasets = apiStore.findAll('datasets').filter(ds => {
+        return ds.item === this
+      })
+      if (!datasets) {
+        return null
+      }
+    }
     if (datasets.length === 1) return datasets[0]
     const primary = datasets.find(dataset => dataset.order === 0)
     return primary
@@ -333,7 +343,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const res = await this.apiStore.request(`items/${this.id}/datasets`)
     runInAction(() => {
       this.loadingDatasets = false
-      this.datasets = res.data
+      const datasets = res.data
+      _.each(datasets, d => {
+        // set the dataset item reference in case we need to look it up later
+        d.item = this
+      })
+      this.datasets = datasets
     })
     return this.datasets
   }

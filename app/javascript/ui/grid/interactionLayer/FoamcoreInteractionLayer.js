@@ -59,6 +59,12 @@ class FoamcoreInteractionLayer extends React.Component {
   loadingCell = null
   @observable
   replacingCard = null
+  picker = null
+
+  constructor(props) {
+    super(props)
+    this.throttledOnCursorMove = _.throttle(this.onCursorMove, 250)
+  }
 
   componentDidMount() {
     this.createDropPane()
@@ -75,11 +81,16 @@ class FoamcoreInteractionLayer extends React.Component {
       onProgress: this.handleOnProgress,
       onSuccess: this.handleSuccess,
     }
-    FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
+    this.picker = FilestackUpload.makeDropPane(
+      container,
+      dropPaneOpts,
+      uploadOpts
+    )
   }
 
+  @action
   handleOnProgress = progress => {
-    runInAction(() => (this.fileDropProgress = progress))
+    this.fileDropProgress = progress
   }
 
   handleDrop = async e => {
@@ -88,7 +99,19 @@ class FoamcoreInteractionLayer extends React.Component {
     const { files } = dataTransfer
     const { row, col } = this.hoveringRowCol
     const { collection, apiStore, uiStore } = this.props
+
+    const { blankContentToolState } = uiStore
+    const { replacingId } = blankContentToolState
     const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+
+    if (!replacingId && (row === null || col === null)) {
+      // the case where you drop over an existing card
+      if (this.picker) {
+        this.picker.cancel()
+      }
+      this.resetUploading()
+      return
+    }
 
     if (filesThatFit.length < files.length) {
       uiStore.setDroppingFilesCount(0)
@@ -106,10 +129,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     if (_.isEmpty(files)) return
 
-    const { blankContentToolState } = uiStore
-    const { replacingId } = blankContentToolState
-
-    if (!!replacingId) {
+    if (replacingId) {
       const { order, col, row, width, height } = blankContentToolState
       runInAction(() => {
         this.replacingCard = {
@@ -314,10 +334,14 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
+  handleDragOver = e => {
+    this.onCursorMove('mouse')(e)
+  }
+
   onCursorMove = type => ev => {
     const { hasSelectedArea } = this
-    if (hasSelectedArea) {
-      // ignore these interactions when you're already dragging a selection square
+    if (hasSelectedArea || !ev || !ev.target) {
+      // ignore these interactions when you're already dragging a selection square or don't have a target
       return
     }
 
@@ -655,24 +679,6 @@ class FoamcoreInteractionLayer extends React.Component {
     return null
   }
 
-  cardWithinViewPlusPage = card => {
-    const { uiStore } = this.props
-    // Select all cards that are within view,
-    // plus half a screen on any side
-    const rows = uiStore.visibleRows
-    const cols = uiStore.visibleCols
-
-    const numRows = Math.ceil(rows.num)
-    const numCols = Math.ceil(cols.num)
-
-    const withinCols =
-      card.col > cols.min - numCols && card.col < cols.max + numCols
-    const withinRows =
-      card.row > rows.min - numRows && card.row < rows.max + numRows
-
-    return withinRows && withinCols
-  }
-
   get renderDropSpots() {
     const blankCards = []
     const { uiStore } = this.props
@@ -826,8 +832,6 @@ class FoamcoreInteractionLayer extends React.Component {
       const interactionType =
         blankContentToolState.blankType === 'hotcell' ? 'hotcell' : 'bct'
       return this.positionBlank({ ...blankContentToolState }, interactionType)
-    } else if (!_.isEmpty(this.replacingCard)) {
-      return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
     }
 
     return null
@@ -842,6 +846,18 @@ class FoamcoreInteractionLayer extends React.Component {
       return null
     }
     return this.positionBlank({ ...this.loadingCell }, 'unrendered')
+  }
+
+  get renderReplacing() {
+    if (
+      _.isEmpty(this.replacingCard) ||
+      !_.isNumber(this.replacingCard.col) ||
+      !_.isNumber(this.replacingCard.row)
+    ) {
+      return null
+    }
+
+    return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
   }
 
   render() {
@@ -862,9 +878,11 @@ class FoamcoreInteractionLayer extends React.Component {
         onTouchEnd={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
-          this.onCursorMove('mouse')(e)
-          const numItems = _.get(e, 'dataTransfer.items.length', 0)
-          uiStore.setDroppingFilesCount(numItems)
+          const { uiStore } = this.props
+          const numFiles = _.get(e, 'dataTransfer.items.length', 0)
+          uiStore.setDroppingFilesCount(numFiles)
+          e.persist()
+          this.throttledOnCursorMove(e)
         }}
         onDragLeave={e => {
           e.preventDefault()
@@ -890,6 +908,7 @@ class FoamcoreInteractionLayer extends React.Component {
         {this.renderHotEdges}
         {this.renderBct}
         {this.renderLoading}
+        {this.renderReplacing}
         {this.renderRightBlankActions}
       </DragLayerWrapper>
     )
