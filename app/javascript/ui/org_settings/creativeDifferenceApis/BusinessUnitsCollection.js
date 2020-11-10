@@ -10,8 +10,8 @@ class BusinessUnitModel extends Model {
   url() {
     // Do this conditionally because otherwise it tries to use the /:id for creating
     return this.id && !this.isNew
-      ? `/api/v1/creative_difference/business_units/${this.id}`
-      : `/api/v1/creative_difference/business_units`
+      ? `/api/v1/creative_difference/groups?business_unit_id=${this.id}`
+      : `/api/v1/creative_difference/groups`
   }
 }
 
