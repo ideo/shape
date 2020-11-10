@@ -230,7 +230,8 @@ Rails.application.routes.draw do
         # resources :business_units, only: %i[index]
         resources :groups, only: %i[index create] do
           collection do
-            patch '', action: :update
+            patch ':business_unit_id', action: :update
+            post ':business_unit_id/clone', action: :clone
           end
         end
         resources :proxy, only: %i[index]

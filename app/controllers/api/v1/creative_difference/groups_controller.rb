@@ -32,12 +32,7 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
       group.errors.add(:business_unit, business_unit["errors"])
       render_api_errors group.errors
     else
-      p groups = find_related_groups(business_unit)
-      p "found #{groups}"
-      if groups.empty?
-        p "no groups, making groups"
-        groups = create_related_groups(business_unit)
-      end
+      groups = find_or_create_related_groups(business_unit)
 
       render jsonapi: groups, include: [roles: %i[users groups]]
     end
@@ -69,7 +64,28 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
     end
   end
 
+  def clone
+    clone_from_id = params[:business_unit_id]
+    business_unit = create_business_unit(clone_from_id)
+    if business_unit["errors"]
+      group = Group.new
+      group.errors.add(:business_unit, business_unit["errors"])
+      render_api_errors group.errors
+    else
+      groups = find_or_create_related_groups(business_unit)
+
+      render jsonapi: groups, include: [roles: %i[users groups]]
+    end
+  end
+
   private
+
+  def find_or_create_related_groups(business_unit)
+    p groups = find_related_groups(business_unit)
+    return groups unless groups.empty?
+
+    create_related_groups(business_unit)
+  end
 
   def find_related_groups(business_unit)
     groups = Group.where(
@@ -121,6 +137,8 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
     # }
     p 'sending params[:group]'
     p params[:group]
+    # Shape to Shape Parameters: {"industry_subcategory_id"=>10, "business_unit_id"=>"2548", "group"=>{}}
+    # Shape to C∆ Parameters: {"business_unit"=>{}, "organization_id"=>"4", "id"=>"2548"}
 
     p response = HTTParty.put(
       URI.encode(url),
@@ -141,9 +159,12 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
     JSON.parse(response.body, symbolize_keys: true)
   end
 
-  def create_business_unit
+  def create_business_unit(clone_from_id = nil)
     token = ENV['CREATIVE_DIFFERENCE_API_TOKEN']
     url = 'http://localhost:3000/api/v3/business_units'
+    if clone_from_id
+      url += "/#{clone_from_id}/clone"
+    end
     external_id = current_user.current_organization.external_records.where(application_id: ENV["CREATIVE_DIFFERENCE_APPLICATION_ID"]).first&.external_id
     creative_difference_org_id = external_id.split("_").last
 

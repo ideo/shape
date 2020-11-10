@@ -57,21 +57,16 @@ class BusinessUnitRow extends React.Component {
     this.businessUnitErrors = err
   }
 
-  updateBusinessUnit = async (businessUnit, params) => {
-    console.log('in update business unit, ', businessUnit)
-
-    this.setIsLoading(true)
-
-    console.log('sending params: ', params)
+  updateBusinessUnit = async params => {
+    console.log('updateBusinessUnit sending params: ', params)
 
     try {
-      const result = await businessUnit.save(params, {
+      const result = await this.props.businessUnit.save(params, {
         optimistic: true,
       })
 
       console.log('result is: ', result)
       this.setBusinessUnitErrors(null)
-      this.setIsLoading(false)
       return result
     } catch (err) {
       console.log('error: ', err)
@@ -81,21 +76,7 @@ class BusinessUnitRow extends React.Component {
   }
 
   cloneBusinessUnit = async businessUnit => {
-    try {
-      this.setIsLoading(true)
-      // // const model = new this.props.BusinessUnitsStore
-      // const modelInstance = new businessUnit({
-      //   id: businessUnit.id,
-      // })
-
-      const promise = businessUnit.rpc('clone', {
-        optimistic: false,
-      })
-      const result = await promise
-      this.refreshBusinessUnits() // Should we pass this function in from Teams Tab?
-      this.setIsLoading(false)
-      return result
-    } catch (err) {}
+    this.props.cloneBusinessUnit(businessUnit)
   }
 
   removeBusinessUnit = async businessUnit => {
@@ -139,8 +120,6 @@ class BusinessUnitRow extends React.Component {
   }
 
   handleNameInputKeyPress = (e, businessUnit) => {
-    console.log('handleNameInputKeyPress:', e)
-    console.log(businessUnit.get('name'))
     if (e.key === 'Enter') {
       this.handleSaveBusinessUnit(businessUnit, {
         name: businessUnit.get('name'),
@@ -149,13 +128,11 @@ class BusinessUnitRow extends React.Component {
   }
 
   handleNameInputChange = (e, businessUnit) => {
-    console.log('setting name to: ', e.target.value)
     businessUnit.set({ name: e.target.value })
   }
 
   handleSaveBusinessUnit = businessUnit => {
-    console.log('saving BU: ', businessUnit)
-    this.updateBusinessUnit(businessUnit, {
+    this.updateBusinessUnit({
       name: businessUnit.get('name'),
     })
     this.setIsEditingName(false)
@@ -228,7 +205,7 @@ class BusinessUnitRow extends React.Component {
               label={'Industry'}
               record={businessUnit.toJS()}
               options={industrySubcategories}
-              updateRecord={params => updateBusinessUnit(businessUnit, params)}
+              updateRecord={params => updateBusinessUnit(params)}
               fieldToUpdate={'industry_subcategory_id'}
             />
           </div>
@@ -342,6 +319,7 @@ BusinessUnitRow.defaultProps = {
 
 BusinessUnitRow.propTypes = {
   // TODO: Add other event handler functions
+  cloneBusinessUnit: PropTypes.func,
   // updateBusinessUnit: PropTypes.func,
   // updateBusinessUnitDeployment: PropTypes.func,
   businessUnit: MobxPropTypes.objectOrObservableObject.isRequired,

@@ -137,6 +137,30 @@ class TeamsTab extends React.Component {
     }
   }
 
+  cloneBusinessUnit = async businessUnit => {
+    try {
+      const result = await this.props.apiStore.cloneCreativeDifferenceGroup(
+        businessUnit.id
+      )
+
+      const groups = result.data
+      console.log('created result.data with BU data: ', groups)
+
+      if (groups) {
+        console.log('setting BU from groups: ', groups[0].business_unit.id)
+        runInAction(() => {
+          this.newBusinessUnitId = groups[0].business_unit.id
+          businessUnitsStore.add([groups[0].business_unit])
+          this.businessUnitGroups = this.businessUnitGroups.concat(groups)
+        })
+      }
+    } catch (err) {
+      console.log('failed to create BU and groups: ', err)
+      this.setIsError(true)
+      this.setBusinessUnitErrors(err.error)
+    }
+  }
+
   render() {
     const {
       isLoading,
@@ -195,6 +219,7 @@ class TeamsTab extends React.Component {
                 contentVersions={contentVersions}
                 industrySubcategories={industrySubcategories}
                 businessUnitsStore={businessUnitsStore}
+                cloneBusinessUnit={this.cloneBusinessUnit}
               />
             ))}
             <div>
