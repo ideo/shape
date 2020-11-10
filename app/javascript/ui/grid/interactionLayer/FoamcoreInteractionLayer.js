@@ -14,10 +14,7 @@ import RowActions from './RowActions'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
-import v, {
-  FOAMCORE_INTERACTION_LAYER,
-  ITEM_TYPES,
-} from '~/utils/variables'
+import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`

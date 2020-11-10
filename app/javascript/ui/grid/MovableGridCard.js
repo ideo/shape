@@ -104,22 +104,14 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidMount() {
-    const { record } = this.props.card
     if (!this.state.preloading) {
-      return
-    }
-    if (this.state.preloading && _.isEmpty(record)) {
-      // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
     this.finishPreloading()
   }
 
   componentDidUpdate(prevProps) {
-    const { record } = this.props.card
-    if (this.state.preloading && !_.isEmpty(record)) {
-      this.finishPreloading()
-    }
+    this.finishPreloading()
     if (this.state.dragging || this.unmounted) {
       return
     }
@@ -139,6 +131,13 @@ class MovableGridCard extends React.Component {
   }
 
   finishPreloading() {
+    const { card } = this.props
+    const { record } = card
+    if (this.state.preloading && _.isEmpty(record) && !card.isSection) {
+      // when we've just loaded the initial layout (no card.record), preserve the preloading state
+      return
+    }
+
     setTimeout(() => {
       if (this.unmounted) return
       // after a slight delay, turn preloading off and render the actual GridCard

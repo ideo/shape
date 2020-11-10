@@ -144,6 +144,10 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     return this.type === COLLECTION_CARD_TYPES.LINK
   }
 
+  get isSection() {
+    return this.type === COLLECTION_CARD_TYPES.SECTION
+  }
+
   get subtitle() {
     // Collection cards only show titles for link cards
     if (!this.isLinkCard) return null

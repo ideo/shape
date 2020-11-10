@@ -121,7 +121,7 @@ module JsonapiCache
           next if @search_result
 
           # private_card allows frontend to hide or display "private" as needed
-          if card.is_a?(CollectionCard::Placeholder)
+          if card.placeholder? || card.section?
             json[:data][:attributes][:can_edit_parent] = can_edit_parent
           else
             json[:data][:attributes][:private_card] = true

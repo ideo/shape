@@ -52,5 +52,14 @@ class CollectionCard
     archivable
     after_archive :after_archive_card
     after_unarchive :after_unarchive_card
+
+    # delegates roles to the parent collection
+    def can_edit?(*args)
+      parent.can_edit_content?(*args)
+    end
+
+    def can_view?(*args)
+      parent.can_view?(*args)
+    end
   end
 end
