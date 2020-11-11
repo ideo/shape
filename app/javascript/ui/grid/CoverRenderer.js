@@ -13,6 +13,7 @@ import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
+import SectionCover from '~/ui/grid/covers/SectionCover'
 
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -48,12 +49,7 @@ class CoverRenderer extends React.Component {
       !viewingCollection.isFourWideBoard
 
     if (card.isSection) {
-      // TODO: fill this in...
-      return (
-        <div
-          style={{ height: '100%', padding: '20px', border: '1px solid black' }}
-        />
-      )
+      return <SectionCover borderSize={16} />
     }
     if (this.isItem) {
       switch (record.type) {
