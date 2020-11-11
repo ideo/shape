@@ -448,6 +448,10 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
+    if (contentType === 'text') {
+      // don't create placeholders when creating a text card
+      return
+    }
     const placeholder = new CollectionCard(
       {
         row,

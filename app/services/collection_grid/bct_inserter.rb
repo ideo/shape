@@ -21,6 +21,7 @@ module CollectionGrid
     def call
       existing_card = @collection.collection_cards.select { |cc| cc.row == @row && cc.col == @col }
       insert_bct_square
+      @placeholder.cache_placeholder_editor_id!(@user.id) if @user.present?
       move_other_cards if existing_card.present?
       @placeholder
     end

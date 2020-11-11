@@ -659,18 +659,12 @@ class GridCard extends React.Component {
       )
     }
 
-    const { row, col } = uiStore.blankContentToolState
-    const collaboratorDidCreateBct =
-      card.isBctPlaceholder && card.row === row && card.col === col
-
     return (
       <StyledGridCard
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
-        collaboratorColor={
-          !collaboratorDidCreateBct && getCollaboratorColor(collaborator)
-        }
+        collaboratorColor={getCollaboratorColor(collaborator)}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}

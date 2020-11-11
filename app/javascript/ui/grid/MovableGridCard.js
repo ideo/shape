@@ -10,7 +10,6 @@ import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
-import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardPagination from '~/ui/grid/GridCardPagination'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
@@ -154,17 +153,35 @@ class MovableGridCard extends React.Component {
   }
 
   get collaborator() {
-    const { record, card, parent } = this.props
-    const recordOrParent = card.isBctPlaceholder ? parent : record
-    if (!_.isEmpty(recordOrParent) && recordOrParent.collaborators.length > 0) {
-      const mostRecentCollaborator = _.last(recordOrParent.collaborators)
-      const { color, name } = mostRecentCollaborator
+    const { record, card } = this.props
+    if (card && card.isBctPlaceholder) {
+      const { placeholder_editor_id } = card
+      const { parent } = this.props
 
+      if (!parent || !placeholder_editor_id) return null
+
+      const collaboratorForPlaceholder = _.find(
+        parent.collaborators,
+        c => c.id && parseInt(c.id) === placeholder_editor_id
+      )
+
+      if (!collaboratorForPlaceholder) return null
+
+      const { color, name } = collaboratorForPlaceholder
       return {
+        color,
         name,
+      }
+    } else if (!_.isEmpty(record)) {
+      const lastCollaboratorForRecord = _.last(record.collaborators)
+      if (!lastCollaboratorForRecord) return null
+
+      const { color } = lastCollaboratorForRecord
+      return {
         color,
       }
     }
+
     return null
   }
 
@@ -337,12 +354,6 @@ class MovableGridCard extends React.Component {
       yPos,
     }
   }
-
-  renderPlaceholder = () => (
-    <PositionedGridCard {...this.styleProps()} {...uiStore.placeholderPosition}>
-      <GridCardPlaceholder />
-    </PositionedGridCard>
-  )
 
   renderEmpty = () => {
     const { currentlyZooming } = uiStore

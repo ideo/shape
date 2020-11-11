@@ -48,6 +48,7 @@
 
 class CollectionCard < ApplicationRecord
   include Archivable
+  include CachedAttributes
 
   DEFAULT_PER_PAGE = 50
   paginates_per DEFAULT_PER_PAGE
@@ -78,7 +79,8 @@ class CollectionCard < ApplicationRecord
              if: :test_collection_within_master_template_after_save?
 
   store_accessor :cached_attributes,
-                 :cached_cover
+                 :cached_cover,
+                 :cached_placeholder_editor_id
 
   validates :parent, presence: true
   validate :single_item_or_collection_is_present

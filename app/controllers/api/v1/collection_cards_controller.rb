@@ -139,6 +139,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       row: row,
       col: col,
       collection: @collection,
+      user: current_user,
     )
     service.call
     # render the placeholder card
