@@ -4,11 +4,10 @@ import v from '~/utils/variables'
  * returns the matching hex color for the collaborator's color
  */
 export const getCollaboratorColor = collaborator => {
-  return (
-    collaborator &&
-    collaborator.color &&
-    v.colors[`collaboratorPrimary${collaborator.color}`]
-  )
+  if (collaborator && collaborator.color) {
+    return v.colors[`collaboratorPrimary${collaborator.color}`]
+  }
+  return null
 }
 
 /*

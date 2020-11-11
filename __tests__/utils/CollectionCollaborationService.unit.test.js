@@ -49,17 +49,5 @@ describe('CollectionCollaborationService', () => {
         current_editor
       )
     })
-
-    describe('with a parent', () => {
-      it('calls setLatestCollaborator on parent', () => {
-        const card = {}
-        const parent = fakeCollection
-        const current_editor = { id: '1', name: 'Lala' }
-        service.setCollaborator({ card, current_editor, parent })
-        expect(fakeCollection.setCollaborators).toHaveBeenCalledWith([
-          current_editor,
-        ])
-      })
-    })
   })
 })

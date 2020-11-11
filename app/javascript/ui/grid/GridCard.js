@@ -56,6 +56,7 @@ class GridCard extends React.Component {
       record,
       searchResult,
     } = this.props
+    if (card.isBctPlaceholder) return true
     if (isSharedCollection || searchResult) return false
     // you can always edit your link cards, regardless of record.can_edit
     if (canEditCollection && card.link) return true
@@ -658,12 +659,18 @@ class GridCard extends React.Component {
       )
     }
 
+    const { row, col } = uiStore.blankContentToolState
+    const collaboratorDidCreateBct =
+      card.isBctPlaceholder && card.row === row && card.col === col
+
     return (
       <StyledGridCard
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
-        collaboratorColor={getCollaboratorColor(collaborator)}
+        collaboratorColor={
+          !collaboratorDidCreateBct && getCollaboratorColor(collaborator)
+        }
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}

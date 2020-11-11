@@ -37,7 +37,7 @@ export default class CollectionCollaborationService {
     if (updateData.card_id) {
       // a card has been created or updated, so fetch that individual card
       const card = await collection.API_fetchCard(updateData.card_id)
-      this.setCollaborator({ card, current_editor, parent: collection })
+      this.setCollaborator({ card, current_editor })
       return
     }
     if (updateData.card_ids) {
@@ -86,13 +86,9 @@ export default class CollectionCollaborationService {
     }
   }
 
-  setCollaborator({ card, current_editor, parent = null }) {
+  setCollaborator({ card, current_editor }) {
     if (!_.isEmpty(card.record)) {
       card.record.setLatestCollaborator(current_editor)
-      return
-    }
-    if (parent) {
-      parent.setCollaborators([current_editor, ...parent.collaborators])
     }
   }
 
