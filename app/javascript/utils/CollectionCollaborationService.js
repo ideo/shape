@@ -87,7 +87,7 @@ export default class CollectionCollaborationService {
   }
 
   setCollaborator({ card, current_editor }) {
-    if (!_.isEmpty(card.record)) {
+    if (card && !_.isEmpty(card.record)) {
       card.record.setLatestCollaborator(current_editor)
     }
   }

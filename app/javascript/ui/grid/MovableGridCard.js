@@ -516,9 +516,7 @@ class MovableGridCard extends React.Component {
     const { zIndex, cardTiltDegrees } = v
     const { cardDragging, aboveClickWrapper, cardHovering } = zIndex
 
-    if (cardType === 'placeholder') {
-      return this.renderPlaceholder()
-    } else if (cardType === 'blank' || cardType === 'submission') {
+    if (cardType === 'blank' || cardType === 'submission') {
       return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
       return this.renderEmpty()

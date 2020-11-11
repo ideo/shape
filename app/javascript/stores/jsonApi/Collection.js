@@ -19,7 +19,11 @@ import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
-import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
+import v, {
+  FOAMCORE_MAX_ZOOM,
+  FOUR_WIDE_MAX_ZOOM,
+  COLLECTION_CARD_TYPES,
+} from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -900,7 +904,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       // mark each card for preloading in MovableGridCard
       _.each(data, cc => {
-        cc.preload = true
+        cc.preload =
+          cc.type === COLLECTION_CARD_TYPES.PLACEHOLDER ? false : true
       })
 
       uiStore.update('isTransparentLoading', false)
