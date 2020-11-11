@@ -653,6 +653,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def ordered_cards
+    # disallow MDL actions from placeholder cards
     CollectionCard
       .ordered
       .not_placeholder

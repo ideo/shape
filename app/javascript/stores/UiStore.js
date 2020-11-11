@@ -682,6 +682,7 @@ export default class UiStore {
     this.movingFromCollectionId = null
     this.showTemplateHelperForCollection = null
     this.draggingFromMDL = false
+    this.setHoveringOver()
     if (deselect) this.deselectCards()
   }
 
