@@ -39,15 +39,27 @@ describe('CollectionCollaborationService', () => {
   })
 
   describe('setCollaborator', () => {
-    it('calls setLatestCollaborator on card.record', () => {
-      const card = {
+    let card, current_editor
+    beforeEach(() => {
+      card = {
         record: fakeCollection,
       }
-      const current_editor = { id: '1', name: 'Lala' }
-      service.setCollaborator({ card, current_editor })
-      expect(fakeCollection.setLatestCollaborator).toHaveBeenCalledWith(
-        current_editor
-      )
+      current_editor = {}
+    })
+    describe('when there is no current_editor', () => {
+      it('should not set collaborator', () => {
+        service.setCollaborator({ card, current_editor })
+        expect(fakeCollection.setLatestCollaborator).not.toHaveBeenCalled()
+      })
+    })
+    describe('when there is no current_editor', () => {
+      it('calls setLatestCollaborator on card.record', () => {
+        current_editor = { id: '1', name: 'Lala' }
+        service.setCollaborator({ card, current_editor })
+        expect(fakeCollection.setLatestCollaborator).toHaveBeenCalledWith(
+          current_editor
+        )
+      })
     })
   })
 })
