@@ -80,7 +80,7 @@ module CollectionGrid
     end
 
     def broadcaster
-      CollectionUpdateBroadcaster.new(@collection, @user)
+      CollectionUpdateBroadcaster.new(@collection)
     end
 
     def select_cards_after
