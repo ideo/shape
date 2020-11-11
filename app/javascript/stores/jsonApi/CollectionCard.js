@@ -523,11 +523,6 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     }
   }
 
-  async API_archiveCards(cardIds = []) {
-    this.uiStore.reselectCardIds(cardIds)
-    return this.API_archive()
-  }
-
   // this could really be a static method now that it archives all selected cards
   async API_archive({ isReplacing = false, onCancel = null } = {}) {
     const { uiStore } = this
