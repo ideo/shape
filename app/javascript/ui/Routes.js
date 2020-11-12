@@ -157,6 +157,7 @@ class Routes extends React.Component {
   }
 
   handleMouseMoveSelection = e => {
+    const { uiStore } = this.props
     this.throttledCalculateGridCursorPosition({
       x: e.clientX,
       y: e.clientY,
@@ -170,6 +171,9 @@ class Routes extends React.Component {
     if (e.buttons === 0) {
       this.handleMouseUpSelection(e)
     }
+
+    // Don't allow selecting while creating a selection
+    if (uiStore.sectionCreation) return
 
     // Stop propagation if dragging so it doesn't trigger other events
     e.stopPropagation()

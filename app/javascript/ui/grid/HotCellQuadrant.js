@@ -102,6 +102,8 @@ const nameToIcon = {
 @observer
 class HotCellQuadrant extends React.Component {
   handleClick = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
     const { name, opts } = this.props
     if (name === 'more') {
       const { onMoreMenuOpen } = this.props

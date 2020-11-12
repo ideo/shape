@@ -293,6 +293,8 @@ export default class UiStore {
   addedNewRole = false
   @observable
   touchActionMenuOpenId = null
+  @observable
+  sectionCreation = false
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1795,6 +1797,16 @@ export default class UiStore {
     // zoomLevels start at 1, so we subtract to get the array idx
     const zoom = this.zoomLevels[zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  @action
+  enterSectionCreationState() {
+    this.sectionCreation = true
+  }
+
+  @action
+  exitSectionCreationState() {
+    this.sectionCreation = false
   }
 
   @action

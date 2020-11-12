@@ -10,10 +10,11 @@ import {
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
-import RowActions from './RowActions'
-import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
+import RowActions from './RowActions'
+import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
+import SectionSquare from '~/ui/grid/SectionSquare'
 import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
 
@@ -21,6 +22,12 @@ const DragLayerWrapper = styled.div`
   height: 100%;
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
+
+  ${props =>
+    props.sectionCreation &&
+    `
+    cursor: copy;
+  `}
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -59,11 +66,17 @@ class FoamcoreInteractionLayer extends React.Component {
   loadingCell = null
   @observable
   replacingCard = null
+  @observable
+  sectionCreationArea = {}
   picker = null
 
   constructor(props) {
     super(props)
     this.throttledOnCursorMove = _.throttle(this.onCursorMove, 250)
+    this.throttledSetSectionCreationArea = _.throttle(
+      this.setSectionCreationArea,
+      25
+    )
   }
 
   componentDidMount() {
@@ -86,6 +99,14 @@ class FoamcoreInteractionLayer extends React.Component {
       dropPaneOpts,
       uploadOpts
     )
+  }
+
+  handleInsertRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
+  }
+
+  handleRemoveRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
   }
 
   @action
@@ -187,6 +208,59 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
+  handleMouseDownSelection = ev => {
+    if (ev.target.id !== FOAMCORE_INTERACTION_LAYER) return
+    const { left, top } = this.transformToGridCoordinates(ev)
+    runInAction(() => {
+      this.sectionCreationArea = { left, top }
+    })
+  }
+
+  handleMouseUpSelection = e => {
+    const { uiStore } = this.props
+    if (!this.sectionCreationArea.left) return
+
+    // Stop propagation if dragging so it doesn't trigger other events
+    e.stopPropagation()
+    e.preventDefault()
+
+    if (this.sectionCreationArea.width && this.sectionCreationArea.height) {
+      this.createSection(this.sectionCreationArea)
+    }
+    // Cancel any currently throttled calls
+    this.throttledSetSectionCreationArea.cancel()
+    // clear selected area (enabling BCT to open)
+    this.setSectionCreationArea({
+      top: null,
+      left: null,
+      width: null,
+      height: null,
+    })
+    // Reset
+    uiStore.exitSectionCreationState()
+  }
+
+  handleTouchStart = ev => {
+    if (ev.target.id !== FOAMCORE_INTERACTION_LAYER) {
+      return false
+    }
+    runInAction(() => {
+      this.touchSwiping = false
+      this.touchClickEv = ev.touches[0]
+    })
+  }
+
+  handleTouchMove = ev => {
+    runInAction(() => {
+      this.touchSwiping = true
+      this.touchClickEv = null
+    })
+  }
+
+  handleDragOver = e => {
+    this.onCursorMove('mouse')(e)
+  }
+
   createCardsFromPlaceholders = files => {
     _.each(files, async (file, idx) => {
       // get row and col from placeholders
@@ -241,6 +315,14 @@ class FoamcoreInteractionLayer extends React.Component {
 
   resetFileDropProgress = () => {
     runInAction(() => (this.fileDropProgress = null))
+  }
+
+  transformToGridCoordinates({ pageY, pageX } = {}) {
+    // These values are based on where the grid is in relation to the rest of the page
+    return {
+      top: pageY - 125,
+      left: pageX - 25,
+    }
   }
 
   // creates collection card for serialization
@@ -301,20 +383,33 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
-  createSection = async ({ col, row, height = 3, width = 3 } = {}) => {
+  startCreatingSection() {
+    const { uiStore } = this.props
+    uiStore.enterSectionCreationState()
+  }
+
+  createSection = async ({ top, left, width, height } = {}) => {
+    const { coordinatesForPosition } = this.props
+    const { row, col } = coordinatesForPosition({ x: left, y: top })
+    const end = coordinatesForPosition({ x: left + width, y: top + height })
+
+    const absoluteWidth = end.col - col
+    const absoluteHeight = end.row - row
+    console.log('createSection', col, row, absoluteWidth, absoluteHeight)
+
     const { collection, apiStore } = this.props
     const attrs = {
       col,
       row,
-      width,
-      height,
+      width: absoluteWidth,
+      height: absoluteHeight,
       section_name: 'New Section',
       card_type: 'section',
       parent_id: collection.id,
     }
 
     const card = new CollectionCard(attrs, apiStore)
-    console.log('creating new section at', row, col)
+    // TODO add this to collection so it appears right away?
     card.API_create()
   }
 
@@ -334,31 +429,22 @@ class FoamcoreInteractionLayer extends React.Component {
     this.placeholderCards = []
   }
 
-  handleTouchStart = ev => {
-    if (ev.target.id !== FOAMCORE_INTERACTION_LAYER) {
-      return false
-    }
-    runInAction(() => {
-      this.touchSwiping = false
-      this.touchClickEv = ev.touches[0]
-    })
-  }
-
-  handleTouchMove = ev => {
-    runInAction(() => {
-      this.touchSwiping = true
-      this.touchClickEv = null
-    })
-  }
-
-  handleDragOver = e => {
-    this.onCursorMove('mouse')(e)
-  }
-
   onCursorMove = type => ev => {
     const { hasSelectedArea } = this
+    const { uiStore } = this.props
     if (hasSelectedArea || !ev || !ev.target) {
       // ignore these interactions when you're already dragging a selection square or don't have a target
+      return
+    }
+
+    if (uiStore.sectionCreation && this.sectionCreationArea.left) {
+      const { left, top } = this.transformToGridCoordinates(ev)
+      this.throttledSetSectionCreationArea({
+        left: _.min([left, this.sectionCreationArea.left]),
+        top: _.min([top, this.sectionCreationArea.top]),
+        width: left - this.sectionCreationArea.left,
+        height: top - this.sectionCreationArea.top,
+      })
       return
     }
 
@@ -375,7 +461,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
-    const { coordinatesForPosition, uiStore } = this.props
+    const { coordinatesForPosition } = this.props
 
     const rect = uiStore.foamcoreBoundingRectangle
     let { clientX, clientY, target } = ev
@@ -433,10 +519,7 @@ class FoamcoreInteractionLayer extends React.Component {
       })
       return
     } else if (contentType === 'section') {
-      this.createSection({
-        row,
-        col,
-      })
+      this.startCreatingSection()
       return
     }
 
@@ -496,14 +579,6 @@ class FoamcoreInteractionLayer extends React.Component {
     this.resetHoveringRowCol()
   }
 
-  handleInsertRowClick = (ev, row) => {
-    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
-  }
-
-  handleRemoveRowClick = (ev, row) => {
-    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
-  }
-
   onRowClick = async (ev, row, action) => {
     ev.stopPropagation()
     const { collection, uiStore } = this.props
@@ -548,6 +623,61 @@ class FoamcoreInteractionLayer extends React.Component {
       interactionType,
       showDropzoneIcon
     )
+  }
+
+  @action
+  setSectionCreationArea({ top, left, width, height } = {}) {
+    const { coordinatesForPosition } = this.props
+    const { row, col } = coordinatesForPosition({ width, height })
+    if (row < 3 || col < 3) {
+      uiStore.sectionCreationError()
+    } else {
+      uiStore.sectionCreationError(false)
+    }
+    this.sectionCreationArea = {
+      top,
+      left,
+      width,
+      height,
+    }
+  }
+
+  calculateOpenSpot = takenSpots => {
+    const { collection, uiStore } = this.props
+    const { row, col } = this.hoveringRowCol
+
+    if (!row && !col) return null
+
+    // NOTE: Collection::cardMatrix only returns cards until the collection cards max row
+    const openSpotMatrix = calculateOpenSpotMatrix({
+      collection,
+      takenSpots,
+      maxVisibleRow: uiStore.visibleRows && Math.floor(uiStore.visibleRows.max),
+    })
+
+    const closestOpenSpot = findClosestOpenSpot(
+      {
+        row,
+        col,
+        width: 1,
+        height: 1,
+      },
+      openSpotMatrix,
+      collection.num_columns
+    )
+
+    return closestOpenSpot
+  }
+
+  get droppingFiles() {
+    const { uiStore } = this.props
+    const { droppingFilesCount } = uiStore
+    return droppingFilesCount > 0
+  }
+
+  get hasSelectedArea() {
+    const { minX, maxX } = this.props.uiStore.selectedArea
+    return minX && maxX && maxX > minX
   }
 
   @action
@@ -734,39 +864,7 @@ class FoamcoreInteractionLayer extends React.Component {
     return blankCards
   }
 
-  calculateOpenSpot = takenSpots => {
-    const { collection, uiStore } = this.props
-    const { row, col } = this.hoveringRowCol
-
-    if (!row && !col) return null
-
-    // NOTE: Collection::cardMatrix only returns cards until the collection cards max row
-    const openSpotMatrix = calculateOpenSpotMatrix({
-      collection,
-      takenSpots,
-      maxVisibleRow: uiStore.visibleRows && Math.floor(uiStore.visibleRows.max),
-    })
-
-    const closestOpenSpot = findClosestOpenSpot(
-      {
-        row,
-        col,
-        width: 1,
-        height: 1,
-      },
-      openSpotMatrix,
-      collection.num_columns
-    )
-
-    return closestOpenSpot
-  }
-
-  get droppingFiles() {
-    const { uiStore } = this.props
-    const { droppingFilesCount } = uiStore
-    return droppingFilesCount > 0
-  }
-
+  // TODO rename this something more descriptive of what it's doing
   get renderInnerDragLayer() {
     const { dragging, resizing } = this.props
 
@@ -842,9 +940,9 @@ class FoamcoreInteractionLayer extends React.Component {
     return <div>{hotEdges}</div>
   }
 
-  get hasSelectedArea() {
-    const { minX, maxX } = this.props.uiStore.selectedArea
-    return minX && maxX && maxX > minX
+  get renderSectionCreationSquare() {
+    const { top, left, width, height } = this.sectionCreationArea
+    return <SectionSquare top={top} left={left} width={width} height={height} />
   }
 
   get renderBct() {
@@ -887,6 +985,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   render() {
     const { resizing, uiStore } = this.props
+    const { sectionCreation } = uiStore
 
     if (resizing) {
       return this.renderInnerDragLayer
@@ -897,6 +996,9 @@ class FoamcoreInteractionLayer extends React.Component {
         id={FOAMCORE_INTERACTION_LAYER}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
+        sectionCreation={sectionCreation}
+        onMouseDown={this.handleMouseDownSelection}
+        onMouseUp={this.handleMouseUpSelection}
         onMouseMove={this.onCursorMove('mouse')}
         onTouchStart={this.handleTouchStart}
         onTouchMove={this.handleTouchMove}
@@ -929,9 +1031,10 @@ class FoamcoreInteractionLayer extends React.Component {
         }}
         droppingFiles={this.droppingFiles}
       >
-        {this.renderInnerDragLayer}
-        {this.renderHotEdges}
-        {this.renderBct}
+        {!sectionCreation && this.renderInnerDragLayer}
+        {!sectionCreation && this.renderHotEdges}
+        {!sectionCreation && this.renderBct}
+        {sectionCreation && this.renderSectionCreationSquare}
         {this.renderLoading}
         {this.renderReplacing}
         {this.renderRightBlankActions}
