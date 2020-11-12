@@ -261,7 +261,13 @@ class HotCell extends React.Component {
       HOT_CELL_DEFAULT_COLLECTION_TYPE
     )
     if (collectionType) {
-      return this.collectionTypes.find(type => type.name === collectionType)
+      const chosenType = this.collectionTypes.find(
+        type => type.name === collectionType
+      )
+      if (chosenType) {
+        // e.g. might be "section" which is not available in 4WFC, so it is not found
+        return chosenType
+      }
     }
     return this.collectionTypes[0]
   }

@@ -25,6 +25,9 @@ export const FOAMCORE_GRID_BOUNDARY = 'foamcoreGridBoundary'
 export const FOAMCORE_INTERACTION_LAYER = 'foamcoreInteractionLayer'
 export const FOAMCORE_CLICK_LAYER = 'foamcoreClickLayer'
 
+export const MAX_CARD_W = 4
+export const MAX_CARD_H = 2
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',

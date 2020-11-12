@@ -6,7 +6,11 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+import v, {
+  MAX_CARD_W,
+  MAX_CARD_H,
+  FOAMCORE_GRID_BOUNDARY,
+} from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -18,6 +22,7 @@ import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspo
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
+import SectionCard from '~/ui/grid/SectionCard'
 
 const GridCardPreload = styled.div`
   height: 100%;
@@ -268,7 +273,7 @@ class MovableGridCard extends React.Component {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { isBoardCollection, zoomLevel } = this.props
+    const { card, parent, isBoardCollection, zoomLevel } = this.props
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
@@ -277,21 +282,22 @@ class MovableGridCard extends React.Component {
     const gridSettings = isBoardCollection
       ? v.defaultGridSettings
       : uiStore.gridSettings
-    const { cols } = gridSettings
+    const { num_columns } = parent
     const gridW = gridSettings.gridW / zoomLevel
     const gridH = gridSettings.gridH / zoomLevel
-    const { card } = this.props
     const pad = 0.75
     const newSize = {
       // pad by some so that as you resize it doesn't immediately jump sizes
       width: card.width + Math.floor(delta.width / gridW + pad),
       height: card.height + Math.floor(delta.height / gridH + pad),
     }
-    // TODO: allow sections to be as big as you want?
-    // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
-    newSize.width = Math.max(Math.min(newSize.width, cols), 1)
-    // always max out height at 2
-    newSize.height = Math.max(Math.min(newSize.height, 2), 1)
+    // sections can stretch to 16x16 (or taller?)
+    const maxWidth = card.isSection ? num_columns : MAX_CARD_W
+    const maxHeight = card.isSection ? num_columns : MAX_CARD_H
+    // for normal cards, max out width at 4
+    newSize.width = Math.max(Math.min(newSize.width, maxWidth), 1)
+    // for normal cards, max out height at 2
+    newSize.height = Math.max(Math.min(newSize.height, maxHeight), 1)
     this.props.onResize(this.props.card.id, newSize)
     pageBoundsScroller.setScrolling(false)
     this.setState({
@@ -713,6 +719,19 @@ class MovableGridCard extends React.Component {
       },
     }
 
+    let renderedCard = (
+      <GridCard
+        {...cardProps}
+        draggingMultiple={draggingMultiple}
+        hoveringOver={hoveringOverRight}
+        zoomLevel={zoomLevel}
+      />
+    )
+
+    if (card.isSection) {
+      renderedCard = <SectionCard card={card} />
+    }
+
     return (
       <StyledCardWrapper
         className={touchDeviceClass}
@@ -742,14 +761,7 @@ class MovableGridCard extends React.Component {
           >
             {/* During preload we just render a gray square to simplify initial render */}
             {preloading && <GridCardPreload />}
-            {!preloading && (
-              <GridCard
-                {...cardProps}
-                draggingMultiple={draggingMultiple}
-                hoveringOver={hoveringOverRight}
-                zoomLevel={zoomLevel}
-              />
-            )}
+            {!preloading && renderedCard}
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>

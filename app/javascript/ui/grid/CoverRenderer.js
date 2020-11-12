@@ -47,14 +47,6 @@ class CoverRenderer extends React.Component {
       viewingCollection &&
       !viewingCollection.isFourWideBoard
 
-    if (card.isSection) {
-      // TODO: fill this in...
-      return (
-        <div
-          style={{ height: '100%', padding: '20px', border: '1px solid black' }}
-        />
-      )
-    }
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
