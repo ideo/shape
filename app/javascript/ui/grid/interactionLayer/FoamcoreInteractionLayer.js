@@ -432,7 +432,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
-    if (blankType === 'hotcell' && !hotEdge) {
+    if (blankType === 'hotcell') {
       await uiStore.closeBlankContentTool()
     }
 

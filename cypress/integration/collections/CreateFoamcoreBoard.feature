@@ -14,20 +14,27 @@ Feature: Creating a FoamcoreBoard Collection
     And I create a textItem card at 1,1 on the board with "Hello."
     # hotspot in between two cards
     When I click the "FoamcoreHotEdge-0:1"
+    And I wait for "@apiCreateCollectionCardBct" to finish
     And I wait for "@apiGetCollectionCard" to finish
-
     # should move the card out of the way
     Then I should see the text "To my board." in the card at 0,2
-    # closing it should move back
-    When I wait for 1 second
+
     # click any quadrant
+    When I wait for 1 second
     And I click the "HotCellQuadrant-foamcoreBoard"
+    And I wait for "@apiDeleteCollectionCard" to finish
+    And I wait for "@apiCreateCollectionCardBct" to finish
+    And I wait for "@apiGetCollectionCard" to finish
+    And I wait for 1 second
+    # closing it should move back
     And I click the "BCT-closeButton"
     And I wait for "@apiDeleteCollectionCard" to finish
     Then I should see the text "To my board." in the card at 0,1
 
     # There should be a hotspot to the left of the 0,0 card
+    When I wait for 1 second
     And I create a text item card "Inserted!" using the first hot edge
+    And I wait for "@apiDeleteCollectionCard" to finish
     # should move both row 0 cards out of the way
     Then I should see the text "Inserted!" in the card at 0,0
     Then I should see the text "Welcome!" in the card at 0,1
