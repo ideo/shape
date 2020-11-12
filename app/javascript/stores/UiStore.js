@@ -1850,7 +1850,13 @@ export default class UiStore {
     return gridWidth
   }
 
-  positionForCoordinates({ col, row, width = 1, height = 1 }) {
+  positionForCoordinates({
+    col,
+    row,
+    width = 1,
+    height = 1,
+    isSection = false,
+  }) {
     const { gridW, gridH, gutter } = v.defaultGridSettings
     const { relativeZoomLevel } = this
     const pos = {
@@ -1859,6 +1865,17 @@ export default class UiStore {
       w: width * (gridW + gutter) - gutter,
       h: height * (gridH + gutter) - gutter,
     }
+
+    if (isSection) {
+      // sections are positioned in (x,y) by half a card, and adjusted to be smaller by a full card amount
+      _.assign(pos, {
+        x: (col * (gridW + gutter) + gridW / 2) / relativeZoomLevel,
+        y: (row * (gridH + gutter) + gridH / 2) / relativeZoomLevel,
+        w: (width - 1) * (gridW + gutter) - gutter,
+        h: (height - 1) * (gridH + gutter) - gutter,
+      })
+    }
+
     // TODO: why sometimes NaN? zoomLevel divide by 0??
     if (_.isNaN(pos.x)) {
       pos.x = 0
