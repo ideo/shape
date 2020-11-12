@@ -449,7 +449,6 @@ class PopoutMenu extends React.Component {
       component,
       iconLeft,
       iconRight,
-      onClick,
       loading,
       withAvatar,
       bgColor,
@@ -460,23 +459,33 @@ class PopoutMenu extends React.Component {
       subItems,
       noHover,
     } = item
-    let { padding } = item
+    let { padding, onClick } = item
+    const key = `${name}-${id || i}`
     if (component) {
       return (
-        <StyledMenuItem noHover width={width - 25} padding="0 0 0 16px">
+        <StyledMenuItem
+          key={key}
+          noHover
+          width={width - 25}
+          padding="0 0 0 16px"
+        >
           {component}
         </StyledMenuItem>
       )
+    }
+
+    if (!onClick) {
+      onClick = null
     }
 
     let className = `menu-${_.kebabCase(name)}`
     const rightIconClassName = 'icon-right'
     if (withAvatar) className += ' with-avatar'
     if (subItems) padding = '16px 0 16px 16px'
-    // padding: '18px 0 18px 16px',
+
     return (
       <StyledMenuItem
-        key={`${name}-${id || i}`}
+        key={key}
         borderColor={borderColor}
         noBorder={noBorder}
         noHover={noHover || !onClick}
@@ -506,7 +515,7 @@ class PopoutMenu extends React.Component {
               }}
             >
               <StyledMenu width={width}>
-                {subItems.map(subItem => this.renderMenuItem(subItem))}
+                {subItems.map((subItem, i) => this.renderMenuItem(subItem, i))}
               </StyledMenu>
             </StyledMenuWrapper>
           </Fragment>
