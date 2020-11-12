@@ -743,7 +743,9 @@ class FoamcoreGrid extends React.Component {
         if (!this.hoveringOverCollection) {
           return
         }
-        this.hoveringOver.holdingOver = true
+        runInAction(() => {
+          this.hoveringOver.holdingOver = true
+        })
         this.setHoveringOver(this.hoveringOver)
       }, v.cardHoldTime)
       this.dragTimeoutId = dragTimeoutId

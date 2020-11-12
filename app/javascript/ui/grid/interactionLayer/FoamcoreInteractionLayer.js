@@ -427,10 +427,13 @@ class FoamcoreInteractionLayer extends React.Component {
       runInAction(() => (this.creatingHotEdge = true))
     }
 
+    const { blankContentToolState } = uiStore
+    const { blankType } = blankContentToolState
+
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
-    if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotEdge) {
-      uiStore.closeBlankContentTool()
+    if (blankType === 'hotcell' && !hotEdge) {
+      await uiStore.closeBlankContentTool()
     }
 
     uiStore.openBlankContentTool({
@@ -448,7 +451,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
-    if (contentType === 'text') {
+    if (!hotEdge && contentType === 'text') {
       // don't create placeholders when creating a text card
       return
     }
