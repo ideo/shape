@@ -56,7 +56,7 @@ const bounceAnim = props => css`
 `
 
 const InnerCardWrapper = styled.div.attrs(
-  ({ width, height, transition, transform, zoomLevel, animatedBounce }) => ({
+  ({ width, height, transition, transform, animatedBounce }) => ({
     style: {
       transition,
       transform,
@@ -736,6 +736,14 @@ class MovableGridCard extends React.Component {
       //   topLeft: resizeHandleComponent,
       //   topRight: resizeHandleComponent,
       // })
+      rndProps.dragHandleClassName = '.sectionInner'
+      if (
+        uiStore.hoveringOverSection &&
+        uiStore.hoveringOverSection === card.id
+      ) {
+        // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
+        _zIndex = -1
+      }
       renderedCard = <SectionCard card={card} />
     }
 

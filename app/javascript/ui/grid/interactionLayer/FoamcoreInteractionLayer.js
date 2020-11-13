@@ -18,9 +18,12 @@ import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
+  position: relative;
   height: 100%;
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
+  /* z-index < MovableGridCard default */
+  z-index: 0;
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -355,8 +358,11 @@ class FoamcoreInteractionLayer extends React.Component {
     this.onCursorMove('mouse')(e)
   }
 
+  @action
   onCursorMove = type => ev => {
     const { hasSelectedArea } = this
+    const { coordinatesForPosition, uiStore } = this.props
+
     if (hasSelectedArea || !ev || !ev.target) {
       // ignore these interactions when you're already dragging a selection square or don't have a target
       return
@@ -375,7 +381,6 @@ class FoamcoreInteractionLayer extends React.Component {
     }
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
-    const { coordinatesForPosition, uiStore } = this.props
 
     const rect = uiStore.foamcoreBoundingRectangle
     let { clientX, clientY, target } = ev
@@ -409,10 +414,13 @@ class FoamcoreInteractionLayer extends React.Component {
     // ev.stopPropagation()
     const { blankContentToolState } = uiStore
     // If there's a card already there don't render a positioned blank card
-    const cardOrBctOpenAtThisSpot =
-      (cardMatrix[row] && cardMatrix[row][col]) ||
-      (blankContentToolState.row === row && blankContentToolState.col === col)
-    if (cardOrBctOpenAtThisSpot) {
+    const cardAtThisSpot = cardMatrix[row] && cardMatrix[row][col]
+    const bctAtThisSpot =
+      blankContentToolState.row === row && blankContentToolState.col === col
+    if (cardAtThisSpot || bctAtThisSpot) {
+      if (cardAtThisSpot && cardAtThisSpot.isSection) {
+        uiStore.update('hoveringOverSection', null)
+      }
       this.resetHoveringRowCol()
     } else {
       this.repositionBlankCard({ row, col })
@@ -808,6 +816,7 @@ class FoamcoreInteractionLayer extends React.Component {
         const twoCardsTogether =
           col > 0 &&
           !cardMatrix[row][col].isPinnedAndLocked &&
+          !cardMatrix[row][col].isSection &&
           cardMatrix[row][col - 1] &&
           cardMatrix[row][col - 1] !== cardMatrix[row][col]
         if (col === 0 || twoCardsTogether) {

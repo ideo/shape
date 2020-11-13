@@ -147,6 +147,59 @@ export const hideOnHoverCss = css`
   }
 `
 
+const SECTION_THICKNESS = 100
+const SECTION_BORDER = '4px solid black'
+
+export const SectionCardWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  .sectionInner {
+    position: absolute;
+    cursor: grab;
+    ${props =>
+      props.selected &&
+      `
+    &:before {
+      ${highlightedCardCss}
+    }
+    `};
+    /* for debugging: */
+    /* background-color: rgba(130, 125, 185, 0.1); */
+  }
+`
+export const SectionTop = styled.div`
+  border-top: ${SECTION_BORDER};
+  width: 100%;
+  height: ${SECTION_THICKNESS}px;
+  top: 0;
+  left: 0;
+`
+export const SectionBottom = styled.div`
+  border-bottom: ${SECTION_BORDER};
+  width: 100%;
+  height: ${SECTION_THICKNESS}px;
+  bottom: 0;
+  left: 0;
+`
+export const SectionLeft = styled.div`
+  border-left: ${SECTION_BORDER};
+  height: 100%;
+  width: ${SECTION_THICKNESS}px;
+  top: 0;
+  left: 0;
+`
+export const SectionRight = styled.div`
+  border-right: ${SECTION_BORDER};
+  height: 100%;
+  width: ${SECTION_THICKNESS}px;
+  top: 0;
+  right: 0;
+`
+
 const mdlPillPlaceholderCss = css`
   position: fixed !important;
 

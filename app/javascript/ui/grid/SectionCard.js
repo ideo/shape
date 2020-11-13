@@ -1,30 +1,57 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import _ from 'lodash'
+import { computed } from 'mobx'
+import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 
-// import v from '~/utils/variables'
+import {
+  SectionCardWrapper,
+  SectionTop,
+  SectionLeft,
+  SectionBottom,
+  SectionRight,
+} from '~/ui/grid/shared'
+import { uiStore } from '~/stores'
 
-// const { gridH, gridW } = v.defaultGridSettings
-
-// const SectionCardOuter = styled.div`
-//   position: relative;
-//   top: ${props => props.marginTop}px;
-//   left: ${props => props.marginLeft}px;
-//   height: calc(100% - ${gridH}px);
-//   width: calc(100% - ${gridW}px);
-// `
-
-const SectionCardInner = styled.div`
-  height: 100%;
-  width: 100%;
-  outline: 4px solid black;
-`
-
+@observer
 class SectionCard extends React.Component {
+  setCardRef(ref) {
+    if (!ref) return
+    const { card } = this.props
+    uiStore.setCardPosition(card.id, ref.getBoundingClientRect())
+  }
+
+  @computed
+  get isSelected() {
+    const { card } = this.props
+    const selected = uiStore.isSelected(card.id)
+    return selected
+  }
+
+  onMouseMove = ev => {
+    // if we're hovering over the middle area of the wrapper
+    // mark hoveringOverSection so we can bump the zIndex down in MovableGridCard
+    // NOTE: this probably won't work on touch devices?
+    if (_.includes(ev.target.classList, 'sectionCardWrapper')) {
+      uiStore.update('hoveringOverSection', this.props.card.id)
+    } else {
+      uiStore.update('hoveringOverSection', null)
+    }
+  }
+
   render() {
-    // const { card } = this.props
-    // const marginTop = gridH / 2
-    // const marginLeft = gridW / 2
-    return <SectionCardInner />
+    return (
+      <SectionCardWrapper
+        selected={this.isSelected}
+        className="sectionCardWrapper"
+        onMouseMove={this.onMouseMove}
+        // needed for dragging selection square
+        ref={r => this.setCardRef(r)}
+      >
+        <SectionTop className="sectionInner" />
+        <SectionLeft className="sectionInner" />
+        <SectionBottom className="sectionInner" />
+        <SectionRight className="sectionInner" />
+      </SectionCardWrapper>
+    )
   }
 }
 

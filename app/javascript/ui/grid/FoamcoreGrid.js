@@ -269,7 +269,9 @@ class FoamcoreGrid extends React.Component {
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     const visRows = _.get(uiStore, 'visibleRows.num', 1)
-    let maxRows = collection.max_row_index + 1
+    let maxRows = (
+      _.maxBy(collection.collection_cards, 'maxRow') || { maxRow: 1 }
+    ).maxRow
     if (collection.isSplitLevelBottom) {
       maxRows += 1
     } else if (!collection.isSplitLevel) {
@@ -351,7 +353,12 @@ class FoamcoreGrid extends React.Component {
     const { row, col, height, width } = card
     let h = 1
     let w = 1
-    const { cardMatrix } = collection
+
+    // the actual CollectionCard is tucked into the card object
+    const { isSection } = card.card
+    const cardMatrix = isSection
+      ? collection.cardMatrixForDraggingSections
+      : collection.cardMatrix
 
     while (h <= height) {
       while (w <= width) {
@@ -914,10 +921,13 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  findFilledSpot({ col, row }, cardId = null) {
+  findFilledSpot({ col, row, isSection }, cardId = null) {
     if (!_.isNumber(col) || _.isNaN(col)) return null
     const { collection, uiStore } = this.props
-    const filledRow = collection.cardMatrix[row]
+    const cardMatrix = isSection
+      ? collection.cardMatrixForDraggingSections
+      : collection.cardMatrix
+    const filledRow = cardMatrix[row]
     const foundCard = filledRow ? filledRow[col] : null
     if (foundCard) {
       if (
@@ -945,7 +955,10 @@ class FoamcoreGrid extends React.Component {
     while (tempCol < col + max) {
       tempRow = row
       while (tempRow < row + height) {
-        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow, isSection },
+          id
+        )
         if (filled) {
           return tempCol - col
         }
@@ -970,7 +983,10 @@ class FoamcoreGrid extends React.Component {
     while (tempRow < row + max) {
       tempCol = col
       while (tempCol < col + width) {
-        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow, isSection },
+          id
+        )
         if (filled) {
           return tempRow - row
         }
