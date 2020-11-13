@@ -39,6 +39,7 @@ import captureGlobalKeypress, {
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
 const AppWrapper = styled.div`
+  ${props => `cursor: url(${props.cursorImageUrl}), auto;`}
   /* used by terms of use modal to blur the whole site */
   ${props =>
     props.blur &&
@@ -286,11 +287,22 @@ class Routes extends React.Component {
       (!termsAccepted || termsAccepted === 'outdated') &&
       !routingStore.pathContains('/terms')
 
+    const drawingCursorUrl =
+      'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/section%20creation%20cursor.svg?alt=media&token=ad217257-491c-405e-88a5-69f0ad9c4290'
+    const errorCursorUrl =
+      'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/section%20error%20cursor.svg?alt=media&token=ceaa7b73-3059-4ebb-b27e-00d3a516d03a'
+    let cursorImageUrl
+    console.log('sectionCreation state: ', uiStore.sectionCreation)
+    if (uiStore.sectionCreation === 'error') cursorImageUrl = errorCursorUrl
+    if (uiStore.sectionCreation === 'drawing') cursorImageUrl = drawingCursorUrl
+    console.log('in Routes.js, cursorImageUrl: ', cursorImageUrl)
+
     return (
       <AppWrapper
         onMouseDown={this.handleMouseDownSelection}
         onMouseUp={this.handleMouseUpSelection}
         onMouseMove={this.handleMouseMoveSelection}
+        cursorImageUrl={cursorImageUrl}
         blur={displayTermsPopup}
         id="AppWrapper"
       >

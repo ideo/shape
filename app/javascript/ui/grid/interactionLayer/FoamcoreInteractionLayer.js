@@ -23,12 +23,6 @@ const DragLayerWrapper = styled.div`
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
 
-  ${props =>
-    props.sectionCreation &&
-    `
-    cursor: copy;
-  `}
-
   /* Override Filestack styling */
   .fsp-drop-pane__container {
     height: 100%;
@@ -436,8 +430,14 @@ class FoamcoreInteractionLayer extends React.Component {
       // ignore these interactions when you're already dragging a selection square or don't have a target
       return
     }
+    console.log(
+      'oncursormove: ',
+      uiStore.sectionCreation,
+      uiStore.isCreatingSection,
+      this.sectionCreationArea.left
+    )
 
-    if (uiStore.sectionCreation && this.sectionCreationArea.left) {
+    if (uiStore.isCreatingSection && this.sectionCreationArea.left) {
       const { left, top } = this.transformToGridCoordinates(ev)
       this.throttledSetSectionCreationArea({
         left: _.min([left, this.sectionCreationArea.left]),
@@ -627,12 +627,13 @@ class FoamcoreInteractionLayer extends React.Component {
 
   @action
   setSectionCreationArea({ top, left, width, height } = {}) {
-    const { coordinatesForPosition } = this.props
-    const { row, col } = coordinatesForPosition({ width, height })
+    const { coordinatesForPosition, uiStore } = this.props
+    const { row, col } = coordinatesForPosition({ x: width, y: height })
+    console.log('setSectionCreationArea', row, col)
     if (row < 3 || col < 3) {
-      uiStore.sectionCreationError()
+      uiStore.setSectionCreation('error')
     } else {
-      uiStore.sectionCreationError(false)
+      uiStore.setSectionCreation('drawing')
     }
     this.sectionCreationArea = {
       top,
@@ -985,7 +986,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   render() {
     const { resizing, uiStore } = this.props
-    const { sectionCreation } = uiStore
+    const { isCreatingSection } = uiStore
 
     if (resizing) {
       return this.renderInnerDragLayer
@@ -996,7 +997,6 @@ class FoamcoreInteractionLayer extends React.Component {
         id={FOAMCORE_INTERACTION_LAYER}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
-        sectionCreation={sectionCreation}
         onMouseDown={this.handleMouseDownSelection}
         onMouseUp={this.handleMouseUpSelection}
         onMouseMove={this.onCursorMove('mouse')}
@@ -1031,10 +1031,10 @@ class FoamcoreInteractionLayer extends React.Component {
         }}
         droppingFiles={this.droppingFiles}
       >
-        {!sectionCreation && this.renderInnerDragLayer}
-        {!sectionCreation && this.renderHotEdges}
-        {!sectionCreation && this.renderBct}
-        {sectionCreation && this.renderSectionCreationSquare}
+        {!isCreatingSection && this.renderInnerDragLayer}
+        {!isCreatingSection && this.renderHotEdges}
+        {!isCreatingSection && this.renderBct}
+        {isCreatingSection && this.renderSectionCreationSquare}
         {this.renderLoading}
         {this.renderReplacing}
         {this.renderRightBlankActions}

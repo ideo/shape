@@ -149,6 +149,7 @@ const captureGlobalKeypress = e => {
       if (uiStore.movingCardIds.length && !uiStore.dragging) {
         uiStore.closeMoveMenu()
       }
+      uiStore.setSectionCreation('default')
       // save on esc happens only when user clicks the title textarea
       const { editingCardCover } = uiStore
       if (editingCardCover) {

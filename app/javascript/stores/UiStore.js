@@ -294,7 +294,8 @@ export default class UiStore {
   @observable
   touchActionMenuOpenId = null
   @observable
-  sectionCreation = false
+  sectionCreation = 'default'
+  // default, drawing, drawingError
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1801,12 +1802,25 @@ export default class UiStore {
 
   @action
   enterSectionCreationState() {
-    this.sectionCreation = true
+    this.sectionCreation = 'drawing'
   }
 
   @action
   exitSectionCreationState() {
-    this.sectionCreation = false
+    this.sectionCreation = 'default'
+  }
+
+  // possible states: default, drawing, error
+  @action
+  setSectionCreation(value) {
+    this.sectionCreation = value
+  }
+
+  @computed
+  get isCreatingSection() {
+    return (
+      this.sectionCreation === 'drawing' || this.sectionCreation === 'error'
+    )
   }
 
   @action

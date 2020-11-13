@@ -9,8 +9,7 @@ const SelectedAreaSquare = styled.div.attrs(({ coords }) => ({
     width: `${coords.width}px`,
   },
 }))`
-  background-color: blue;
-  border: 3px solid black;
+  border: 4px solid black;
   display: block;
   position: absolute;
   z-index: ${v.zIndex.clickWrapper};
