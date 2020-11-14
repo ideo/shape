@@ -991,6 +991,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await apiStore.fetch('collection_cards', cardId, true)
     // make sure it's in our current collection
     const card = res.data
+    if (card.destroyed) {
+      // don't add the card since it was destroyed while being fetched
+      return
+    }
     this.addCard(card)
     return card
   }

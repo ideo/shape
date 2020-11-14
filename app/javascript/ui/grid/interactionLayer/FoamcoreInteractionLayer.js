@@ -428,13 +428,9 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     const { blankContentToolState } = uiStore
-    const { blankType } = blankContentToolState
+    const { placeholderCard } = blankContentToolState
 
-    // BCT is already open as a hotcell, just modify it. But don't do this
-    // if you're opening a new hotcell.
-    if (blankType === 'hotcell') {
-      await uiStore.closeBlankContentTool()
-    }
+    const creatingContentAfterHotEdge = !hotEdge && !!placeholderCard
 
     uiStore.openBlankContentTool({
       row,
@@ -451,10 +447,12 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
-    if (!hotEdge && contentType === 'text') {
-      // don't create placeholders when creating a text card
+
+    if (creatingContentAfterHotEdge || contentType === 'text') {
+      // don't create a placeholder since we already have it or if creating a text card
       return
     }
+
     const placeholder = new CollectionCard(
       {
         row,
@@ -463,12 +461,15 @@ class FoamcoreInteractionLayer extends React.Component {
       },
       apiStore
     )
-    await placeholder.API_createBct()
     uiStore.setBctPlaceholderCard(placeholder)
-    // add placeholder to datx store to trigger warning before unload
-    collection.addCard(placeholder)
+    await placeholder.API_createBct()
     if (this.creatingHotEdge) {
       runInAction(() => (this.creatingHotEdge = false))
+    }
+    if (!uiStore.blankContentToolIsOpen) {
+      // NOTE: the bct was closed during placeholder.API_createBct
+      placeholder.API_destroy()
+      return
     }
   }
 

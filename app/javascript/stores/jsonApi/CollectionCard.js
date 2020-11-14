@@ -380,6 +380,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
       return
     }
     try {
+      this.destroyed = true
       this.destroy()
       this.parentCollection.removeCard(this)
       return

@@ -882,16 +882,35 @@ export default class UiStore {
   // --- BCT + GridCard properties
   @action
   async openBlankContentTool(options = {}) {
-    const { viewingCollection } = this
-    if (this.blankContentToolState.placeholderCard) {
+    const { viewingCollection, blankContentToolState } = this
+    const { placeholderCard } = blankContentToolState
+    if (
+      placeholderCard &&
+      (placeholderCard.col !== options.col ||
+        placeholderCard.row !== options.row)
+    ) {
+      // if we have a placeholder and we're trying to open from the a different spot, close it
       await this.closeBlankContentTool()
     }
     runInAction(() => {
       this.deselectCards()
       this.closeCardMenu()
       this.clearTextEditingCard()
+      const { placeholderCard, blankType } = this.blankContentToolState
+      const openingBctFromHotEdge =
+        placeholderCard &&
+        blankType === 'hotcell' &&
+        options &&
+        options.blankType !== 'hotcell'
+      const bctState = openingBctFromHotEdge
+        ? {
+            ...this.defaultBCTState,
+            placeholderCard,
+          }
+        : this.defaultBCTState
+
       this.blankContentToolState = {
-        ...this.defaultBCTState,
+        ...bctState,
         order: 0,
         width: 1,
         height: 1,
