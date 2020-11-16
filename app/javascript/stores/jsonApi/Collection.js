@@ -276,7 +276,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // keeping in mind a card's area needs to contribute to width/height
     ({
       minRow: _.min(cards.map(card => card.row)),
-      maxRow: _.max(cards.map(card => card.maxRow)),
+      maxRow: _.max(cards.map(card => card.maxRowWithSections)),
       minCol: _.min(cards.map(card => card.col)),
       maxCol: _.max(cards.map(card => card.maxCol)),
     })

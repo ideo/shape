@@ -78,7 +78,7 @@ class GridCard extends React.Component {
   @computed
   get isSelected() {
     const { card } = this.props
-    return uiStore.selectedCardIds.findIndex(id => id === card.id) > -1
+    return card.isSelected
   }
 
   get actionsColor() {

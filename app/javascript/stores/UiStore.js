@@ -312,18 +312,19 @@ export default class UiStore {
   startDragging(cardId) {
     this.dragging = true
     this.draggingFromMDL = false
-    if (
-      this.selectedCardIds.length > 0 &&
-      this.selectedCardIds.indexOf(cardId.toString()) > -1
-    ) {
-      this.multiMoveCardIds = [...this.selectedCardIds]
-    } else if (_.includes(cardId, '-mdlPlaceholder')) {
+    if (_.includes(cardId, '-mdlPlaceholder')) {
       this.draggingFromMDL = true
       this.multiMoveCardIds = [...this.movingCardIds]
     } else {
-      // just select the one dragging card
-      this.reselectCardIds([cardId])
-      this.multiMoveCardIds = [cardId]
+      if (
+        this.selectedCardIds.length === 0 ||
+        this.selectedCardIds.indexOf(cardId.toString()) === -1
+      ) {
+        // if the dragging card is not already selected, select it.
+        // this will also pick up any cards inside the selected section
+        this.reselectCardIds([cardId])
+      }
+      this.multiMoveCardIds = [...this.selectedCardIds]
     }
     this.dragCardMaster = cardId
   }
@@ -1087,23 +1088,26 @@ export default class UiStore {
   reselectCardIds(cardIds = []) {
     let newSelected = cardIds
 
-    // TODO: select all cards in section? this sort of works...
+    // select all cards inside of any selected sections
     const { viewingCollection } = this
     if (viewingCollection) {
+      // look up section cards in the collection, filtering ones that are selected
       const selectedSections = viewingCollection.collection_cards.filter(
-        cc => cc.isSection && this.isSelected(cc.id)
+        cc => cc.isSection && _.includes(cardIds, cc.id)
       )
       _.each(selectedSections, section => {
         // combine newSelected with cards in the section
         newSelected = _.reverse(
-          _.uniq(_.concat(newSelected, this.selectCardsInSection(section.id)))
+          _.uniq(_.concat(newSelected, this.cardIdsInSection(section.id)))
         )
       })
     }
-    // ---------
+
+    if (_.isEqual([...this.selectedCardIds], newSelected)) {
+      return
+    }
 
     this.selectedCardIds.replace(newSelected)
-
     this.broadcastCardSelection([...newSelected])
   }
 
@@ -1297,34 +1301,17 @@ export default class UiStore {
     if (_.isEmpty(_.difference(newSelected, selected))) {
       newSelected = _.difference(selected, cardIdsBetween)
     }
-
-    return this.reselectCardIds([newSelected])
+    return this.reselectCardIds(newSelected)
   }
 
   @action
-  selectCardsInSection(cardId) {
-    // const selected = [...this.selectedCardIds]
-
+  cardIdsInSection(cardId) {
     // Get cardIds that are between this card and the last selected card
     return this.viewingCollection.cardIdsBetween(
       // get everything between the corners of the section
       cardId,
       cardId
     )
-
-    // // Get unique cardIds selected
-    // // Make sure the current card is put at the end w/ reverse
-    // const newSelected = _.reverse(
-    //   _.uniq(_.concat([cardId], selected, cardIdsBetween))
-    // )
-    //
-    // // if there is no difference in selection
-    // if (_.isEmpty(_.difference(newSelected, selected))) {
-    //   return []
-    // }
-    //
-    // // this gets called inside reselectCardIds, so we just return the cardIds
-    // return newSelected
   }
 
   isSelected(cardId) {

@@ -142,6 +142,22 @@ describe('UiStore', () => {
       expect(uiStore.selectedCardIds).toEqual([cardId])
     })
 
+    describe('with a section card', () => {
+      const collection = {
+        ...fakeCollection,
+        collection_cards: [{ id: '99', isSection: true }],
+        cardIdsBetween: jest.fn(),
+      }
+      beforeEach(() => {
+        uiStore.setViewingRecord(collection)
+      })
+
+      it('should call cardIdsBetween to select cards in the section', () => {
+        uiStore.reselectCardIds(['99'])
+        expect(collection.cardIdsBetween).toHaveBeenCalledWith('99', '99')
+      })
+    })
+
     describe('with cardId part of a larger selection', () => {
       const selectedCardIds = [cardId, '1', '2', '3']
       beforeEach(() => {

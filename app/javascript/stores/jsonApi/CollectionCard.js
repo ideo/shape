@@ -82,6 +82,15 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     return this.row + this.height - 1
   }
 
+  get maxRowWithSections() {
+    const { maxRow } = this
+    if (!this.isSection || maxRow === 0) {
+      return maxRow
+    }
+    // section corner is 1 row up
+    return maxRow - 1
+  }
+
   // For cards that are positioned using row/col,
   // this is the col that they extend to
   get maxCol() {
@@ -453,7 +462,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
   }
 
   get isSelected() {
-    return this.uiStore.selectedCardIds.indexOf(this.id) > -1
+    return this.uiStore.isSelected(this.id)
   }
 
   get isMDLPlaceholder() {
