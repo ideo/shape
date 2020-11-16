@@ -95,6 +95,8 @@ module CollectionGrid
     )
       return [] if collection.collection_cards.none? && drag_positions.empty?
 
+      moving_section_card = moving_cards.count == 1 && moving_cards.first.section?
+
       # TODO: memoize?
       # omit moving cards from our matrix
       cards = collection.collection_cards.visible.where.not(id: moving_cards.pluck(:id)).order(created_at: :desc)
@@ -110,9 +112,23 @@ module CollectionGrid
       cards.each do |card|
         rows = (card.row..card_max_row(card))
         cols = (card.col..card_max_col(card))
-        rows.each do |row|
-          cols.each do |col|
-            matrix[row][col] = card
+
+        if moving_section_card && card.section?
+          rows = (card.row + 1..card_max_row(card) - 1)
+          cols = (card.col + 1..card_max_col(card) - 1)
+        end
+
+        rows.each_with_index do |row, r_idx|
+          cols.each_with_index do |col, c_idx|
+            if !moving_section_card && card.section?
+              mid_row = r_idx.positive? && r_idx < rows.count - 1
+              mid_col = c_idx.positive? && c_idx < cols.count - 1
+              if r_idx.zero? || r_idx == rows.count - 1 || (mid_row && !mid_col)
+                matrix[row][col] = card
+              end
+            else
+              matrix[row][col] = card
+            end
           end
         end
       end

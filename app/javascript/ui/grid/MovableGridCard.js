@@ -56,7 +56,7 @@ const bounceAnim = props => css`
 `
 
 const InnerCardWrapper = styled.div.attrs(
-  ({ width, height, transition, transform, zoomLevel, animatedBounce }) => ({
+  ({ width, height, transition, transform, animatedBounce }) => ({
     style: {
       transition,
       transform,
@@ -116,9 +116,11 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.finishPreloading()
     if (this.state.dragging || this.unmounted) {
       return
+    }
+    if (this.state.preloading) {
+      this.finishPreloading()
     }
     const { xPos, yPos } = this.props.position
     if (xPos === this.state.x && yPos === this.state.y) {
@@ -273,15 +275,13 @@ class MovableGridCard extends React.Component {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { card, parent, isBoardCollection, zoomLevel } = this.props
+    const { card, parent, zoomLevel } = this.props
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
       uiStore.setEditingCardCover(null)
     }
-    const gridSettings = isBoardCollection
-      ? v.defaultGridSettings
-      : uiStore.gridSettings
+    const gridSettings = v.defaultGridSettings
     const { num_columns } = parent
     const gridW = gridSettings.gridW / zoomLevel
     const gridH = gridSettings.gridH / zoomLevel
@@ -468,8 +468,7 @@ class MovableGridCard extends React.Component {
       card,
       cardType,
       record,
-      position: { xPos },
-      position: { yPos },
+      position: { xPos, yPos },
       canEditCollection,
       isUserCollection,
       isSharedCollection,
@@ -483,8 +482,7 @@ class MovableGridCard extends React.Component {
     } = this.props
 
     let {
-      position: { height },
-      position: { width },
+      position: { height, width },
     } = this.props
 
     const {
@@ -517,10 +515,7 @@ class MovableGridCard extends React.Component {
       return this.renderPagination()
     }
 
-    const gridSettings = isBoardCollection
-      ? v.defaultGridSettings
-      : uiStore.gridSettings
-    const { gridW, gridH, cols, gutter } = gridSettings
+    const { gridW, gridH, cols, gutter } = v.defaultGridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...
     // resize placeholder should determine if it's overlapping an empty spot or not
     const minWidth = (gridW * 0.8) / zoomLevel
@@ -652,6 +647,7 @@ class MovableGridCard extends React.Component {
     const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
+    const resizeHandleComponent = () => this.renderResizeIcon(menuOpen)
 
     const enableResizing =
       canEditCollection &&
@@ -701,7 +697,7 @@ class MovableGridCard extends React.Component {
       },
       extendsProps: {
         handleComponent: {
-          bottomRight: () => this.renderResizeIcon(menuOpen),
+          bottomRight: resizeHandleComponent,
         },
       },
       style: {
@@ -729,6 +725,25 @@ class MovableGridCard extends React.Component {
     )
 
     if (card.isSection) {
+      // TODO: figure out resize math and UI for handle that works for 3 new corners
+      // _.assign(rndProps.enableResizing, {
+      //   bottomLeft: enableResizing,
+      //   topLeft: enableResizing,
+      //   topRight: enableResizing,
+      // })
+      // _.assign(rndProps.extendsProps.handleComponent, {
+      //   bottomLeft: resizeHandleComponent,
+      //   topLeft: resizeHandleComponent,
+      //   topRight: resizeHandleComponent,
+      // })
+      rndProps.dragHandleClassName = '.sectionInner'
+      if (
+        uiStore.hoveringOverSection &&
+        uiStore.hoveringOverSection === card.id
+      ) {
+        // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
+        _zIndex = -1
+      }
       renderedCard = <SectionCard card={card} />
     }
 
@@ -745,8 +760,8 @@ class MovableGridCard extends React.Component {
         // for mdlPlaceholder
         maxWidth={card.maxWidth}
         maxHeight={card.maxHeight}
-        width={card.maxWidth * v.defaultGridSettings.gridW}
-        height={card.maxHeight * v.defaultGridSettings.gridH}
+        width={card.maxWidth * gridW}
+        height={card.maxHeight * gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
         // <-----
       >

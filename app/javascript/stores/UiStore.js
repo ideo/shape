@@ -269,7 +269,7 @@ export default class UiStore {
     ...this.placeholderDefaults,
   }
   @observable
-  hoveringOverDataItem = false
+  hoveringOverSection = null
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
@@ -1086,6 +1086,30 @@ export default class UiStore {
     this.broadcastCardSelection([...this.selectedCardIds])
   }
 
+  @action
+  reselectCardIds(cardIds = []) {
+    let newSelected = cardIds
+
+    // TODO: select all cards in section? this sort of works...
+    const { viewingCollection } = this
+    if (viewingCollection) {
+      const selectedSections = viewingCollection.collection_cards.filter(
+        cc => cc.isSection && this.isSelected(cc.id)
+      )
+      _.each(selectedSections, section => {
+        // combine newSelected with cards in the section
+        newSelected = _.reverse(
+          _.uniq(_.concat(newSelected, this.selectCardsInSection(section.id)))
+        )
+      })
+    }
+    // ---------
+
+    this.selectedCardIds.replace(newSelected)
+
+    this.broadcastCardSelection([...newSelected])
+  }
+
   // For certain actions we want to force a toggle on
   @action
   selectCardId(cardId) {
@@ -1093,12 +1117,6 @@ export default class UiStore {
       // always put the newly selected card at the end
       _.reject(this.selectedCardIds, i => i === cardId).concat(cardId)
     )
-  }
-
-  @action
-  reselectCardIds(cardIds) {
-    this.selectedCardIds.replace(cardIds)
-    this.broadcastCardSelection([...cardIds])
   }
 
   @action
@@ -1262,7 +1280,7 @@ export default class UiStore {
     const selected = [...this.selectedCardIds]
     const lastSelectedCardId = _.last(selected)
 
-    if (!lastSelectedCardId) return this.selectedCardIds.replace([cardId])
+    if (!lastSelectedCardId) return this.reselectCardIds([cardId])
     if (lastSelectedCardId === cardId) return this.selectedCardIds
 
     // Get cardIds that are between this card and the last selected card
@@ -1283,7 +1301,33 @@ export default class UiStore {
       newSelected = _.difference(selected, cardIdsBetween)
     }
 
-    return this.selectedCardIds.replace(newSelected)
+    return this.reselectCardIds([newSelected])
+  }
+
+  @action
+  selectCardsInSection(cardId) {
+    // const selected = [...this.selectedCardIds]
+
+    // Get cardIds that are between this card and the last selected card
+    return this.viewingCollection.cardIdsBetween(
+      // get everything between the corners of the section
+      cardId,
+      cardId
+    )
+
+    // // Get unique cardIds selected
+    // // Make sure the current card is put at the end w/ reverse
+    // const newSelected = _.reverse(
+    //   _.uniq(_.concat([cardId], selected, cardIdsBetween))
+    // )
+    //
+    // // if there is no difference in selection
+    // if (_.isEmpty(_.difference(newSelected, selected))) {
+    //   return []
+    // }
+    //
+    // // this gets called inside reselectCardIds, so we just return the cardIds
+    // return newSelected
   }
 
   isSelected(cardId) {
@@ -1876,7 +1920,13 @@ export default class UiStore {
     return gridWidth
   }
 
-  positionForCoordinates({ col, row, width = 1, height = 1 }) {
+  positionForCoordinates({
+    col,
+    row,
+    width = 1,
+    height = 1,
+    isSection = false,
+  }) {
     const { gridW, gridH, gutter } = v.defaultGridSettings
     const { relativeZoomLevel } = this
     const pos = {
@@ -1885,6 +1935,18 @@ export default class UiStore {
       w: width * (gridW + gutter) - gutter,
       h: height * (gridH + gutter) - gutter,
     }
+
+    if (isSection) {
+      // sections are positioned in (x,y) by half a card, and adjusted to be smaller by a full card amount
+      // TODO: sections should actually overlap the gutter so this should adjust slightly
+      _.assign(pos, {
+        x: (col * (gridW + gutter) + gridW / 2) / relativeZoomLevel,
+        y: (row * (gridH + gutter) + gridH / 2) / relativeZoomLevel,
+        w: (width - 1) * (gridW + gutter) - gutter,
+        h: (height - 1) * (gridH + gutter) - gutter,
+      })
+    }
+
     // TODO: why sometimes NaN? zoomLevel divide by 0??
     if (_.isNaN(pos.x)) {
       pos.x = 0

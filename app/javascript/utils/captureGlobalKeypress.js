@@ -101,7 +101,7 @@ const captureGlobalKeypress = e => {
       break
     // CTRL+C: Duplicate
     case 'KeyC':
-      if (noCardsSelected) {
+      if (noCardsSelected || shiftKey) {
         return false
       }
       uiStore.openMoveMenu({

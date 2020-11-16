@@ -223,6 +223,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get cardMatrix() {
+    return this.calculateCardMatrix()
+  }
+
+  get cardMatrixForDraggingSections() {
+    return this.calculateCardMatrix({ forSections: true })
+  }
+
+  calculateCardMatrix = ({ forSections = false } = {}) => {
     if (this.collection_cards.length === 0) return [[]]
 
     // Get maximum dimensions of our card matrix
@@ -237,13 +245,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(this.collection_cards, card => {
       // Create a range with the min and max row and column that this card occupies
       // range does not include last value, so increment max by 1
-      const rows = _.range(card.row, card.maxRow + 1)
-      const cols = _.range(card.col, card.maxCol + 1)
+      let rows = _.range(card.row, card.maxRow + 1)
+      let cols = _.range(card.col, card.maxCol + 1)
+      if (forSections && card.isSection) {
+        // only treat the inner part of the section as being filled
+        rows = _.range(card.row + 1, card.maxRow)
+        cols = _.range(card.col + 1, card.maxCol)
+      }
 
       // Iterate over each to populate the matrix
-      _.each(rows, row => {
-        _.each(cols, col => {
-          matrix[row][col] = card
+      _.each(rows, (row, rIdx) => {
+        _.each(cols, (col, cIdx) => {
+          if (!forSections && card.isSection) {
+            const midRow = rIdx > 0 && rIdx < rows.length - 1
+            const midCol = cIdx > 0 && cIdx < cols.length - 1
+            if (rIdx === 0 || rIdx === rows.length - 1 || (midRow && !midCol)) {
+              matrix[row][col] = card
+            }
+          } else {
+            matrix[row][col] = card
+          }
         })
       })
     })
@@ -262,7 +283,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   // Find all cards that are between these two card ids,
   // using the card row & col
-  cardIdsBetweenByColRow(firstCardId, lastCardId) {
+  cardIdsBetweenByColRow(firstCardId, lastCardId = null) {
     const cards = this.collection_cards.filter(
       card => card.id === firstCardId || card.id === lastCardId
     )

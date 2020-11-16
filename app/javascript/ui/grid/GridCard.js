@@ -672,6 +672,7 @@ class GridCard extends React.Component {
         data-row={card.row}
         data-cy="GridCard"
         onContextMenu={this.handleContextMenu}
+        // needed for dragging selection square
         ref={r => this.setCardRef(r)}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}

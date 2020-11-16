@@ -269,7 +269,7 @@ HotCellQuadrant.propTypes = {
   zoomLevel: PropTypes.number.isRequired,
   opts: PropTypes.shape({
     templateId: PropTypes.string,
-  }),
+  }).isRequired,
   subTypes: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
