@@ -23,7 +23,6 @@ Feature: Creating a FoamcoreBoard Collection
     # click any quadrant
     And I click the "HotCellQuadrant-foamcoreBoard"
     And I click the "BCT-closeButton"
-    And I wait for "@apiDeleteCollectionCard" to finish
     Then I should see the text "To my board." in the card at 0,1
 
     # There should be a hotspot to the left of the 0,0 card

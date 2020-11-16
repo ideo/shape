@@ -139,6 +139,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       row: row,
       col: col,
       collection: @collection,
+      user: current_user,
     )
     service.call
     # render the placeholder card
@@ -172,9 +173,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def destroy
     if @collection_card.destroy
       if @collection_card.bct_placeholder?
-        CollectionGrid::BctRemover.call(
-          placeholder_card: @collection_card,
-        )
+        if @collection_card.parent_snapshot?
+          CollectionGrid::BctRemover.call(
+            placeholder_card: @collection_card,
+          )
+        else
+          collection_broadcaster(@collection_card.parent).cards_archived([@collection_card.id])
+        end
       end
       @collection_card.parent.reorder_cards!
       head :no_content
@@ -349,7 +354,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder_id = params[:placeholder_id]
     placeholder = CollectionCard::Placeholder.find placeholder_id
 
-    placeholder.delete if placeholder.present?
+    if placeholder.present?
+      parent = placeholder.parent
+      placeholder.delete
+      collection_broadcaster(parent).cards_archived([placeholder_id])
+    end
 
     head :no_content
   end
@@ -644,6 +653,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def ordered_cards
+    # disallow MDL actions from placeholder cards
     CollectionCard
       .ordered
       .not_placeholder

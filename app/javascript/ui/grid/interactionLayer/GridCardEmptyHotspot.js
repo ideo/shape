@@ -123,6 +123,7 @@ GridCardEmptyHotspot.propTypes = {
   rowIdx: PropTypes.number,
 }
 GridCardEmptyHotspot.defaultProps = {
+  parent: null,
   visible: true,
   card: null,
   interactionType: 'drag',

@@ -48,16 +48,24 @@
 
 class CollectionCard
   class Placeholder < CollectionCard
-
     # overrides for placeholder cards with no record
     def can_edit?(*args)
       return super unless record.nil?
+
       parent.can_edit_content?(*args)
     end
 
     def can_view?(*args)
       return super unless record.nil?
+
       parent.can_view?(*args)
+    end
+
+    def cache_placeholder_editor_id!(editor_id)
+      cache_attribute!(
+        :cached_placeholder_editor_id,
+        editor_id,
+      )
     end
   end
 end

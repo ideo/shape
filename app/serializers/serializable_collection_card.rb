@@ -55,4 +55,8 @@ class SerializableCollectionCard < BaseJsonSerializer
   attribute :cover do
     @object.cached_cover || {}
   end
+
+  attribute :placeholder_editor_id do
+    @object.cached_placeholder_editor_id || nil
+  end
 end

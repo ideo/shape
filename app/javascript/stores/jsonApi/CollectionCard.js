@@ -9,7 +9,7 @@ import {
 } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import FilestackUpload from '~/utils/FilestackUpload'
-import TitleAndCoverEditingMixin from './TitleAndCoverEditingMixin'
+import TitleAndCoverEditingMixin from '~/stores/jsonApi/mixins/TitleAndCoverEditingMixin'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
@@ -380,6 +380,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
       return
     }
     try {
+      this.destroyed = true
       this.destroy()
       this.parentCollection.removeCard(this)
       return
@@ -521,11 +522,6 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     } catch (e) {
       this.uiStore.defaultAlertError()
     }
-  }
-
-  async API_archiveCards(cardIds = []) {
-    this.uiStore.reselectCardIds(cardIds)
-    return this.API_archive()
   }
 
   // this could really be a static method now that it archives all selected cards

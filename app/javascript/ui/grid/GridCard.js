@@ -18,8 +18,8 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
   StyledGridCardPrivate,
-  CardLoader,
 } from '~/ui/grid/shared'
+import CardLoader from '~/ui/grid/loader/CardLoader'
 import PlaceholderCard from '~/ui/grid/PlaceholderCard'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
@@ -36,7 +36,9 @@ import HiddenIcon from '~/ui/icons/HiddenIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import EditButton from '~/ui/reporting/EditButton'
+import propShapes from '~/utils/propShapes'
 import v from '~/utils/variables'
+import { getCollaboratorColor } from '~/utils/colorUtils'
 import { linkOffsite } from '~/utils/url'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -54,6 +56,7 @@ class GridCard extends React.Component {
       record,
       searchResult,
     } = this.props
+    if (card.isBctPlaceholder) return true
     if (isSharedCollection || searchResult) return false
     // you can always edit your link cards, regardless of record.can_edit
     if (canEditCollection && card.link) return true
@@ -119,7 +122,7 @@ class GridCard extends React.Component {
       record.menuDisabled ||
       uiStore.textEditingItem === record ||
       record.archived ||
-      card.isLoadingPlaceholder
+      (card.isLoadingPlaceholder && !card.isBctPlaceholder)
     ) {
       return null
     }
@@ -506,9 +509,10 @@ class GridCard extends React.Component {
   }
 
   get transparentBackground() {
-    const { cardType, record } = this.props
-    // If a data item and is a collection cover, it's transparent
-    if (record.coverItem && record.coverItem.isData) return true
+    const { cardType, record, card } = this.props
+    // If a data item and is a collection cover, or it's a placeholder it's transparent
+    if ((record.coverItem && record.coverItem.isData) || card.isBctPlaceholder)
+      return true
     // If this is a legend, data or text item it's transparent
     if (
       cardType === 'items' &&
@@ -553,6 +557,7 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
       zoomLevel,
+      collaborator,
     } = this.props
     const showHotEdge =
       this.props.showHotEdge && canEditCollection && !card.isLoadingPlaceholder
@@ -575,15 +580,22 @@ class GridCard extends React.Component {
       let warnBeforeLeaving = false
 
       if (row === card.row && col === card.col) {
+        // when it's user initiated; placeholder and bct are on the same spot
         warnBeforeLeaving = true
       } else if (droppingFilesCount > 0) {
-        // will technically mark other collaborator's placeholders as true
-        // but this is still correct when the user is dropping files
+        // when user is uploading
         warnBeforeLeaving = true
       }
 
       contents = (
-        <PlaceholderCard card={card} warnBeforeLeaving={warnBeforeLeaving} />
+        <Fragment>
+          <PlaceholderCard
+            card={card}
+            warnBeforeLeaving={warnBeforeLeaving}
+            collaborator={collaborator}
+          />
+          {this.renderTopRightActions()}
+        </Fragment>
       )
     } else {
       contents = (
@@ -647,18 +659,12 @@ class GridCard extends React.Component {
       )
     }
 
-    let collaboratorColor = null
-    if (!_.isEmpty(record.collaborators)) {
-      const { color } = _.last(record.collaborators)
-      collaboratorColor = v.colors[`collaboratorPrimary${color}`]
-    }
-
     return (
       <StyledGridCard
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
-        collaboratorColor={collaboratorColor}
+        collaboratorColor={getCollaboratorColor(collaborator)}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
@@ -686,6 +692,7 @@ GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  collaborator: PropTypes.shape(propShapes.collaborator),
   height: PropTypes.number,
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
@@ -714,6 +721,7 @@ GridCard.defaultProps = {
   searchResult: false,
   showHotEdge: true,
   zoomLevel: 1,
+  collaborator: null,
 }
 
 export default GridCard

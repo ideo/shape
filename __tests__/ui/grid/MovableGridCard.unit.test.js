@@ -36,12 +36,6 @@ const rerender = () => {
 }
 
 describe('MovableGridCard', () => {
-  it('renders a placeholder card if cardType is "placeholder"', () => {
-    props.cardType = 'placeholder'
-    rerender()
-    expect(wrapper.find('GridCardPlaceholder').exists()).toBeTruthy()
-  })
-
   it('renders a blank card creation tool if cardType is "blank"', () => {
     props.cardType = 'blank'
     rerender()
