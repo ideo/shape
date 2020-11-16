@@ -383,15 +383,13 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   createSection = async ({ top, left, width, height } = {}) => {
-    const { coordinatesForPosition } = this.props
+    const { apiStore, collection, coordinatesForPosition } = this.props
     const { row, col } = coordinatesForPosition({ x: left, y: top })
     const end = coordinatesForPosition({ x: left + width, y: top + height })
 
     const absoluteWidth = end.col - col
     const absoluteHeight = end.row - row
-    console.log('createSection', col, row, absoluteWidth, absoluteHeight)
 
-    const { collection, apiStore } = this.props
     const attrs = {
       col,
       row,
@@ -399,10 +397,12 @@ class FoamcoreInteractionLayer extends React.Component {
       height: absoluteHeight,
       section_name: 'New Section',
       card_type: 'section',
+      type: 'CollectionCard::Section',
       parent_id: collection.id,
     }
 
     const card = new CollectionCard(attrs, apiStore)
+    card.parent = collection
     // TODO add this to collection so it appears right away?
     card.API_create()
   }
