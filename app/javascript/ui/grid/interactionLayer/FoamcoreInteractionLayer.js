@@ -403,6 +403,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
+    collection.addCard(card)
     // TODO add this to collection so it appears right away?
     card.API_create()
   }
