@@ -597,6 +597,8 @@ class MovableGridCard extends React.Component {
       textEditingCardId,
       isTouchDevice,
       isCypress,
+      blankContentToolState,
+      blankContentToolIsOpen,
     } = uiStore
 
     let _zIndex = 1
@@ -644,6 +646,16 @@ class MovableGridCard extends React.Component {
       _zIndex = cardHovering
       transform += ' scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
+    }
+
+    const { placeholderCard } = blankContentToolState
+    if (
+      blankContentToolIsOpen &&
+      !!placeholderCard &&
+      parseInt(currentUser.id) === placeholderCard.placeholder_editor_id
+    ) {
+      // ensure that the bct placeholder appears behind the user's bct
+      _zIndex = -1
     }
 
     const isTouchDeviceSingleColumn = isTouchDevice && cols === 1

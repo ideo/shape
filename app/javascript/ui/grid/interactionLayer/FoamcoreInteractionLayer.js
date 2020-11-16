@@ -427,11 +427,6 @@ class FoamcoreInteractionLayer extends React.Component {
       runInAction(() => (this.creatingHotEdge = true))
     }
 
-    const { blankContentToolState } = uiStore
-    const { placeholderCard } = blankContentToolState
-
-    const creatingContentAfterHotEdge = !hotEdge && !!placeholderCard
-
     uiStore.openBlankContentTool({
       row,
       col,
@@ -448,8 +443,16 @@ class FoamcoreInteractionLayer extends React.Component {
 
     this.resetHoveringRowCol()
 
-    if (creatingContentAfterHotEdge || contentType === 'text') {
-      // don't create a placeholder since we already have it or if creating a text card
+    const { blankContentToolState } = uiStore
+    const { placeholderCard } = blankContentToolState
+
+    const creatingAtTheSameSpot =
+      placeholderCard &&
+      placeholderCard.row === row &&
+      placeholderCard.col === col
+
+    if (creatingAtTheSameSpot || contentType === 'text') {
+      // don't create a placeholder if creating at the same spot or creating a text card
       return
     }
 
