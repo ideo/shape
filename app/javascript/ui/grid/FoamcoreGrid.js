@@ -351,11 +351,12 @@ class FoamcoreGrid extends React.Component {
   findOverlap(card) {
     const { collection, uiStore } = this.props
     const { row, col, height, width } = card
+    // the actual CollectionCard is tucked into the card object
+    const collectionCard = card.card || {}
+    const { isSection } = collectionCard
     let h = 1
     let w = 1
 
-    // the actual CollectionCard is tucked into the card object
-    const { isSection } = card.card
     const cardMatrix = isSection
       ? collection.cardMatrixForDraggingSections
       : collection.cardMatrix

@@ -279,7 +279,11 @@ describe('UiStore', () => {
         bottom: 500,
         left: 0,
       })
-      uiStore.setViewingRecord({ ...fakeCollection, cardIds: ['1', '2', '5'] })
+      uiStore.setViewingRecord({
+        ...fakeCollection,
+        collection_cards: [],
+        cardIds: ['1', '2', '5'],
+      })
     })
 
     it('selects cards in within the selectedArea', () => {
