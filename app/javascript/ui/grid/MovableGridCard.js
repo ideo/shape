@@ -104,11 +104,12 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidMount() {
-    const { record } = this.props.card
+    const { card } = this.props
+    const { record } = card
     if (!this.state.preloading) {
       return
     }
-    if (this.state.preloading && _.isEmpty(record)) {
+    if (this.state.preloading && _.isEmpty(record) && !card.isPrivate) {
       // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
@@ -116,8 +117,9 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { record } = this.props.card
-    if (this.state.preloading && !_.isEmpty(record)) {
+    const { card } = this.props
+    const { record } = card
+    if ((this.state.preloading && !_.isEmpty(record)) || card.isPrivate) {
       this.finishPreloading()
     }
     if (this.state.dragging || this.unmounted) {
