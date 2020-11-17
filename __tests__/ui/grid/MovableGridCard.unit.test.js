@@ -193,14 +193,30 @@ describe('MovableGridCard', () => {
         expect(uiStore.startDragging).toHaveBeenCalledWith(props.card.id)
       })
     })
+  })
 
-    describe('componentDidUpdate', () => {
+  describe('componentDidUpdate', () => {
+    beforeEach(() => {
+      component.finishPreloading = jest.fn()
+    })
+
+    it('should call finishPreloading', () => {
+      wrapper.setState({ preloading: true })
+      expect(component.finishPreloading).toHaveBeenCalled()
+    })
+
+    describe('with private card', () => {
       beforeEach(() => {
-        component.finishPreloading = jest.fn()
+        props.card = {
+          ...fakeItemCard,
+          isPrivate: true,
+        }
+        wrapper.setProps({ props })
+        rerender()
       })
 
       it('should call finishPreloading', () => {
-        wrapper.setState({ preloading: true })
+        wrapper.setState({ preloading: false })
         expect(component.finishPreloading).toHaveBeenCalled()
       })
     })
