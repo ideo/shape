@@ -48,6 +48,7 @@
 
 class CollectionCard < ApplicationRecord
   include Archivable
+  include CachedAttributes
 
   DEFAULT_PER_PAGE = 50
   paginates_per DEFAULT_PER_PAGE
@@ -78,7 +79,8 @@ class CollectionCard < ApplicationRecord
              if: :test_collection_within_master_template_after_save?
 
   store_accessor :cached_attributes,
-                 :cached_cover
+                 :cached_cover,
+                 :cached_placeholder_editor_id
 
   validates :parent, presence: true
   validate :single_item_or_collection_is_present
@@ -349,7 +351,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def bct_placeholder?
-    is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
+    is_a?(CollectionCard::Placeholder)
   end
 
   def copy_into_new_link_card
@@ -627,6 +629,10 @@ class CollectionCard < ApplicationRecord
     self.cached_cover = nil
     self.cover_card_id = nil
     save
+  end
+
+  def parent_snapshot?
+    parent_snapshot.present?
   end
 
   private

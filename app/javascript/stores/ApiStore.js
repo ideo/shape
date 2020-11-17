@@ -776,7 +776,6 @@ class ApiStore extends jsonapi(datxCollection) {
     } catch (e) {
       // throw to be caught by CardMoveService
       throw e
-      return
     }
 
     runInAction(() => {
@@ -868,7 +867,6 @@ class ApiStore extends jsonapi(datxCollection) {
     } catch (e) {
       // throw to be caught by CardMoveService
       throw e
-      return
     }
     const collection = this.find('collections', data.to_id)
     const { meta } = res

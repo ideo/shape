@@ -88,6 +88,7 @@ describe('ActionMenu', () => {
     it('calls selectCardId and openMoveMenu on duplicate action', () => {
       component.duplicateCard()
       expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.reselectWithoutPlaceholders).toHaveBeenCalled()
       expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
         from: props.uiStore.viewingCollection,
         cardAction: 'duplicate',
@@ -97,6 +98,7 @@ describe('ActionMenu', () => {
     it('calls selectCardId and openMoveMenu on link action', () => {
       component.linkCard()
       expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.reselectWithoutPlaceholders).toHaveBeenCalled()
       expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
         from: props.uiStore.viewingCollection,
         cardAction: 'link',

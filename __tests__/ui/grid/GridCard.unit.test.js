@@ -323,12 +323,17 @@ describe('GridCard', () => {
   })
 
   describe('with an active collaborator', () => {
+    beforeEach(() => {
+      props.collaborator = null
+      rerender()
+    })
+
     it('renders the collaborator color', () => {
       expect(
         wrapper.find('StyledGridCard').props().collaboratorColor
       ).toBeNull()
       // now simulate collaborator on the record
-      props.record.collaborators = [{ id: '1', name: 'Vlad', color: 'Blue' }]
+      props.collaborator = { id: '1', name: 'Vlad', color: 'Blue' }
       rerender()
       expect(wrapper.find('StyledGridCard').props().collaboratorColor).toEqual(
         v.colors.collaboratorPrimaryBlue

@@ -7,7 +7,7 @@ module.exports = {
     'prettier',
     'import',
     'compat',
-    'json'
+    'json',
   ],
   env: {
     es6: true,
@@ -63,10 +63,10 @@ module.exports = {
       {
         argsIgnorePattern: '^_',
         args: 'none',
-        varsIgnorePattern: '^React$'
+        varsIgnorePattern: '^React$',
       },
     ],
-    'eqeqeq': ['error', 'smart'],
+    eqeqeq: ['error', 'smart'],
     'no-var': 'error',
     'prefer-const': 'error',
     'import/no-unresolved': 2,
@@ -84,6 +84,7 @@ module.exports = {
     'no-undef': 2,
     'no-duplicate-imports': 2,
     'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-unreachable': 2,
     'object-shorthand': 1,
     'prettier/prettier': 'error',
     'prefer-destructuring': [

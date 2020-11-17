@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import MinusCircleIcon from '~/ui/icons/MinusCircleIcon'
 import Tooltip from '~/ui/global/Tooltip'
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
