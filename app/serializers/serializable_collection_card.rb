@@ -21,6 +21,7 @@ class SerializableCollectionCard < BaseJsonSerializer
     :col,
     :row,
     :section_type,
+    :section_name,
     :font_color,
     :font_background,
     :cover_card_id,

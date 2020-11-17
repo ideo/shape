@@ -151,9 +151,6 @@ const SECTION_THICKNESS = 100
 const SECTION_BORDER = '4px solid black'
 
 export const SectionCardWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
   height: 100%;
   width: 100%;
 
@@ -169,6 +166,14 @@ export const SectionCardWrapper = styled.div`
     `};
     /* for debugging: */
     /* background-color: rgba(130, 125, 185, 0.1); */
+  }
+
+  .styled-name {
+    /* just relative to .sectionInner this should be on top */
+    z-index: 10;
+    position: relative;
+    top: 40px;
+    left: 174px;
   }
 `
 export const SectionTop = styled.div`

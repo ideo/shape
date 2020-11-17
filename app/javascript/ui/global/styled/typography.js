@@ -5,9 +5,9 @@ import v from '~/utils/variables'
 export const Heading1TypographyCss = css`
   color: ${props => props.theme.fontColor || v.colors.black};
   font-family: ${v.fonts.sans};
-  font-size: 1.75rem;
   font-weight: ${v.weights.book};
-  line-height: 2rem;
+  font-size: ${props => (props.fontSize ? props.fontSize : '1.75rem')};
+  line-height: ${props => (props.fontSize ? props.fontSize : '2rem')};
   text-transform: none;
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
