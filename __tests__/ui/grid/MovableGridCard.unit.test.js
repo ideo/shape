@@ -193,5 +193,16 @@ describe('MovableGridCard', () => {
         expect(uiStore.startDragging).toHaveBeenCalledWith(props.card.id)
       })
     })
+
+    describe('componentDidUpdate', () => {
+      beforeEach(() => {
+        component.finishPreloading = jest.fn()
+      })
+
+      it('should call finishPreloading', () => {
+        wrapper.setState({ preloading: true })
+        expect(component.finishPreloading).toHaveBeenCalled()
+      })
+    })
   })
 })
