@@ -224,17 +224,6 @@ class FoamcoreInteractionLayer extends React.Component {
     if (this.sectionCreationArea.width && this.sectionCreationArea.height) {
       this.createSection(this.sectionCreationArea)
     }
-    // Cancel any currently throttled calls
-    this.throttledSetSectionCreationArea.cancel()
-    // clear selected area (enabling BCT to open)
-    this.setSectionCreationArea({
-      top: null,
-      left: null,
-      width: null,
-      height: null,
-    })
-    // Reset
-    uiStore.exitSectionCreationState()
   }
 
   handleTouchStart = ev => {
@@ -314,6 +303,15 @@ class FoamcoreInteractionLayer extends React.Component {
     runInAction(() => (this.fileDropProgress = null))
   }
 
+  positionForCoordinates({ row, col }) {
+    const { gridW, gridH, gutter } = this.gridSettings
+    const { relativeZoomLevel } = this.props
+
+    const left = Math.floor((col * (gridW + gutter)) / relativeZoomLevel)
+    const top = Math.floor((row * (gridH + gutter)) / relativeZoomLevel)
+    return { left, top }
+  }
+
   transformToGridCoordinates({ pageY, pageX } = {}) {
     // These values are based on where the grid is in relation to the rest of the page
     return {
@@ -386,12 +384,16 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   createSection = async ({ top, left, width, height } = {}) => {
-    const { apiStore, collection, coordinatesForPosition } = this.props
+    const { apiStore, collection, coordinatesForPosition, uiStore } = this.props
     const { row, col } = coordinatesForPosition({ x: left, y: top })
     const end = coordinatesForPosition({ x: left + width, y: top + height })
 
     const absoluteWidth = end.col - col
     const absoluteHeight = end.row - row
+    if (absoluteWidth < 3 || absoluteHeight < 3) {
+      this.clearSectionCreationArea()
+      return
+    }
 
     const attrs = {
       col,
@@ -404,10 +406,37 @@ class FoamcoreInteractionLayer extends React.Component {
       parent_id: collection.id,
     }
 
+    // Cancel any currently throttled calls
+    this.throttledSetSectionCreationArea.cancel()
+    // Set the section creation to the actual section
+    const { x, y, w, h } = uiStore.positionForCoordinates({
+      col,
+      row,
+      width: absoluteWidth,
+      height: absoluteHeight,
+    })
+    this.setSectionCreationArea({
+      left: x,
+      top: y,
+      height: h,
+      width: w,
+    })
+
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
-    // TODO add this to collection so it appears right away?
+    setTimeout(() => {
+      this.clearSectionCreationArea()
+    }, 500)
+    // runInAction(() => {
+    //   collection.tempSection = card
+    // })
     await card.API_create()
+    // runInAction(() => {
+    //   collection.tempTextCard = null
+    // })
+
+    // clear selected area (enabling BCT to open)
+    this.clearSectionCreationArea()
   }
 
   @action
@@ -661,6 +690,19 @@ class FoamcoreInteractionLayer extends React.Component {
       width,
       height,
     }
+  }
+
+  @action
+  clearSectionCreationArea() {
+    const { uiStore } = this.props
+    this.setSectionCreationArea({
+      left: null,
+      top: null,
+      height: null,
+      width: null,
+    })
+    // Reset
+    uiStore.exitSectionCreationState()
   }
 
   calculateOpenSpot = takenSpots => {
@@ -964,7 +1006,15 @@ class FoamcoreInteractionLayer extends React.Component {
 
   get renderSectionCreationSquare() {
     const { top, left, width, height } = this.sectionCreationArea
-    return <SectionSquare top={top} left={left} width={width} height={height} />
+    return (
+      <SectionSquare
+        top={top}
+        left={left}
+        width={width}
+        height={height}
+        transition
+      />
+    )
   }
 
   get renderBct() {

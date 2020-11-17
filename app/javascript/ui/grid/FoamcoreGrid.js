@@ -1062,12 +1062,15 @@ class FoamcoreGrid extends React.Component {
 
   renderVisibleCards() {
     const { collection } = this.props
-    const { tempTextCard } = collection
+    const { tempSection, tempTextCard } = collection
     let cards = _.reject(
       collection.collection_cards,
       // hide additional cards that are being moved/hidden
       'shouldHideFromUI'
     )
+    if (tempSection) {
+      cards.push(tempSection)
+    }
     if (tempTextCard) {
       // push the temporary card which was created to allow the user to edit right away
       cards.push(tempTextCard)
