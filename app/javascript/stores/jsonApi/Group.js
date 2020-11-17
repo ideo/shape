@@ -1,7 +1,4 @@
-import { ReferenceType } from 'datx'
-
 import { apiUrl } from '~/utils/url'
-import Role from './Role'
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {

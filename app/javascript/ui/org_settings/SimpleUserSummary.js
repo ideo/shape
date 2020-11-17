@@ -11,8 +11,6 @@ import { AddButton } from '../global/styled/buttons'
 import Tooltip from '../global/Tooltip'
 // import OrganizationMenu from '~/ui/organizations'
 import _ from 'lodash'
-import AdminUsersModal from '../admin/AdminUsersModal'
-import RolesAdd from '../roles/RolesAdd'
 // TODO: load groups/BUs and their roles?
 // OrganizationMenu gets its roles from /users/me
 // Will need to rework that for this

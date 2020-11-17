@@ -228,7 +228,7 @@ Rails.application.routes.draw do
 
       namespace :creative_difference do
         # resources :business_units, only: %i[index]
-        resources :groups, only: %i[index create] do
+        resources :groups, only: %i[index create destroy] do
           collection do
             patch ':business_unit_id', action: :update
             post ':business_unit_id/clone', action: :clone

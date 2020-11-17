@@ -80,23 +80,7 @@ class BusinessUnitRow extends React.Component {
   }
 
   removeBusinessUnit = async businessUnit => {
-    try {
-      this.setIsLoading(true)
-      // const model = businessUnitsStore.model()
-      // const modelInstance = new model({
-      //   id: businessUnit.id,
-      // })
-
-      const promise = businessUnit.destroy({
-        optimistic: false,
-      })
-      const result = await promise
-      console.log('destroyed: ', result)
-      this.setIsLoading(false)
-      return result
-    } catch (err) {
-      console.log('err destroying BU: ', err)
-    }
+    this.props.removeBusinessUnit(businessUnit)
   }
 
   setTextInputRef = element => {
@@ -220,20 +204,10 @@ class BusinessUnitRow extends React.Component {
                 'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
               }
               objectToUpdateName={businessUnit.get('name')}
-              record={businessUnit.get('closest_business_unit_deployment')}
+              record={businessUnit.get('content_version')}
               options={contentVersions}
-              updateRecord={
-                params => {
-                  throw new Error(
-                    'IMPLEMENT NEW ROUTE FOR BU TO UPDATE PARENT CV'
-                  )
-                }
-                // updateBusinessUnitDeployment(
-                //   businessUnit.get('closest_business_unit_deployment'),
-                //   params
-                // )
-              }
-              fieldToUpdate={'content_version_id'}
+              updateRecord={params => updateBusinessUnit(params)}
+              fieldToUpdate={'parent_content_version_id'}
             />
           </div>
           <div
@@ -257,7 +231,7 @@ class BusinessUnitRow extends React.Component {
                   id: 'Horizontal',
                 },
               ]}
-              updateRecord={params => updateBusinessUnit(businessUnit, params)}
+              updateRecord={params => updateBusinessUnit(params)}
               fieldToUpdate={'structure'}
             />
           </div>
@@ -320,6 +294,7 @@ BusinessUnitRow.defaultProps = {
 BusinessUnitRow.propTypes = {
   // TODO: Add other event handler functions
   cloneBusinessUnit: PropTypes.func,
+  removeBusinessUnit: PropTypes.func,
   // updateBusinessUnit: PropTypes.func,
   // updateBusinessUnitDeployment: PropTypes.func,
   businessUnit: MobxPropTypes.objectOrObservableObject.isRequired,

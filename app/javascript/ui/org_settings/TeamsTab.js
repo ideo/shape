@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { observable, runInAction, action } from 'mobx'
-import { inject, observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { v4 as uuidv4 } from 'uuid'
 import _ from 'lodash'
 import {
@@ -113,7 +113,7 @@ class TeamsTab extends React.Component {
 
   createBusinessUnit = async () => {
     const values = this.initialNewTeamValues()
-    // TODO: how to show loader without causing rerender that makes componentDidMount fire?
+
     try {
       const result = await this.props.apiStore.createCreativeDifferenceGroup({
         business_unit: values,
@@ -158,6 +158,23 @@ class TeamsTab extends React.Component {
       console.log('failed to create BU and groups: ', err)
       this.setIsError(true)
       this.setBusinessUnitErrors(err.error)
+    }
+  }
+
+  removeBusinessUnit = async businessUnit => {
+    try {
+      const businessUnitIdToDestroy = businessUnit.id
+      console.log('attempting to destroy BU: ', businessUnitIdToDestroy)
+      const promise = businessUnit.destroy({
+        optimistic: false,
+      })
+      const result = await promise
+      console.log('destroyed: ', result)
+      runInAction(() => {
+        businessUnitsStore.remove([businessUnitIdToDestroy])
+      })
+    } catch (err) {
+      console.log('err destroying BU: ', err)
     }
   }
 
@@ -220,6 +237,7 @@ class TeamsTab extends React.Component {
                 industrySubcategories={industrySubcategories}
                 businessUnitsStore={businessUnitsStore}
                 cloneBusinessUnit={this.cloneBusinessUnit}
+                removeBusinessUnit={this.removeBusinessUnit}
               />
             ))}
             <div>
@@ -241,4 +259,8 @@ class TeamsTab extends React.Component {
 
 TeamsTab.propTypes = {}
 
+TeamsTab.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
 export default TeamsTab

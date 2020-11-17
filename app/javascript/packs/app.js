@@ -14,7 +14,7 @@ import '~/vendor/cypress'
 // Enable MobX Strict functionality -- requires explicit @actions
 // TODO: re-enable before releasing to production
 // Fork this PR: https://github.com/masylum/mobx-rest/pull/80/files
-// configure({ enforceActions: 'observed' })
+configure({ enforceActions: 'observed' })
 
 const browserHistory = createBrowserHistory()
 const history = syncHistoryWithStore(browserHistory, routingStore)

@@ -78,6 +78,24 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
     end
   end
 
+  def destroy
+    p 'destroying'
+    p params
+    p id_to_destroy = params[:id]
+    p business_unit = destroy_business_unit
+    if business_unit['errors']
+      group = Group.new
+      group.errors.add(:business_unit, business_unit['errors'])
+      render_api_errors group.errors
+    else
+      groups = find_related_groups(business_unit)
+      p groups.pluck(:id)
+      groups.map(&:destroy)
+      # TODO: Should this return []?
+      render jsonapi: groups, include: [roles: %i[users groups]]
+    end
+  end
+
   private
 
   def find_or_create_related_groups(business_unit)
@@ -123,6 +141,29 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
     end
   end
 
+  def destroy_business_unit
+    id_to_destroy = params[:id] # comes through as ID, not BU ID due to REST
+    token = ENV['CREATIVE_DIFFERENCE_API_TOKEN']
+    p url = "http://localhost:3000/api/v3/business_units/#{id_to_destroy}"
+    external_id = current_user.current_organization.external_records.where(application_id: ENV["CREATIVE_DIFFERENCE_APPLICATION_ID"]).first&.external_id
+    creative_difference_org_id = external_id.split('_').last
+
+    p response = HTTParty.delete(
+      URI.encode(url),
+      headers: {
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer #{token}"
+      },
+      query: {
+        'organization_id': creative_difference_org_id
+      },
+      # format: :plain, # https://github.com/jnunemaker/httparty/tree/master/docs#parsing-json
+      timeout: 10,
+      retries: 1
+    )
+    JSON.parse(response.body, symbolize_keys: true)
+  end
+
   def update_business_unit
     token = ENV['CREATIVE_DIFFERENCE_API_TOKEN']
     url = "http://localhost:3000/api/v3/business_units/#{params[:business_unit_id]}"
@@ -131,17 +172,15 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
 
     # Use dig or except or similar to get correct keys
     business_unit_params = {}
-    %i[name industry_subcategory_id content_version_id structure].each do |key|
+    %i[name industry_subcategory_id parent_content_version_id structure].each do |key|
       business_unit_params[key] = params[key] if params.key?(key)
     end
-    # business_unit_params[:name] = params[:name] if params[:name]
-    # business_unit_params[:industry_subcategory_id] = params[:industry_subcategory_id] if params[:industry_subcategory_id]
-    # business_unit_params[:content_version_id] = params[:content_version_id] if params[:content_version_id]
-    # business_unit_params[:structure] = params[:structure] if params[:structure]
     # # Shape to Shape Parameters: {"industry_subcategory_id"=>10, "business_unit_id"=>"2548", "group"=>{}}
     # Shape to C∆ Parameters: {"business_unit"=>{}, "organization_id"=>"4", "id"=>"2548"}
     p "after filling in params"
     p business_unit_params
+    data = {}
+    data[:business_unit] = business_unit_params
 
     p response = HTTParty.put(
       URI.encode(url),
@@ -149,9 +188,7 @@ class Api::V1::CreativeDifference::GroupsController < Api::V1::CreativeDifferenc
         "Content-Type" => "application/json",
         "Authorization" => "Bearer #{token}"
       },
-      body: {
-        business_unit: business_unit_params, # { name: "foo" }
-      }.to_json,
+      body: data.to_json,
       query: {
         'organization_id': creative_difference_org_id
       },
