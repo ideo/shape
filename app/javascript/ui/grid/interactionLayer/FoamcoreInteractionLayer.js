@@ -406,9 +406,11 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
+    apiStore.updateModelId(card, 'sectionid')
     collection.addCard(card)
     // TODO add this to collection so it appears right away?
-    card.API_create()
+    await card.API_create()
+    collection.removeCardIds(['sectionid'])
   }
 
   @action
@@ -457,13 +459,6 @@ class FoamcoreInteractionLayer extends React.Component {
       // ignore these interactions when you're already dragging a selection square or don't have a target
       return
     }
-
-    console.log(
-      'oncursormove: ',
-      uiStore.sectionCreation,
-      uiStore.isCreatingSection,
-      this.sectionCreationArea.left
-    )
 
     if (uiStore.isCreatingSection && this.sectionCreationArea.left) {
       const { left, top } = this.transformToGridCoordinates(ev)
@@ -658,7 +653,6 @@ class FoamcoreInteractionLayer extends React.Component {
   setSectionCreationArea({ top, left, width, height } = {}) {
     const { coordinatesForPosition, uiStore } = this.props
     const { row, col } = coordinatesForPosition({ x: width, y: height })
-    console.log('setSectionCreationArea', row, col)
     if (row < 3 || col < 3) {
       uiStore.setSectionCreation('error')
     } else {

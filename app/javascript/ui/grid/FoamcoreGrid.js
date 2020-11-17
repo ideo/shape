@@ -345,7 +345,6 @@ class FoamcoreGrid extends React.Component {
     const outsideDraggableArea = col >= collection.num_columns || col < 0
 
     col = _.clamp(col, 0, collection.num_columns - width)
-    console.log('coordinates:', col, row, outsideDraggableArea)
     return { col, row, outsideDraggableArea }
   }
 

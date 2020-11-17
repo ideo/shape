@@ -733,11 +733,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   addCard(card) {
-    if (this.collection_cards.find(cc => cc.id === card.id)) {
-      return
-    }
+    console.log('fuck', card)
     this.collection_cards.unshift(card)
-    this._reorderCards()
+    // this._reorderCards()
   }
 
   @action

@@ -274,6 +274,19 @@ class Routes extends React.Component {
     }
   }
 
+  get cursorUrl() {
+    const { uiStore } = this.props
+    const drawingCursorUrl =
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/section+creation+cursor.svg'
+    const errorCursorUrl =
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/section+error+cursor.svg'
+    let cursorImageUrl =
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/cursor.svg'
+    if (uiStore.sectionCreation === 'error') cursorImageUrl = errorCursorUrl
+    if (uiStore.sectionCreation === 'drawing') cursorImageUrl = drawingCursorUrl
+    return cursorImageUrl
+  }
+
   render() {
     const { apiStore, uiStore, routingStore } = this.props
     const { sessionLoaded, currentUser } = apiStore
@@ -287,22 +300,12 @@ class Routes extends React.Component {
       (!termsAccepted || termsAccepted === 'outdated') &&
       !routingStore.pathContains('/terms')
 
-    const drawingCursorUrl =
-      'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/section%20creation%20cursor.svg?alt=media&token=ad217257-491c-405e-88a5-69f0ad9c4290'
-    const errorCursorUrl =
-      'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/section%20error%20cursor.svg?alt=media&token=ceaa7b73-3059-4ebb-b27e-00d3a516d03a'
-    let cursorImageUrl
-    console.log('sectionCreation state: ', uiStore.sectionCreation)
-    if (uiStore.sectionCreation === 'error') cursorImageUrl = errorCursorUrl
-    if (uiStore.sectionCreation === 'drawing') cursorImageUrl = drawingCursorUrl
-    console.log('in Routes.js, cursorImageUrl: ', cursorImageUrl)
-
     return (
       <AppWrapper
         onMouseDown={this.handleMouseDownSelection}
         onMouseUp={this.handleMouseUpSelection}
         onMouseMove={this.handleMouseMoveSelection}
-        cursorImageUrl={cursorImageUrl}
+        cursorImageUrl={this.cursorUrl}
         blur={displayTermsPopup}
         id="AppWrapper"
       >
