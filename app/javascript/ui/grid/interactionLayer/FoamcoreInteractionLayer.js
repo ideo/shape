@@ -406,11 +406,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
-    apiStore.updateModelId(card, 'sectionid')
-    collection.addCard(card)
     // TODO add this to collection so it appears right away?
     await card.API_create()
-    collection.removeCardIds(['sectionid'])
   }
 
   @action
