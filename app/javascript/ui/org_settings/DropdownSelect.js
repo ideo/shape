@@ -6,8 +6,6 @@ import _ from 'lodash'
 
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
-// import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
-// import TruncatableText from '../global/TruncatableText'
 
 const findSelectedOption = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
@@ -17,7 +15,6 @@ const findSelectedOption = (record, options, fieldToUpdate) => {
 
 const DropdownSelect = ({
   label,
-  // toolTip,
   record,
   options,
   fieldToUpdate,
@@ -25,6 +22,7 @@ const DropdownSelect = ({
   objectToUpdateName,
   ...additionalProps
 }) => {
+  console.log(record, options, fieldToUpdate)
   const option = findSelectedOption(record, options, fieldToUpdate)
 
   const [open, setOpen] = useState(false)
@@ -61,8 +59,6 @@ const DropdownSelect = ({
   }
 
   return (
-    // Should this really be setting margin?
-    // Shouldn't its parent or container do that?
     <React.Fragment>
       <ConfirmationDialog
         prompt={`You are about to change ${recordName(record)}
@@ -108,7 +104,6 @@ const DropdownSelect = ({
 
 DropdownSelect.propTypes = {
   label: PropTypes.string.isRequired,
-  // toolTip: PropTypes.string,
   record: MobxPropTypes.objectOrObservableObject,
   objectToUpdateName: PropTypes.string,
   options: MobxPropTypes.arrayOrObservableArray(

@@ -204,7 +204,7 @@ class BusinessUnitRow extends React.Component {
                 'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
               }
               objectToUpdateName={businessUnit.get('name')}
-              record={businessUnit.get('content_version')}
+              record={businessUnit.toJS()}
               options={contentVersions}
               updateRecord={params => updateBusinessUnit(params)}
               fieldToUpdate={'parent_content_version_id'}

@@ -4,6 +4,10 @@ class Api::V1::CreativeDifference::ProxyController < Api::V1::CreativeDifference
     render json: result
   end
 
+  # TODO:
+  # Add update route
+  # proxy to C∆ OrganizationsController#update for industry/content_version_id/supported_languages
+
   private
 
   def fetch_url
