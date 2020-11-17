@@ -20,8 +20,9 @@ import { StyledCardWrapper } from '~/ui/grid/shared'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
 const GridCardPreload = styled.div`
-  height: 100%;
   width: 100%;
+  height: 100%;
+  border-radius: ${props => props.zoomLevel * 2}px;
   background: ${v.colors.commonMediumTint};
 `
 
@@ -741,7 +742,7 @@ class MovableGridCard extends React.Component {
             zoomLevel={zoomLevel}
           >
             {/* During preload we just render a gray square to simplify initial render */}
-            {preloading && <GridCardPreload />}
+            {preloading && <GridCardPreload zoomLevel={zoomLevel} />}
             {!preloading && (
               <GridCard
                 {...cardProps}

@@ -182,7 +182,7 @@ class HotCellQuadrant extends React.Component {
       uiStore,
       zoomLevel,
     } = this.props
-    const TypeIcon = nameToIcon[name]
+    const TypeIcon = nameToIcon[name] || TemplateIcon
     return (
       <Quadrant
         moreMenuOpen={currentMenuOpen}

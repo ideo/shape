@@ -38,6 +38,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     }
     return 'none'
   }};
+  border-radius: ${props => props.zoomLevel * 2}px;
   position: absolute;
   transform-origin: left top;
   opacity: ${props => {
