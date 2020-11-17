@@ -6,19 +6,23 @@ module CollectionGrid
     def initialize(
       row: 0,
       col: 0,
-      collection:
+      collection:,
+      user: nil
     )
       @row = row
       @col = col
       @collection = collection
+      @user = user
 
       @card_attributes_was = []
       @card_attributes = []
     end
 
     def call
+      existing_card = @collection.collection_cards.select { |cc| cc.row == @row && cc.col == @col }
       insert_bct_square
-      move_other_cards
+      @placeholder.cache_placeholder_editor_id!(@user.id) if @user.present?
+      move_other_cards if existing_card.present?
       @placeholder
     end
 

@@ -140,6 +140,7 @@ const captureGlobalKeypress = e => {
       if (!selectedCardIds || !selectedCardIds.length) {
         return false
       }
+      uiStore.reselectWithoutPlaceholders()
       card = apiStore.find('collection_cards', selectedCardIds[0])
       // see note in CollectionCard model -- this could really be a static method;
       // because it's not, we just have to call it on any selected card

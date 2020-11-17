@@ -355,7 +355,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   handleDragOver = e => {
-    this.onCursorMove('mouse')(e)
+    this.throttledOnCursorMove('mouse')(e)
   }
 
   @action
@@ -432,7 +432,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  onCreateBct = async ({ row, col, hotcell = false }, contentType, opts) => {
+  onCreateBct = async ({ row, col, hotEdge = false }, contentType, opts) => {
     const { apiStore, uiStore, collection } = this.props
 
     if (contentType === 'useTemplate') {
@@ -452,31 +452,19 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // If we're already in the process of creating a hot edge and placeholder
     // don't create another one.
-    if (hotcell && this.creatingHotEdge) return
+    if (hotEdge && this.creatingHotEdge) return
 
     // If opening one from a hot edge make sure to not allow opening them again
     // until again.
-    if (hotcell) {
+    if (hotEdge) {
       runInAction(() => (this.creatingHotEdge = true))
-    }
-
-    // BCT is already open as a hotcell, just modify it. But don't do this
-    // if you're opening a new hotcell.
-    if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotcell) {
-      runInAction(() => {
-        uiStore.blankContentToolState = {
-          ...uiStore.blankContentToolState,
-          blankType: contentType,
-        }
-      })
-      return
     }
 
     uiStore.openBlankContentTool({
       row,
       col,
       collectionId: collection.id,
-      blankType: hotcell ? 'hotcell' : contentType,
+      blankType: hotEdge ? 'hotcell' : contentType,
     })
     if (!uiStore.isTouchDevice) {
       runInAction(() => {
@@ -487,18 +475,37 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
-    if (hotcell) {
-      const placeholder = new CollectionCard(
-        {
-          row,
-          col,
-          parent_id: collection.id,
-        },
-        apiStore
-      )
-      await placeholder.API_createBct()
-      uiStore.setBctPlaceholderCard(placeholder)
+
+    const { blankContentToolState } = uiStore
+    const { placeholderCard } = blankContentToolState
+
+    const creatingAtTheSameSpot =
+      placeholderCard &&
+      placeholderCard.row === row &&
+      placeholderCard.col === col
+
+    if (creatingAtTheSameSpot || contentType === 'text') {
+      // don't create a placeholder if creating at the same spot or creating a text card
+      return
+    }
+
+    const placeholder = new CollectionCard(
+      {
+        row,
+        col,
+        parent_id: collection.id,
+      },
+      apiStore
+    )
+    uiStore.setBctPlaceholderCard(placeholder)
+    await placeholder.API_createBct()
+    if (this.creatingHotEdge) {
       runInAction(() => (this.creatingHotEdge = false))
+    }
+    if (!uiStore.blankContentToolIsOpen) {
+      // NOTE: the bct was closed during placeholder.API_createBct
+      placeholder.API_destroy()
+      return
     }
   }
 
@@ -588,6 +595,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // could be drag or drag-overflow
     const isDrag = _.includes(interactionType, 'drag')
+
+    if (!interactionType) return null
 
     return (
       <PositionedBlankCard
@@ -830,7 +839,7 @@ class FoamcoreInteractionLayer extends React.Component {
               col={col}
               horizontal={false}
               onClick={() => {
-                this.onCreateBct({ col, row, hotcell: true })
+                this.onCreateBct({ col, row, hotEdge: true })
               }}
             />
           )
@@ -913,7 +922,7 @@ class FoamcoreInteractionLayer extends React.Component {
           const numFiles = _.get(e, 'dataTransfer.items.length', 0)
           uiStore.setDroppingFilesCount(numFiles)
           e.persist()
-          this.throttledOnCursorMove(e)
+          this.handleDragOver(e)
         }}
         onDragLeave={e => {
           e.preventDefault()

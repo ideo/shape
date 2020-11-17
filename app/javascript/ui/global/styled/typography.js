@@ -150,12 +150,15 @@ export const LoudDisplayLink = styled(DisplayLink)`
 
 /** @component */
 export const SubduedTitle = styled.span`
-  color: ${v.colors.commonMedium};
+  color: ${props => props.color};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
 `
-SubduedTitle.displayName = 'StyledSubduedTitled'
+SubduedTitle.displayName = 'StyledSubduedTitle'
+SubduedTitle.defaultProps = {
+  color: v.colors.commonMedium,
+}
 
 /** @component */
 export const ConfirmText = styled.span`

@@ -74,8 +74,6 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
         </TextButton>
       </Fragment>
     )
-
-    return null
   }
 
   const renderPhaseRows = submissionBox => {

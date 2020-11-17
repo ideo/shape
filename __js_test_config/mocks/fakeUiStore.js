@@ -127,6 +127,7 @@ const fakeUiStore = {
   reselectCardIds: jest.fn(),
   reselectOnlyEditableRecords: jest.fn(),
   reselectOnlyMovableCards: jest.fn(),
+  reselectWithoutPlaceholders: jest.fn(),
   setMovingCards: jest.fn(),
   setVisibleRows: jest.fn(),
   setPlaceholderSpot: jest.fn(),

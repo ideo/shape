@@ -7,7 +7,7 @@ import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
 import styled, { css } from 'styled-components'
 
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import v from '~/utils/variables'
 
 /** @component */

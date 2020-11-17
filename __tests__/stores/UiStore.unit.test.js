@@ -62,9 +62,14 @@ describe('UiStore', () => {
         expect(blankContentToolState.col).toBe(4)
       })
 
-      describe('with placeholderCard', () => {
+      describe('with placeholderCard that is placed in a different spot as the bct', () => {
         beforeEach(() => {
-          uiStore.setBctPlaceholderCard({ id: '99' })
+          const { blankContentToolState } = uiStore
+          uiStore.setBctPlaceholderCard({
+            id: '99',
+            col: blankContentToolState.col + 1,
+            row: blankContentToolState.row,
+          })
           uiStore.closeBlankContentTool = jest.fn()
         })
         it('should call closeBlankContentTool to clear the card', () => {

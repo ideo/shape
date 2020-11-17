@@ -78,7 +78,6 @@ const ChallengeHeaderButton = ({ record, parentChallenge }) => {
   } else {
     return <ReviewSubmissionsButton record={record} />
   }
-  return null
 }
 
 ChallengeHeaderButton.propTypes = {

@@ -814,6 +814,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           row: 0,
           col: 0,
           collection: collection,
+          user: user,
         )
         post(path, params: params)
         expect(response.status).to eq(200)
@@ -833,6 +834,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           row: 0,
           col: 2,
           collection: collection,
+          user: user,
         )
         expect {
           post(path, params: params)

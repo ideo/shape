@@ -34,7 +34,7 @@ InlineLoader.propTypes = {
 InlineLoader.defaultProps = {
   fixed: false,
   background: 'commonDark',
-  animation: 'cube',
+  animation: 'circular',
 }
 
 export default InlineLoader
