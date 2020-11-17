@@ -29,7 +29,7 @@ export default class CollectionCollaborationService {
       if (updateData.collection_cards_attributes) {
         _.each(updateData.collection_cards_attributes, cardData => {
           const card = apiStore.find('collection_cards', cardData.id)
-          this.setCollaborator(card, current_editor)
+          this.setCollaborator({ card, current_editor })
         })
       }
       return
@@ -37,14 +37,14 @@ export default class CollectionCollaborationService {
     if (updateData.card_id) {
       // a card has been created or updated, so fetch that individual card
       const card = await collection.API_fetchCard(updateData.card_id)
-      this.setCollaborator(card, current_editor)
+      this.setCollaborator({ card, current_editor })
       return
     }
     if (updateData.card_ids) {
       // a card has been created or updated, so fetch those cards
       const cards = collection.API_fetchAndMergeCards(updateData.card_ids)
       _.each(cards, card => {
-        this.setCollaborator(card, current_editor)
+        this.setCollaborator({ card, current_editor })
       })
       return
     }
@@ -70,7 +70,7 @@ export default class CollectionCollaborationService {
     if (updateData.cards_selected) {
       _.each(updateData.cards_selected, cardId => {
         const card = apiStore.find('collection_cards', cardId)
-        this.setCollaborator(card, current_editor)
+        this.setCollaborator({ card, current_editor })
       })
     }
     if (updateData.coordinates) {
@@ -86,8 +86,10 @@ export default class CollectionCollaborationService {
     }
   }
 
-  setCollaborator(card, current_editor) {
-    if (card && card.record && !_.isEmpty(current_editor)) {
+  setCollaborator({ card, current_editor }) {
+    if (_.isEmpty(current_editor)) return
+
+    if (card && !_.isEmpty(card.record)) {
       card.record.setLatestCollaborator(current_editor)
     }
   }

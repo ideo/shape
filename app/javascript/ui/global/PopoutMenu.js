@@ -463,7 +463,12 @@ class PopoutMenu extends React.Component {
     let { padding } = item
     if (component) {
       return (
-        <StyledMenuItem noHover width={width - 25} padding="0 0 0 16px">
+        <StyledMenuItem
+          noHover
+          width={width - 25}
+          padding="0 0 0 16px"
+          key={`menu-item-${i}`}
+        >
           {component}
         </StyledMenuItem>
       )
@@ -551,9 +556,9 @@ class PopoutMenu extends React.Component {
     const { groupExtraComponent } = this.props
     const { groupedMenuItems } = this
     const rendered = []
-    Object.keys(groupedMenuItems).forEach(groupName => {
+    Object.keys(groupedMenuItems).forEach((groupName, idx) => {
       rendered.push(
-        <div className={groupName} key={groupName}>
+        <div className={groupName} key={`group-menu-${groupName}-${idx}`}>
           {groupExtraComponent[groupName]}
           {groupedMenuItems[groupName].map((item, i) =>
             this.renderMenuItem(item, i)

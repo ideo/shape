@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -57,7 +57,6 @@ class FoamcoreGrid extends React.Component {
   // track whether drag movement is blocked because of overlapping cards
   @observable
   hasDragCollision = false
-  hoveringOver = false
   dragTimeoutId = null
   openSpotMatrix = []
   movingFromNormalCollection = false
@@ -744,7 +743,9 @@ class FoamcoreGrid extends React.Component {
         if (!this.hoveringOverCollection) {
           return
         }
-        this.hoveringOver.holdingOver = true
+        runInAction(() => {
+          this.hoveringOver.holdingOver = true
+        })
         this.setHoveringOver(this.hoveringOver)
       }, v.cardHoldTime)
       this.dragTimeoutId = dragTimeoutId
@@ -802,11 +803,14 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  get hoveringOver() {
+    const { uiStore } = this.props
+    return uiStore.hoveringOver
+  }
+
+  @computed
   get hoveringOverCollection() {
-    if (
-      this.hoveringOver &&
-      this.hoveringOver.record.internalType === 'collections'
-    ) {
+    if (_.get(this, 'hoveringOver.record.internalType') === 'collections') {
       return this.hoveringOver.record
     }
     return null
@@ -814,7 +818,6 @@ class FoamcoreGrid extends React.Component {
 
   setHoveringOver(val) {
     const { uiStore } = this.props
-    this.hoveringOver = val
     uiStore.setHoveringOver(val)
   }
 

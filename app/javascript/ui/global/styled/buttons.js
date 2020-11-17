@@ -215,5 +215,4 @@ const invertColor = color => {
     default:
       return v.colors.white
   }
-  return v.colors.white
 }

@@ -77,7 +77,7 @@ class NetworkStore extends jsonapi(Collection) {
     this.removeAll('invoices')
     return this.fetchAll('invoices', {
       filter: { organization_id },
-      sort: 'period_start',
+      sort: '-period_start',
     })
   }
 

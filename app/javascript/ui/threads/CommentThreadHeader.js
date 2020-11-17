@@ -11,7 +11,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import { SubduedTitle } from '~/ui/global/styled/typography'
 import FollowIcon from '~/ui/icons/FollowIcon'
 import v from '~/utils/variables'
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 import UnresolvedCount from '~/ui/threads/UnresolvedCount'
 

@@ -7,8 +7,10 @@ Feature: Data Item
     And I create a data card
     Then I should see a "DataItemCover" in the card at 0,0
     Then I should see 1 for the single data value
+    Then I should see a "EditableButton"
 
-    When I select "viewers" on the "measure" select on the report item
+    When I click the "EditableButton"
+    And I select "viewers" on the "measure" select on the report item
     And I wait for "@apiUpdateDataset" to finish
     Then I should see 16 for the single data value
 

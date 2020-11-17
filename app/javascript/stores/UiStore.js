@@ -682,6 +682,7 @@ export default class UiStore {
     this.movingFromCollectionId = null
     this.showTemplateHelperForCollection = null
     this.draggingFromMDL = false
+    this.setHoveringOver()
     if (deselect) this.deselectCards()
   }
 
@@ -881,16 +882,35 @@ export default class UiStore {
   // --- BCT + GridCard properties
   @action
   async openBlankContentTool(options = {}) {
-    const { viewingCollection } = this
-    if (this.blankContentToolState.placeholderCard) {
+    const { viewingCollection, blankContentToolState } = this
+    const { placeholderCard } = blankContentToolState
+    if (
+      placeholderCard &&
+      (placeholderCard.col !== options.col ||
+        placeholderCard.row !== options.row)
+    ) {
+      // if we have a placeholder and we're trying to open from the a different spot, close it
       await this.closeBlankContentTool()
     }
     runInAction(() => {
       this.deselectCards()
       this.closeCardMenu()
       this.clearTextEditingCard()
+      const { placeholderCard, blankType } = this.blankContentToolState
+      const openingBctFromHotEdge =
+        placeholderCard &&
+        blankType === 'hotcell' &&
+        options &&
+        options.blankType !== 'hotcell'
+      const bctState = openingBctFromHotEdge
+        ? {
+            ...this.defaultBCTState,
+            placeholderCard,
+          }
+        : this.defaultBCTState
+
       this.blankContentToolState = {
-        ...this.defaultBCTState,
+        ...bctState,
         order: 0,
         width: 1,
         height: 1,
@@ -1152,6 +1172,22 @@ export default class UiStore {
     const rejectCards = _.filter(
       this.apiStore.findAll('collection_cards'),
       card => _.includes(cardIds, card.id) && !card.canMove
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
+  reselectWithoutPlaceholders(cardIds = this.selectedCardIds) {
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && card.isBctPlaceholder
     )
     if (rejectCards.length === 0) return
 

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import PropTypes from 'prop-types'
 
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
@@ -162,6 +162,7 @@ PositionedBlankCard.propTypes = {
     'unrendered',
     'resize',
     'bct',
+    'hotcell',
   ]).isRequired,
   onCloseHtc: PropTypes.func.isRequired,
   handleBlankCardClick: PropTypes.func,

@@ -25,6 +25,7 @@ class CardMover < SimpleService
 
   def call
     return false if to_collection_invalid
+    return false if @moving_cards.empty?
 
     select_existing_cards
     select_pinned_cards
@@ -223,7 +224,7 @@ class CardMover < SimpleService
     return unless move?
 
     @moving_cards.each do |card|
-      next if card.link?
+      next if card.link? || card.placeholder?
       # private records remain private, do not alter their permissions
       next if card.record.private?
 
