@@ -360,11 +360,12 @@ class FoamcoreInteractionLayer extends React.Component {
 
   @action
   onCursorMove = type => ev => {
-    const { hasSelectedArea } = this
     const { coordinatesForPosition, uiStore } = this.props
+    const { hasSelectedArea } = uiStore
+    const rect = uiStore.foamcoreBoundingRectangle
 
     if (hasSelectedArea || !ev || !ev.target) {
-      // ignore these interactions when you're already dragging a selection square or don't have a target
+      // ignore these interactions when you don't have a target
       return
     }
 
@@ -372,6 +373,7 @@ class FoamcoreInteractionLayer extends React.Component {
       `.${FOAMCORE_INTERACTION_LAYER}`
     )
     const childOfCardMenu = !!ev.target.closest('.card-menu')
+    // ignore interactionLayer when hovering over a CardMenu
     if (
       (ev.target.id !== FOAMCORE_INTERACTION_LAYER &&
         !childOfInteractionLayer) ||
@@ -382,7 +384,6 @@ class FoamcoreInteractionLayer extends React.Component {
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
 
-    const rect = uiStore.foamcoreBoundingRectangle
     let { clientX, clientY, target } = ev
     // TouchEnd doesn't give you a clientX, have to get it from start event
     if (type === 'touch') {
@@ -393,6 +394,13 @@ class FoamcoreInteractionLayer extends React.Component {
       target = touchClickEv.target
     }
 
+    const rawCoords = {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    }
+
+    const coords = coordinatesForPosition(rawCoords)
+    const { row, col } = coords
     const { classList } = target
     if (
       (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) &&
@@ -402,13 +410,7 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    const rawCoords = {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    }
-    const coords = coordinatesForPosition(rawCoords)
     const { cardMatrix } = this.props.collection
-    const { row, col } = coords
 
     // ev.preventDefault()
     // ev.stopPropagation()
@@ -849,11 +851,6 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     return <div>{hotEdges}</div>
-  }
-
-  get hasSelectedArea() {
-    const { minX, maxX } = this.props.uiStore.selectedArea
-    return minX && maxX && maxX > minX
   }
 
   get renderBct() {

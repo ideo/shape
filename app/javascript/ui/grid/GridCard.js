@@ -125,7 +125,7 @@ class GridCard extends React.Component {
     }
 
     let className = 'show-on-hover'
-    if (this.isEditingCardCover || uiStore.selectedArea.minX) {
+    if (this.isEditingCardCover || uiStore.hasSelectedArea) {
       className = 'hidden-actions'
     }
 
@@ -535,10 +535,7 @@ class GridCard extends React.Component {
   }
 
   setCardRef(ref) {
-    const { card } = this.props
     this.gridCardRef = ref
-    if (!ref) return
-    uiStore.setCardPosition(card.id, ref.getBoundingClientRect())
   }
 
   render() {
@@ -672,7 +669,6 @@ class GridCard extends React.Component {
         data-row={card.row}
         data-cy="GridCard"
         onContextMenu={this.handleContextMenu}
-        // needed for dragging selection square
         ref={r => this.setCardRef(r)}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}

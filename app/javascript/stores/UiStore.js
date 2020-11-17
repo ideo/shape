@@ -229,12 +229,16 @@ export default class UiStore {
   @observable
   dragCardMaster = null
   @observable
-  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+  selectedArea = {
+    minX: null,
+    maxX: null,
+    minY: null,
+    maxY: null,
+  }
   @observable
   selectedAreaShifted = false
   @observable
   selectedAreaEnabled = false
-  cardPositions = []
   @observable
   linkedBreadcrumbTrail = []
   @observable
@@ -384,76 +388,77 @@ export default class UiStore {
 
   @action
   setSelectedArea(selectedArea, { shifted = false } = {}) {
-    const { viewingCollection } = this
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
 
-    if (viewingCollection && viewingCollection.isBoard) {
-      this.selectCardsWithinSelectedArea()
+    // ----
+    const { viewingCollection } = this
+    if (!viewingCollection || !viewingCollection.isBoard) {
+      return
     }
-  }
 
-  @action
-  resetCardPositions() {
-    this.cardPositions = []
-  }
+    const { minX, minY, maxX, maxY } = selectedArea
+    const rect = this.foamcoreBoundingRectangle
+    const scrollTop = window.pageYOffset
+    const scrollLeft = window.pageXOffset
 
-  @action
-  removeCardPositions(cardIds = []) {
-    _.each(cardIds, cardId => {
-      const idx = _.findIndex(this.cardPositions, { cardId })
-      if (idx > 0) {
-        this.cardPositions.splice(idx, 1)
-      }
+    const top = rect.y + scrollTop
+    const left = rect.x + scrollLeft
+
+    const minRawCoords = {
+      x: minX - left,
+      y: minY - top,
+    }
+    const maxRawCoords = {
+      x: maxX - left,
+      y: maxY - top,
+    }
+    const minCoords = this.coordinatesForPosition(minRawCoords)
+    const maxCoords = this.coordinatesForPosition(maxRawCoords)
+
+    this.selectCardsWithinSelectedArea({
+      minRow: minCoords.row,
+      minCol: minCoords.col,
+      maxRow: maxCoords.row,
+      maxCol: maxCoords.col,
     })
   }
 
-  @action
-  setCardPosition(cardId, { top, right, bottom, left } = {}) {
-    const idx = _.findIndex(this.cardPositions, { cardId })
-    const data = { cardId, position: { top, right, bottom, left } }
-    if (idx >= 0) {
-      this.cardPositions[idx] = data
-      return
-    }
-    this.cardPositions.push(data)
+  @computed
+  get hasSelectedArea() {
+    const { minX, maxX } = this.selectedArea
+    return minX && maxX && maxX > minX
   }
 
   @action
-  selectCardsWithinSelectedArea() {
-    const { minX, minY, maxX, maxY } = this.selectedArea
+  resetSelectedArea() {
+    this.selectedArea = {
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    }
+  }
+
+  @action
+  selectCardsWithinSelectedArea(minMaxCorners) {
     const { selectedCardIds, selectedAreaShifted, viewingCollection } = this
-    const viewingCardIds = viewingCollection.cardIds
+    // const viewingCardIds = viewingCollection.cardIds
     let newSelectedCardIds = []
 
-    if (minY === null || minX === null) {
+    if (minMaxCorners.minRow === null || minMaxCorners.minCol === null) {
       // or select none??
       return
     }
 
-    const scrollTop = window.pageYOffset
-    const scrollLeft = window.pageXOffset
-
-    newSelectedCardIds = _.map(
-      _.filter(this.cardPositions, pos => {
-        const { top, right, bottom, left } = pos.position
-        // make sure this card hasn't been removed e.g. archived
-        if (!_.includes(viewingCardIds, pos.cardId)) {
-          return false
-        }
-        return !(
-          right + scrollLeft < minX ||
-          left + scrollLeft > maxX ||
-          bottom + scrollTop < minY ||
-          top + scrollTop > maxY
-        )
-      }),
-      'cardId'
-    )
+    newSelectedCardIds = viewingCollection.cardIdsBetweenByColRow({
+      minMaxCorners,
+    })
 
     if (selectedAreaShifted) {
       newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
     }
+
     if (!_.isEqual(newSelectedCardIds, [...selectedCardIds])) {
       this.reselectCardIds(newSelectedCardIds)
     }
@@ -1077,6 +1082,10 @@ export default class UiStore {
   @action
   toggleSelectedCardId(cardId) {
     if (this.isSelected(cardId)) {
+      const parentSectionCard = this.parentSection(cardId)
+      if (parentSectionCard && this.isSelected(parentSectionCard.id)) {
+        this.selectedCardIds.remove(parentSectionCard.id)
+      }
       this.selectedCardIds.remove(cardId)
     } else {
       this.selectedCardIds.push(cardId)
@@ -1311,6 +1320,14 @@ export default class UiStore {
       // get everything between the corners of the section
       cardId,
       cardId
+    )
+  }
+
+  parentSection(cardId) {
+    return _.first(
+      this.viewingCollection.collection_cards.filter(
+        cc => cc.isSection && _.includes(this.cardIdsInSection(cc.id), cardId)
+      )
     )
   }
 
@@ -1921,6 +1938,26 @@ export default class UiStore {
       width: pos.w,
       height: pos.h,
     }
+  }
+
+  coordinatesForPosition(position) {
+    const collection = this.viewingCollection
+    const { gridW, gridH, gutter } = v.defaultGridSettings
+    const { relativeZoomLevel } = this
+    const { x, y } = position
+    const width = position.width || 1
+
+    let col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
+    let row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
+    if (row < 0) {
+      row = 0
+    }
+    // even though we restrict coordinates to being within the grid,
+    // we want to know if horizontalScroll should be disabled based on unmodified col
+    const outsideDraggableArea = col >= collection.num_columns || col < 0
+
+    col = _.clamp(col, 0, collection.num_columns - width)
+    return { col, row, outsideDraggableArea }
   }
 
   createRoles = (entities, roleName, opts = {}, record) => {

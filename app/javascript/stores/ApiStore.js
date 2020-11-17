@@ -711,7 +711,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     this.uiStore.deselectCards()
-    this.uiStore.removeCardPositions(cardIds)
     collection.removeCardIds(cardIds)
     return archiveResult
   }

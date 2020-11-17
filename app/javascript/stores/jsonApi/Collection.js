@@ -182,15 +182,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   cardIdsBetween(firstCardId, lastCardId) {
     if (this.isBoard && this.viewMode !== 'list') {
-      return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
+      return this.cardIdsBetweenByColRow({ firstCardId, lastCardId })
     }
     // For all other collection types, find cards by order
-    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
+    return this.cardIdsBetweenByOrder({ firstCardId, lastCardId })
   }
 
   // Find all cards that are between these two card ids,
   // using the card order
-  cardIdsBetweenByOrder(firstCardId, lastCardId) {
+  cardIdsBetweenByOrder({ firstCardId, lastCardId }) {
     const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
     const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
     const cardIdsBetween = [...this.cardIds]
@@ -278,16 +278,25 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       minRow: _.min(cards.map(card => card.row)),
       maxRow: _.max(cards.map(card => card.maxRowWithSections)),
       minCol: _.min(cards.map(card => card.col)),
-      maxCol: _.max(cards.map(card => card.maxCol)),
+      maxCol: _.max(cards.map(card => card.maxColWithSections)),
     })
 
   // Find all cards that are between these two card ids,
   // using the card row & col
-  cardIdsBetweenByColRow(firstCardId, lastCardId = null) {
-    const cards = this.collection_cards.filter(
-      card => card.id === firstCardId || card.id === lastCardId
-    )
-    const minMax = this.minMaxRowColForCards(cards)
+  cardIdsBetweenByColRow({
+    firstCardId = null,
+    lastCardId = null,
+    minMaxCorners = null,
+  } = {}) {
+    let minMax = minMaxCorners
+
+    if (!minMaxCorners && firstCardId) {
+      const cards = this.collection_cards.filter(
+        card => card.id === firstCardId || card.id === lastCardId
+      )
+      minMax = this.minMaxRowColForCards(cards)
+    }
+    // range has to add 1; e.g. _.range(0, 1) === [0]
     const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
     const colRange = _.range(minMax.minCol, minMax.maxCol + 1)
 

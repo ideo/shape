@@ -324,28 +324,13 @@ class FoamcoreGrid extends React.Component {
 
   // Finds row and column from an x,y coordinate
   coordinatesForPosition = position => {
-    const { collection } = this.props
-    const { x, y } = position
-    let width = 1
-    if (position.width && !this.hoveringOverCollection) {
+    const { uiStore } = this.props
+    if (this.hoveringOverCollection) {
       // if we're hovering over a collection we leave the virtual width at 1
       // so that we can still drag wide cards over 1x1 collections
-      width = position.width
+      position.width = 1
     }
-    const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel } = this
-
-    let col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
-    let row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
-    if (row < 0) {
-      row = 0
-    }
-    // even though we restrict coordinates to being within the grid,
-    // we want to know if horizontalScroll should be disabled based on unmodified col
-    const outsideDraggableArea = col >= collection.num_columns || col < 0
-
-    col = _.clamp(col, 0, collection.num_columns - width)
-    return { col, row, outsideDraggableArea }
+    return uiStore.coordinatesForPosition(position)
   }
 
   findOverlap(card) {

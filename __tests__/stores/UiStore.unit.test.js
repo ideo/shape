@@ -170,6 +170,35 @@ describe('UiStore', () => {
     })
   })
 
+  describe('#toggleSelectedCardId', () => {
+    const collection = {
+      ...fakeCollection,
+      collection_cards: [{ id: '99', isSection: true }, { id: '100' }],
+      // mock return value to simulate card 100 being inside the section
+      cardIdsBetween: jest.fn().mockReturnValue(['100']),
+    }
+    beforeEach(() => {
+      uiStore.setViewingRecord(collection)
+    })
+
+    it('should set the cardId as selected', () => {
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('100')).toBe(true)
+    })
+
+    it('should deselect the parent section if cardId is deselected', () => {
+      uiStore.toggleSelectedCardId('99')
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('99')).toBe(true)
+      expect(uiStore.isSelected('100')).toBe(true)
+      // now deselect
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('99')).toBe(false)
+      // section should also get deselected
+      expect(uiStore.isSelected('100')).toBe(false)
+    })
+  })
+
   describe('#openMoveMenu', () => {
     const parentId = '111'
     const collection = {

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable, runInAction } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import queryString from 'query-string'
 
 import {
@@ -96,6 +96,15 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
   get maxCol() {
     if (this.col === undefined || this.width === undefined) return 0
     return this.col + this.width - 1
+  }
+
+  get maxColWithSections() {
+    const { maxCol } = this
+    if (!this.isSection || maxCol === 0) {
+      return maxCol
+    }
+    // section corner is 1 row up
+    return maxCol - 1
   }
 
   get isTestCollection() {
@@ -461,6 +470,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     )
   }
 
+  @computed
   get isSelected() {
     return this.uiStore.isSelected(this.id)
   }

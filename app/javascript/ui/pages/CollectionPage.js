@@ -79,7 +79,6 @@ class CollectionPage extends React.Component {
         this.subscribeToChannel(currentId)
         // when navigating between collections, close BCT
         uiStore.closeBlankContentTool()
-        uiStore.resetCardPositions()
         this.setViewingRecordAndRestoreScrollPosition()
         this.initialLoad()
         routingStore.updateScrollState(previousId, window.pageYOffset)
