@@ -823,14 +823,15 @@ class FoamcoreInteractionLayer extends React.Component {
           // continue iteration
           return true
         }
-        // find two cards together UNLESS the card on the right isPinnedAndLocked
+        // find two cards together UNLESS the card on the right isPinnedAndLocked/isSection
+        const canBumpNextCard =
+          !cardMatrix[row][col].isPinnedAndLocked &&
+          !cardMatrix[row][col].isSection
         const twoCardsTogether =
           col > 0 &&
-          !cardMatrix[row][col].isPinnedAndLocked &&
-          !cardMatrix[row][col].isSection &&
           cardMatrix[row][col - 1] &&
           cardMatrix[row][col - 1] !== cardMatrix[row][col]
-        if (col === 0 || twoCardsTogether) {
+        if (canBumpNextCard && (col === 0 || twoCardsTogether)) {
           hotEdges.push(
             <FoamcoreHotEdge
               key={`hotspot-${row}:${col}`}

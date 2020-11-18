@@ -399,11 +399,11 @@ export default class UiStore {
 
     const { minX, minY, maxX, maxY } = selectedArea
     const rect = this.foamcoreBoundingRectangle
-    const scrollTop = window.pageYOffset
-    const scrollLeft = window.pageXOffset
+    const scrollTop = window.pageYOffset || 0
+    const scrollLeft = window.pageXOffset || 0
 
-    const top = rect.y + scrollTop
-    const left = rect.x + scrollLeft
+    const top = rect.top + scrollTop
+    const left = rect.left + scrollLeft
 
     const minRawCoords = {
       x: minX - left,
@@ -443,7 +443,6 @@ export default class UiStore {
   @action
   selectCardsWithinSelectedArea(minMaxCorners) {
     const { selectedCardIds, selectedAreaShifted, viewingCollection } = this
-    // const viewingCardIds = viewingCollection.cardIds
     let newSelectedCardIds = []
 
     if (minMaxCorners.minRow === null || minMaxCorners.minCol === null) {

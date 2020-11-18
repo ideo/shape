@@ -176,6 +176,7 @@ export const SectionCardWrapper = styled.div`
     position: relative;
     top: 40px;
     left: 174px;
+    width: 60%;
   }
 `
 export const SectionTop = styled.div`
