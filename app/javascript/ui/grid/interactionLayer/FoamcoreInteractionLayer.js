@@ -214,7 +214,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   handleMouseUpSelection = e => {
-    const { uiStore } = this.props
+    // const { uiStore } = this.props
     if (!this.sectionCreationArea.left) return
 
     // Stop propagation if dragging so it doesn't trigger other events
@@ -414,6 +414,22 @@ class FoamcoreInteractionLayer extends React.Component {
       row,
       width: absoluteWidth,
       height: absoluteHeight,
+      isSection: true,
+    })
+    console.log('grid coords', {
+      row,
+      col,
+      width: absoluteWidth + 2,
+      height: absoluteHeight + 2,
+    })
+    console.log('px coords', { x, y, w, h })
+    const redoneCoordsStart = coordinatesForPosition({ x, y })
+    const redoneCoordsEnd = coordinatesForPosition({ x: x + w, y: y + h })
+    console.log('grid coords redone', {
+      row: redoneCoordsStart.row,
+      col: redoneCoordsStart.col,
+      width: redoneCoordsEnd.col - redoneCoordsStart.col,
+      height: redoneCoordsEnd.row - redoneCoordsStart.row,
     })
     this.setSectionCreationArea({
       left: x,
