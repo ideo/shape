@@ -781,7 +781,7 @@ class MovableGridCard extends React.Component {
         // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
         _zIndex = -1
       }
-      renderedCard = <SectionCard card={card} />
+      renderedCard = <SectionCard card={card} zoomLevel={zoomLevel} />
     }
 
     return (
