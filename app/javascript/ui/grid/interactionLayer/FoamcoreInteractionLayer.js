@@ -390,7 +390,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const absoluteWidth = end.col - col
     const absoluteHeight = end.row - row
-    if (absoluteWidth < 3 || absoluteHeight < 3) {
+    if (absoluteWidth < 2 || absoluteHeight < 2) {
       this.clearSectionCreationArea()
       return
     }
@@ -398,8 +398,8 @@ class FoamcoreInteractionLayer extends React.Component {
     const attrs = {
       col,
       row,
-      width: absoluteWidth,
-      height: absoluteHeight,
+      width: absoluteWidth + 1,
+      height: absoluteHeight + 1,
       section_name: 'New Section',
       card_type: 'section',
       type: 'CollectionCard::Section',
@@ -412,25 +412,11 @@ class FoamcoreInteractionLayer extends React.Component {
     const { x, y, w, h } = uiStore.positionForCoordinates({
       col,
       row,
-      width: absoluteWidth,
-      height: absoluteHeight,
+      width: absoluteWidth + 1,
+      height: absoluteHeight + 1,
       isSection: true,
     })
-    console.log('grid coords', {
-      row,
-      col,
-      width: absoluteWidth + 2,
-      height: absoluteHeight + 2,
-    })
-    console.log('px coords', { x, y, w, h })
-    const redoneCoordsStart = coordinatesForPosition({ x, y })
-    const redoneCoordsEnd = coordinatesForPosition({ x: x + w, y: y + h })
-    console.log('grid coords redone', {
-      row: redoneCoordsStart.row,
-      col: redoneCoordsStart.col,
-      width: redoneCoordsEnd.col - redoneCoordsStart.col,
-      height: redoneCoordsEnd.row - redoneCoordsStart.row,
-    })
+
     this.setSectionCreationArea({
       left: x,
       top: y,
@@ -443,13 +429,7 @@ class FoamcoreInteractionLayer extends React.Component {
     setTimeout(() => {
       this.clearSectionCreationArea()
     }, 500)
-    // runInAction(() => {
-    //   collection.tempSection = card
-    // })
     await card.API_create()
-    // runInAction(() => {
-    //   collection.tempTextCard = null
-    // })
 
     // clear selected area (enabling BCT to open)
     this.clearSectionCreationArea()
@@ -694,8 +674,11 @@ class FoamcoreInteractionLayer extends React.Component {
   @action
   setSectionCreationArea({ top, left, width, height } = {}) {
     const { coordinatesForPosition, uiStore } = this.props
-    const { row, col } = coordinatesForPosition({ x: width, y: height })
-    if (row < 3 || col < 3) {
+    const { row, col } = coordinatesForPosition({
+      x: width,
+      y: height,
+    })
+    if (row < 2 || col < 2) {
       uiStore.setSectionCreation('error')
     } else {
       uiStore.setSectionCreation('drawing')
