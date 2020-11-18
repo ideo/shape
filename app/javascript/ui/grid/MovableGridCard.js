@@ -4,7 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
-
+import { hexToRgba } from '~/utils/colorUtils'
 import { uiStore } from '~/stores'
 import v, {
   MAX_SECTION_W,
@@ -792,7 +792,16 @@ class MovableGridCard extends React.Component {
         // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
         _zIndex = -1
       }
-      renderedCard = <SectionCard card={card} />
+
+      let backgroundColor = null
+
+      if (resizing) {
+        backgroundColor = `${hexToRgba(v.colors.primaryLight, 0.2)}`
+      }
+
+      renderedCard = (
+        <SectionCard card={card} backgroundColor={backgroundColor} />
+      )
     }
 
     return (

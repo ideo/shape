@@ -474,9 +474,17 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    const { row, col } = positionedCard
+    if (!positionedCard) return null
+
+    const { row, col, isSection } = positionedCard
     const { width, height } = newSize
-    this.throttledSetResizeSpot({ col, row, height, width })
+    this.throttledSetResizeSpot({
+      col,
+      row,
+      height,
+      width,
+      hidden: isSection,
+    })
   }
 
   resizeCard = card => {
@@ -651,7 +659,7 @@ class FoamcoreGrid extends React.Component {
     this.dragging = false
     this.resizing = false
     this.draggingCardMasterPosition = {}
-    uiStore.setPlaceholderSpot(this.placeholderDefaults)
+    uiStore.setPlaceholderSpot()
     if (!keepMDLOpen) {
       uiStore.setMovingCards([])
     }
@@ -899,7 +907,7 @@ class FoamcoreGrid extends React.Component {
     return _.compact(dragMap)
   }
 
-  setResizeSpot({ row, col, width, height }) {
+  setResizeSpot({ row, col, width, height, hidden = false }) {
     const { uiStore } = this.props
     uiStore.setPlaceholderSpot({
       row,
@@ -907,6 +915,7 @@ class FoamcoreGrid extends React.Component {
       width,
       height,
       type: 'resize',
+      hidden,
     })
   }
 

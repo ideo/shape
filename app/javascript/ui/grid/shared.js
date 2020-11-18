@@ -155,7 +155,7 @@ const SECTION_BORDER = '4px solid black'
 export const SectionCardWrapper = styled.div`
   height: 100%;
   width: 100%;
-
+  background: ${props => props.backgroundColor};
   .sectionInner {
     position: absolute;
     cursor: grab;
@@ -166,8 +166,6 @@ export const SectionCardWrapper = styled.div`
       ${highlightedCardCss}
     }
     `};
-    /* for debugging: */
-    /* background-color: rgba(130, 125, 185, 0.1); */
   }
 
   .styled-name {
@@ -178,6 +176,17 @@ export const SectionCardWrapper = styled.div`
     left: 174px;
   }
 `
+
+SectionCardWrapper.propTypes = {
+  /* for debugging: */
+  /* backgroundColor: rgba(130, 125, 185, 0.1); */
+  backgroundColor: PropTypes.string,
+}
+
+SectionCardWrapper.defaultProps = {
+  backgroundColor: v.colors.transparent,
+}
+
 export const SectionTop = styled.div`
   border-top: ${SECTION_BORDER};
   width: 100%;

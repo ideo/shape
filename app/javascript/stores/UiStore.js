@@ -267,6 +267,7 @@ export default class UiStore {
     height: 0,
     cardWidth: 1,
     cardHeight: 1,
+    hidden: false,
   }
   @observable
   placeholderPosition = {
@@ -1896,12 +1897,13 @@ export default class UiStore {
   @action
   setPlaceholderSpot(placeholderSpot = this.placeholderDefaults) {
     if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
-      const { row, col, width, height, type } = placeholderSpot
+      const { row, col, width, height, type, hidden } = placeholderSpot
       this.placeholderSpot.row = row
       this.placeholderSpot.col = col
       this.placeholderSpot.width = width
       this.placeholderSpot.height = height
       this.placeholderSpot.type = type
+      this.placeholderSpot.hidden = hidden
     }
   }
 

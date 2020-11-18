@@ -1,5 +1,7 @@
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
+import v from '~/utils/variables'
 
 import {
   SectionCardWrapper,
@@ -25,7 +27,7 @@ class SectionCard extends React.Component {
   }
 
   render() {
-    const { card } = this.props
+    const { card, backgroundColor } = this.props
     const { section_name, can_edit_parent, isSelected } = card
 
     return (
@@ -33,6 +35,7 @@ class SectionCard extends React.Component {
         selected={isSelected}
         className="sectionCardWrapper"
         onMouseMove={this.onMouseMove}
+        backgroundColor={backgroundColor}
       >
         <EditableName
           name={section_name}
@@ -52,6 +55,11 @@ class SectionCard extends React.Component {
 
 SectionCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  backgroundColor: PropTypes.string,
+}
+
+SectionCard.defaultProps = {
+  backgroundColor: v.colors.transparent,
 }
 
 export default SectionCard

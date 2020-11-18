@@ -706,7 +706,9 @@ class FoamcoreInteractionLayer extends React.Component {
   get renderResizeSpot() {
     const { uiStore } = this.props
     const { placeholderSpot } = uiStore
-    const { row, col, width, height } = placeholderSpot
+    const { row, col, width, height, hidden } = placeholderSpot
+
+    if (hidden) return null
 
     if (row !== null && col !== null) {
       return this.positionBlank(
