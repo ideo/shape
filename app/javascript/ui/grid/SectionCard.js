@@ -75,7 +75,7 @@ class SectionCard extends React.Component {
             canView
             canEdit
             canReplace={false}
-            location={this.location}
+            location="GridCard"
             className="show-on-hover"
             wrapperClassName="card-menu"
             card={card}

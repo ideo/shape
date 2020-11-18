@@ -1190,6 +1190,7 @@ export default class UiStore {
           _.includes(cardIds, card.id) &&
           (card.link ||
             (card.record && card.record.can_edit) ||
+            card.isSection ||
             (card.isBctPlaceholder && card.can_edit_parent))
       )
     const filteredCardIds = _.map(filteredCards, 'id')
