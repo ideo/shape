@@ -189,12 +189,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return this.cardIdsBetweenByColRow({ firstCardId, lastCardId })
     }
     // For all other collection types, find cards by order
-    return this.cardIdsBetweenByOrder({ firstCardId, lastCardId })
+    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
   }
 
   // Find all cards that are between these two card ids,
   // using the card order
-  cardIdsBetweenByOrder({ firstCardId, lastCardId }) {
+  cardIdsBetweenByOrder(firstCardId, lastCardId) {
     const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
     const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
     const cardIdsBetween = [...this.cardIds]
