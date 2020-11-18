@@ -581,6 +581,9 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
             prompt,
             onToggleSnoozeDialog,
           } = collection.confirmEditOptions)
+        } else if (this.isSection) {
+          prompt =
+            'All contents in this Section will be deleted. You can undo with ‘CTRL+Z’. Would you like to conintue?'
         } else {
           prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {
