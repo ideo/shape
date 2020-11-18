@@ -73,7 +73,7 @@ class SectionCard extends React.Component {
           </CardActionHolder>
           <ActionMenu
             canView
-            canEdit
+            canEdit={card.can_edit_parent}
             canReplace={false}
             location="GridCard"
             className="show-on-hover"
