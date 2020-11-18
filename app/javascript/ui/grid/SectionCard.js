@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { action } from 'mobx'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 
 import {
@@ -24,6 +25,13 @@ class SectionCard extends React.Component {
     }
   }
 
+  @action
+  updateSectionName = name => {
+    const { card } = this.props
+    card.section_name = name
+    card.save()
+  }
+
   render() {
     const { card } = this.props
     const { section_name, can_edit_parent, isSelected } = card
@@ -35,8 +43,8 @@ class SectionCard extends React.Component {
         onMouseMove={this.onMouseMove}
       >
         <EditableName
-          name={section_name}
-          updateNameHandler={n => console.log('should update', n)}
+          name={section_name || ''}
+          updateNameHandler={this.updateSectionName}
           canEdit={can_edit_parent}
           fontSize={'3.5rem'}
           fieldName="sectionName"

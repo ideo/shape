@@ -678,6 +678,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :order,
       :hidden,
       :section_type,
+      :section_name,
       :font_color,
       :font_background,
       :cover_card_id,
