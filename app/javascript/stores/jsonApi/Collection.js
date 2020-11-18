@@ -2070,8 +2070,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get styledTheme() {
-    const { fontColor } = this
+    const { fontColor, uiStore } = this
     const theme = {
+      zoomLevel: uiStore.relativeZoomLevel,
       // can probably deprecate this once we fully migrate 4WFC?
       useResponsiveText: !this.isBoard,
     }

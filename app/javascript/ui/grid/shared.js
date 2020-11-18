@@ -159,6 +159,7 @@ export const SectionCardWrapper = styled.div`
   width: 100%;
 
   .sectionInner {
+    border-radius: ${props => props.theme.zoomLevel * 2}px;
     position: absolute;
     cursor: grab;
     ${props =>
