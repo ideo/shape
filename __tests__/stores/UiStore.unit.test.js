@@ -14,6 +14,8 @@ let uiStore
 const fakeCollection = {
   id: '123',
   isCollection: true,
+  isBoard: true,
+  num_columns: 4,
   parent_collection_card: {},
   setCollaborators: jest.fn(),
 }
@@ -62,9 +64,14 @@ describe('UiStore', () => {
         expect(blankContentToolState.col).toBe(4)
       })
 
-      describe('with placeholderCard', () => {
+      describe('with placeholderCard that is placed in a different spot as the bct', () => {
         beforeEach(() => {
-          uiStore.setBctPlaceholderCard({ id: '99' })
+          const { blankContentToolState } = uiStore
+          uiStore.setBctPlaceholderCard({
+            id: '99',
+            col: blankContentToolState.col + 1,
+            row: blankContentToolState.row,
+          })
           uiStore.closeBlankContentTool = jest.fn()
         })
         it('should call closeBlankContentTool to clear the card', () => {
@@ -142,6 +149,22 @@ describe('UiStore', () => {
       expect(uiStore.selectedCardIds).toEqual([cardId])
     })
 
+    describe('with a section card', () => {
+      const collection = {
+        ...fakeCollection,
+        collection_cards: [{ id: '99', isSection: true }],
+        cardIdsBetween: jest.fn(),
+      }
+      beforeEach(() => {
+        uiStore.setViewingRecord(collection)
+      })
+
+      it('should call cardIdsBetween to select cards in the section', () => {
+        uiStore.reselectCardIds(['99'])
+        expect(collection.cardIdsBetween).toHaveBeenCalledWith('99', '99')
+      })
+    })
+
     describe('with cardId part of a larger selection', () => {
       const selectedCardIds = [cardId, '1', '2', '3']
       beforeEach(() => {
@@ -151,6 +174,35 @@ describe('UiStore', () => {
       it('should update multiMoveCardIds to match selectedCardIds', () => {
         expect(uiStore.multiMoveCardIds).toEqual(selectedCardIds)
       })
+    })
+  })
+
+  describe('#toggleSelectedCardId', () => {
+    const collection = {
+      ...fakeCollection,
+      collection_cards: [{ id: '99', isSection: true }, { id: '100' }],
+      // mock return value to simulate card 100 being inside the section
+      cardIdsBetween: jest.fn().mockReturnValue(['100']),
+    }
+    beforeEach(() => {
+      uiStore.setViewingRecord(collection)
+    })
+
+    it('should set the cardId as selected', () => {
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('100')).toBe(true)
+    })
+
+    it('should deselect the parent section if cardId is deselected', () => {
+      uiStore.toggleSelectedCardId('99')
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('99')).toBe(true)
+      expect(uiStore.isSelected('100')).toBe(true)
+      // now deselect
+      uiStore.toggleSelectedCardId('100')
+      expect(uiStore.isSelected('99')).toBe(false)
+      // section should also get deselected
+      expect(uiStore.isSelected('100')).toBe(false)
     })
   })
 
@@ -269,16 +321,7 @@ describe('UiStore', () => {
       maxY: 200,
     }
     beforeEach(() => {
-      uiStore.setSelectedArea(coords)
-      // cardPositions determines where each card is placed on the grid
-      // gets called in GridCard when it sets the ref
-      uiStore.setCardPosition('1', { top: 0, right: 100, bottom: 100, left: 0 })
-      uiStore.setCardPosition('2', {
-        top: 300,
-        right: 100,
-        bottom: 500,
-        left: 0,
-      })
+      fakeCollection.cardIdsBetweenByColRow = jest.fn().mockReturnValue(['1'])
       uiStore.setViewingRecord({
         ...fakeCollection,
         collection_cards: [],
@@ -288,21 +331,22 @@ describe('UiStore', () => {
 
     it('selects cards in within the selectedArea', () => {
       expect(uiStore.selectedCardIds).toEqual([])
-      uiStore.selectCardsWithinSelectedArea()
+      uiStore.setSelectedArea(coords)
+      expect(fakeCollection.cardIdsBetweenByColRow).toHaveBeenCalledWith({
+        minMaxCorners: {
+          maxCol: 0,
+          maxRow: 0,
+          minCol: 0,
+          minRow: 0,
+        },
+      })
       expect(uiStore.selectedCardIds).toEqual(['1'])
     })
 
     it('adds to selection if shifted', () => {
       uiStore.reselectCardIds(['5'])
       uiStore.setSelectedArea(coords, { shifted: true })
-      uiStore.selectCardsWithinSelectedArea()
       expect(uiStore.selectedCardIds).toEqual(['1', '5'])
-    })
-
-    it('omits cards that are not in viewingCollection', () => {
-      uiStore.setViewingRecord({ ...fakeCollection, id: '999', cardIds: ['2'] })
-      uiStore.selectCardsWithinSelectedArea()
-      expect(uiStore.selectedCardIds).toEqual([])
     })
   })
 

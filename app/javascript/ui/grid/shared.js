@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
-import Loader from '~/ui/layout/Loader'
 
 const Container = styled.div`
   align-items: center;
@@ -40,7 +39,8 @@ const IconHolder = styled.div`
 `
 
 export const StyledGridCardPrivate = styled.div`
-  background: ${v.colors.commonMedium};
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
+  background: ${props => props.backgroundColor};
   text-align: center;
   color: ${v.colors.collectionCover};
   width: 100%;
@@ -51,6 +51,9 @@ export const StyledGridCardPrivate = styled.div`
     margin: auto;
   }
 `
+StyledGridCardPrivate.defaultProps = {
+  backgroundColor: `${v.colors.commonMedium}`,
+}
 StyledGridCardPrivate.displayName = 'StyledGridCardPrivate'
 
 export const highlightedCardCss = css`
@@ -68,6 +71,7 @@ export const highlightedCardCss = css`
 
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.unclickable) return 'auto'
@@ -151,13 +155,11 @@ const SECTION_THICKNESS = 100
 const SECTION_BORDER = '4px solid black'
 
 export const SectionCardWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
   height: 100%;
   width: 100%;
 
   .sectionInner {
+    border-radius: ${props => props.theme.zoomLevel * 2}px;
     position: absolute;
     cursor: grab;
     ${props =>
@@ -169,6 +171,15 @@ export const SectionCardWrapper = styled.div`
     `};
     /* for debugging: */
     /* background-color: rgba(130, 125, 185, 0.1); */
+  }
+
+  .styled-name {
+    /* just relative to .sectionInner this should be on top */
+    z-index: 10;
+    position: relative;
+    top: 40px;
+    left: 174px;
+    width: 60%;
   }
 `
 export const SectionTop = styled.div`
@@ -271,6 +282,7 @@ StyledCardWrapper.defaultProps = {
 }
 
 export const StyledGridCardInner = styled.div`
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   position: relative;
   height: 100%;
   ${props =>
@@ -446,22 +458,4 @@ export class GridCardIconWithName extends React.PureComponent {
 GridCardIconWithName.propTypes = {
   text: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
-}
-
-export const CardLoader = () => {
-  return (
-    <div
-      style={{
-        top: 0,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        zIndex: v.zIndex.gridCardTop,
-        background: hexToRgba(v.colors.commonDark, 0.5),
-        color: 'white',
-      }}
-    >
-      <Loader size={30} containerHeight="100%" animation="circular" />
-    </div>
-  )
 }

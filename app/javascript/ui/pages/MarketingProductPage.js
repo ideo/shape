@@ -91,7 +91,6 @@ class MarketingProductPage extends React.Component {
         break
       default:
         return ''
-        break
     }
 
     return (

@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types'
+import color from 'color'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { StyledGridCardPrivate, CardLoader } from '~/ui/grid/shared'
+import { StyledGridCardPrivate } from '~/ui/grid/shared'
+import CardLoader from '~/ui/grid/loader/CardLoader'
+import propShapes from '~/utils/propShapes'
+import { getCollaboratorColor } from '~/utils/colorUtils'
 
 class PlaceholderCard extends React.Component {
   componentDidMount() {
@@ -53,9 +57,19 @@ class PlaceholderCard extends React.Component {
   }
 
   render() {
+    const { collaborator } = this.props
+
+    const collaboratorColor = getCollaboratorColor(collaborator)
+    const backgroundColor =
+      collaboratorColor &&
+      color(collaboratorColor)
+        .alpha(0.3)
+        .rgb()
+        .toString()
+
     return (
-      <StyledGridCardPrivate>
-        <CardLoader />
+      <StyledGridCardPrivate backgroundColor={backgroundColor}>
+        <CardLoader collaborator={collaborator} />
       </StyledGridCardPrivate>
     )
   }
@@ -64,6 +78,11 @@ class PlaceholderCard extends React.Component {
 PlaceholderCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   warnBeforeLeaving: PropTypes.bool.isRequired,
+  collaborator: PropTypes.shape(propShapes.collaborator),
+}
+
+PlaceholderCard.defaultProps = {
+  collaborator: null,
 }
 
 export default PlaceholderCard

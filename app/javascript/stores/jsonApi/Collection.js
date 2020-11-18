@@ -19,7 +19,11 @@ import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
-import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
+import v, {
+  FOAMCORE_MAX_ZOOM,
+  FOUR_WIDE_MAX_ZOOM,
+  COLLECTION_CARD_TYPES,
+} from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -182,7 +186,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   cardIdsBetween(firstCardId, lastCardId) {
     if (this.isBoard && this.viewMode !== 'list') {
-      return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
+      return this.cardIdsBetweenByColRow({ firstCardId, lastCardId })
     }
     // For all other collection types, find cards by order
     return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
@@ -276,18 +280,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // keeping in mind a card's area needs to contribute to width/height
     ({
       minRow: _.min(cards.map(card => card.row)),
-      maxRow: _.max(cards.map(card => card.maxRow)),
+      maxRow: _.max(cards.map(card => card.maxRowWithSections)),
       minCol: _.min(cards.map(card => card.col)),
-      maxCol: _.max(cards.map(card => card.maxCol)),
+      maxCol: _.max(cards.map(card => card.maxColWithSections)),
     })
 
   // Find all cards that are between these two card ids,
   // using the card row & col
-  cardIdsBetweenByColRow(firstCardId, lastCardId = null) {
-    const cards = this.collection_cards.filter(
-      card => card.id === firstCardId || card.id === lastCardId
-    )
-    const minMax = this.minMaxRowColForCards(cards)
+  cardIdsBetweenByColRow({
+    firstCardId = null,
+    lastCardId = null,
+    minMaxCorners = null,
+  } = {}) {
+    let minMax = minMaxCorners
+
+    if (!minMaxCorners && firstCardId) {
+      const cards = this.collection_cards.filter(
+        card => card.id === firstCardId || card.id === lastCardId
+      )
+      minMax = this.minMaxRowColForCards(cards)
+    }
+    // range has to add 1; e.g. _.range(0, 1) === [0]
     const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
     const colRange = _.range(minMax.minCol, minMax.maxCol + 1)
 
@@ -918,7 +931,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       // mark each card for preloading in MovableGridCard
       _.each(data, cc => {
-        cc.preload = true
+        cc.preload =
+          cc.type === COLLECTION_CARD_TYPES.PLACEHOLDER ? false : true
       })
 
       uiStore.update('isTransparentLoading', false)
@@ -1004,6 +1018,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await apiStore.fetch('collection_cards', cardId, true)
     // make sure it's in our current collection
     const card = res.data
+    if (card.destroyed) {
+      // don't add the card since it was destroyed while being fetched
+      return
+    }
     this.addCard(card)
     return card
   }
@@ -2049,8 +2067,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get styledTheme() {
-    const { fontColor } = this
+    const { fontColor, uiStore } = this
     const theme = {
+      zoomLevel: uiStore.relativeZoomLevel,
       // can probably deprecate this once we fully migrate 4WFC?
       useResponsiveText: !this.isBoard,
     }

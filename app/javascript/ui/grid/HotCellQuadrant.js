@@ -269,7 +269,7 @@ HotCellQuadrant.propTypes = {
   zoomLevel: PropTypes.number.isRequired,
   opts: PropTypes.shape({
     templateId: PropTypes.string,
-  }).isRequired,
+  }),
   subTypes: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
@@ -290,6 +290,7 @@ HotCellQuadrant.defaultProps = {
   subTypes: null,
   displayName: false,
   currentMenuOpen: false,
+  opts: null,
 }
 
 export default HotCellQuadrant

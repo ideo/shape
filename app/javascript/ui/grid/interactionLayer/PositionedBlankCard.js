@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import PropTypes from 'prop-types'
 
-import hexToRgba from '~/utils/hexToRgba'
+import { hexToRgba } from '~/utils/colorUtils'
 import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
@@ -38,6 +38,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     }
     return 'none'
   }};
+  border-radius: ${props => props.zoomLevel * 2}px;
   position: absolute;
   transform-origin: left top;
   opacity: ${props => {
@@ -161,6 +162,7 @@ PositionedBlankCard.propTypes = {
     'unrendered',
     'resize',
     'bct',
+    'hotcell',
   ]).isRequired,
   onCloseHtc: PropTypes.func.isRequired,
   handleBlankCardClick: PropTypes.func,

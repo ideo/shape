@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { computed } from 'mobx'
+import { action } from 'mobx'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 
 import {
@@ -9,23 +9,11 @@ import {
   SectionBottom,
   SectionRight,
 } from '~/ui/grid/shared'
+import EditableName from '~/ui/pages/shared/EditableName'
 import { uiStore } from '~/stores'
 
 @observer
 class SectionCard extends React.Component {
-  setCardRef(ref) {
-    if (!ref) return
-    const { card } = this.props
-    uiStore.setCardPosition(card.id, ref.getBoundingClientRect())
-  }
-
-  @computed
-  get isSelected() {
-    const { card } = this.props
-    const selected = uiStore.isSelected(card.id)
-    return selected
-  }
-
   onMouseMove = ev => {
     // if we're hovering over the middle area of the wrapper
     // mark hoveringOverSection so we can bump the zIndex down in MovableGridCard
@@ -37,15 +25,30 @@ class SectionCard extends React.Component {
     }
   }
 
+  @action
+  updateSectionName = name => {
+    const { card } = this.props
+    card.section_name = name
+    card.save()
+  }
+
   render() {
+    const { card } = this.props
+    const { section_name, can_edit_parent, isSelected } = card
+
     return (
       <SectionCardWrapper
-        selected={this.isSelected}
+        selected={isSelected}
         className="sectionCardWrapper"
         onMouseMove={this.onMouseMove}
-        // needed for dragging selection square
-        ref={r => this.setCardRef(r)}
       >
+        <EditableName
+          name={section_name || ''}
+          updateNameHandler={this.updateSectionName}
+          canEdit={can_edit_parent}
+          fontSize={'3.5rem'}
+          fieldName="sectionName"
+        />
         <SectionTop className="sectionInner" />
         <SectionLeft className="sectionInner" />
         <SectionBottom className="sectionInner" />

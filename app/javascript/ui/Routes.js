@@ -209,6 +209,7 @@ class Routes extends React.Component {
 
   handleMouseUpSelection = e => {
     if (!this.mouseDownAt.x) return
+    const { uiStore } = this.props
 
     // Stop propagation if dragging so it doesn't trigger other events
     e.stopPropagation()
@@ -220,12 +221,7 @@ class Routes extends React.Component {
     // Cancel any currently throttled calls
     this.throttledSetSelectedArea.cancel()
     // clear selected area (enabling BCT to open)
-    this._setSelectedArea({
-      minX: null,
-      maxX: null,
-      minY: null,
-      maxY: null,
-    })
+    uiStore.resetSelectedArea()
     pageBoundsScroller.setScrolling(false)
   }
 

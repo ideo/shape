@@ -36,12 +36,6 @@ const rerender = () => {
 }
 
 describe('MovableGridCard', () => {
-  it('renders a placeholder card if cardType is "placeholder"', () => {
-    props.cardType = 'placeholder'
-    rerender()
-    expect(wrapper.find('GridCardPlaceholder').exists()).toBeTruthy()
-  })
-
   it('renders a blank card creation tool if cardType is "blank"', () => {
     props.cardType = 'blank'
     rerender()
@@ -197,6 +191,33 @@ describe('MovableGridCard', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
         expect(uiStore.reselectOnlyMovableCards).toHaveBeenCalled()
         expect(uiStore.startDragging).toHaveBeenCalledWith(props.card.id)
+      })
+    })
+  })
+
+  describe('componentDidUpdate', () => {
+    beforeEach(() => {
+      component.finishPreloading = jest.fn()
+    })
+
+    it('should call finishPreloading', () => {
+      wrapper.setState({ preloading: true })
+      expect(component.finishPreloading).toHaveBeenCalled()
+    })
+
+    describe('with private card', () => {
+      beforeEach(() => {
+        props.card = {
+          ...fakeItemCard,
+          isPrivate: true,
+        }
+        wrapper.setProps({ props })
+        rerender()
+      })
+
+      it('should call finishPreloading', () => {
+        wrapper.setState({ preloading: false })
+        expect(component.finishPreloading).toHaveBeenCalled()
       })
     })
   })

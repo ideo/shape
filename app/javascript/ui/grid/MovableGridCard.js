@@ -14,7 +14,6 @@ import v, {
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
-import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardPagination from '~/ui/grid/GridCardPagination'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
@@ -25,8 +24,9 @@ import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import SectionCard from '~/ui/grid/SectionCard'
 
 const GridCardPreload = styled.div`
-  height: 100%;
   width: 100%;
+  height: 100%;
+  border-radius: ${props => props.zoomLevel * 2}px;
   background: ${v.colors.commonMediumTint};
 `
 
@@ -140,7 +140,12 @@ class MovableGridCard extends React.Component {
   finishPreloading() {
     const { card } = this.props
     const { record } = card
-    if (this.state.preloading && _.isEmpty(record) && !card.isSection) {
+    if (
+      this.state.preloading &&
+      _.isEmpty(record) &&
+      !card.isSection &&
+      !card.isPrivate
+    ) {
       // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
@@ -157,6 +162,39 @@ class MovableGridCard extends React.Component {
       !uiStore.isTouchDevice ||
       (uiStore.isTouchDevice && this.state.allowTouchDeviceDragging)
     )
+  }
+
+  get collaborator() {
+    const { record, card } = this.props
+    if (card && card.isBctPlaceholder) {
+      const { placeholder_editor_id } = card
+      const { parent } = this.props
+
+      if (!parent || !placeholder_editor_id) return null
+
+      const collaboratorForPlaceholder = _.find(
+        parent.collaborators,
+        c => c.id && parseInt(c.id) === placeholder_editor_id
+      )
+
+      if (!collaboratorForPlaceholder) return null
+
+      const { color, name } = collaboratorForPlaceholder
+      return {
+        color,
+        name,
+      }
+    } else if (!_.isEmpty(record)) {
+      const lastCollaboratorForRecord = _.last(record.collaborators)
+      if (!lastCollaboratorForRecord) return null
+
+      const { color } = lastCollaboratorForRecord
+      return {
+        color,
+      }
+    }
+
+    return null
   }
 
   handleStart = (e, data) => {
@@ -329,12 +367,6 @@ class MovableGridCard extends React.Component {
     }
   }
 
-  renderPlaceholder = () => (
-    <PositionedGridCard {...this.styleProps()} {...uiStore.placeholderPosition}>
-      <GridCardPlaceholder />
-    </PositionedGridCard>
-  )
-
   renderEmpty = () => {
     const { currentlyZooming } = uiStore
     const transition = currentlyZooming ? 'none' : cardCSSTransition
@@ -505,9 +537,7 @@ class MovableGridCard extends React.Component {
     const { zIndex, cardTiltDegrees } = v
     const { cardDragging, aboveClickWrapper, cardHovering } = zIndex
 
-    if (cardType === 'placeholder') {
-      return this.renderPlaceholder()
-    } else if (cardType === 'blank' || cardType === 'submission') {
+    if (cardType === 'blank' || cardType === 'submission') {
       return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
       return this.renderEmpty()
@@ -550,6 +580,7 @@ class MovableGridCard extends React.Component {
       card,
       cardType,
       record,
+      collaborator: this.collaborator,
       // useful for sub-components to know about the card's height
       height,
       // we want to track "dragging" until the transition is complete
@@ -573,6 +604,8 @@ class MovableGridCard extends React.Component {
       textEditingCardId,
       isTouchDevice,
       isCypress,
+      blankContentToolState,
+      blankContentToolIsOpen,
     } = uiStore
 
     let _zIndex = 1
@@ -620,6 +653,16 @@ class MovableGridCard extends React.Component {
       _zIndex = cardHovering
       transform += ' scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
+    }
+
+    const { placeholderCard } = blankContentToolState
+    if (
+      blankContentToolIsOpen &&
+      !!placeholderCard &&
+      parseInt(currentUser.id) === placeholderCard.placeholder_editor_id
+    ) {
+      // ensure that the bct placeholder appears behind the user's bct
+      _zIndex = -1
     }
 
     const isTouchDeviceSingleColumn = isTouchDevice && cols === 1
@@ -775,7 +818,7 @@ class MovableGridCard extends React.Component {
             zoomLevel={zoomLevel}
           >
             {/* During preload we just render a gray square to simplify initial render */}
-            {preloading && <GridCardPreload />}
+            {preloading && <GridCardPreload zoomLevel={zoomLevel} />}
             {!preloading && renderedCard}
           </InnerCardWrapper>
         </Rnd>

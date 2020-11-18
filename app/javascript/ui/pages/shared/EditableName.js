@@ -13,6 +13,7 @@ const StyledName = styled.div`
   display: ${props => (props.inline ? 'inline-block' : 'block')};
   margin-top: 0;
   vertical-align: top;
+  font-size: ${props => props.fontSize};
 
   .editable-name-heading {
     margin-bottom: 0;
@@ -27,6 +28,7 @@ const StyledEditableName = styled.div`
     margin-top: ${props => props.editingMarginTop};
     input {
       ${props => props.typographyCss};
+      font-size: ${props => props.fontSize};
       z-index: ${v.zIndex.aboveClickWrapper};
       position: relative;
       background-color: transparent;
@@ -148,7 +150,7 @@ class EditableName extends React.Component {
   render() {
     const {
       canEdit,
-      editFontSize,
+      fontSize,
       uiStore,
       TypographyComponent,
       typographyCss,
@@ -162,7 +164,7 @@ class EditableName extends React.Component {
         <StyledEditableName
           typographyCss={typographyCss}
           className="styled-name"
-          fontSize={editFontSize}
+          fontSize={fontSize}
           editingMarginTop={editingMarginTop}
         >
           <AutosizeInput
@@ -172,7 +174,7 @@ class EditableName extends React.Component {
             placeholder={placeholder}
             maxLength={v.maxTitleLength}
             className="input__name"
-            style={{ fontSize: editFontSize }}
+            // style={{ fontSize: editFontSize }}
             value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
@@ -185,6 +187,7 @@ class EditableName extends React.Component {
     return (
       <StyledName className="styled-name" inline={this.props.inline}>
         <TypographyComponent
+          fontSize={fontSize}
           className="editable-name-heading"
           data-cy={`EditableNameHeading-${fieldName}`}
           ref={ref => {
@@ -211,6 +214,7 @@ EditableName.propTypes = {
   canEdit: PropTypes.bool,
   /** Adds extra margin when calculating truncation of the name while displaying */
   extraWidth: PropTypes.number,
+  fontSize: PropTypes.string,
   /** Font size for the input that is shown when editing */
   editFontSize: PropTypes.number,
   /** The component that displays the name when uneditable */
@@ -237,6 +241,9 @@ EditableName.wrappedComponent.propTypes = {
 
 EditableName.defaultProps = {
   canEdit: false,
+  // default should line up with the default in Heading1TypographyCss
+  fontSize: '1.75rem',
+  // TODO: remove this prop
   editFontSize: 2.25,
   extraWidth: 0,
   editingMarginTop: '0.5rem',

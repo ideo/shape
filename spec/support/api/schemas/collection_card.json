@@ -22,10 +22,12 @@
     "updated_at": { "type": "date" },
     "idea_id": { "type": ["string", "null"] },
     "section_type": { "type": ["string", "null"] },
+    "section_name": { "type": ["string", "null"] },
     "font_color": { "type": ["string", "null"] },
     "font_background": { "type": ["boolean"] },
     "cover_card_id": { "type": ["integer", "null"] },
-    "cover": { "type": ["object", "null"] }
+    "cover": { "type": ["object", "null"] },
+    "placeholder_editor_id": { "type": ["integer", "null"] }
   },
   "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }
