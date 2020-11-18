@@ -24,8 +24,9 @@ import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import SectionCard from '~/ui/grid/SectionCard'
 
 const GridCardPreload = styled.div`
-  height: 100%;
   width: 100%;
+  height: 100%;
+  border-radius: ${props => props.zoomLevel * 2}px;
   background: ${v.colors.commonMediumTint};
 `
 
@@ -139,7 +140,12 @@ class MovableGridCard extends React.Component {
   finishPreloading() {
     const { card } = this.props
     const { record } = card
-    if (this.state.preloading && _.isEmpty(record) && !card.isSection) {
+    if (
+      this.state.preloading &&
+      _.isEmpty(record) &&
+      !card.isSection &&
+      !card.isPrivate
+    ) {
       // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
@@ -812,7 +818,7 @@ class MovableGridCard extends React.Component {
             zoomLevel={zoomLevel}
           >
             {/* During preload we just render a gray square to simplify initial render */}
-            {preloading && <GridCardPreload />}
+            {preloading && <GridCardPreload zoomLevel={zoomLevel} />}
             {!preloading && renderedCard}
           </InnerCardWrapper>
         </Rnd>

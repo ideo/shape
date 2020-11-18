@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { ThemeProvider } from 'styled-components'
 
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
@@ -596,63 +597,71 @@ class GridCard extends React.Component {
       )
     } else {
       contents = (
-        <Fragment>
-          <StyledTopRightActions>
-            <TextActionMenu card={card} />
-          </StyledTopRightActions>
-          {showHotEdge && firstCardInRow && !card.isPinnedAndLocked && (
-            <GridCardHotspot card={card} dragging={dragging} position="left" />
-          )}
-          {showHotEdge && (!card.isPinnedAndLocked || lastPinnedCard) && (
-            <GridCardHotspot card={card} dragging={dragging} />
-          )}
-          {this.renderReplaceControl()}
-          {this.renderTopRightActions()}
-          {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
-            <BottomLeftCardIcons
-              card={card}
-              cardType={cardType}
-              record={record}
-            />
-          )}
-          {/* onClick placed here so it's separate from hotspot click */}
-          <StyledGridCardInner
-            onClick={this.handleClick}
-            hasOverflow={record.isData || record.isLegend || record.isText}
-            filter={card.filter}
-            forceFilter={!this.hasCover}
-            isText={record.isText}
-            visibleOverflow={
-              record.isReportTypeRecord || record.isCreativeDifferenceChartCover
-            }
-          >
-            {showRestore && (
-              <StyledTopRightActions
-                color={this.actionsColor}
-                zoomLevel={zoomLevel}
-              >
-                <NamedActionButton onClick={this.handleRestore}>
-                  <RestoreIcon />
-                  Restore
-                </NamedActionButton>
-              </StyledTopRightActions>
+        <ThemeProvider theme={{ zoomLevel }}>
+          <Fragment>
+            <StyledTopRightActions>
+              <TextActionMenu card={card} />
+            </StyledTopRightActions>
+            {showHotEdge && firstCardInRow && !card.isPinnedAndLocked && (
+              <GridCardHotspot
+                card={card}
+                dragging={dragging}
+                position="left"
+              />
             )}
-            {card.isLoadingPlaceholder && <CardLoader />}
-            {this.renderCover}
-          </StyledGridCardInner>
-          {record.isCreativeDifferenceChartCover && (
-            <BottomRightActionHolder onClick={this.defaultHandleClick}>
-              <TextButton fontSizeEm={0.75} color={v.colors.black}>
-                More…
-              </TextButton>
-            </BottomRightActionHolder>
-          )}
-          <CollectionCardsTagEditorModal
-            cards={this.cardsForTagging}
-            canEdit={this.canEditCard}
-            open={tagEditorOpen}
-          />
-        </Fragment>
+            {showHotEdge && (!card.isPinnedAndLocked || lastPinnedCard) && (
+              <GridCardHotspot card={card} dragging={dragging} />
+            )}
+            {this.renderReplaceControl()}
+            {this.renderTopRightActions()}
+            {uiStore.viewingRecord &&
+              !uiStore.viewingRecord.isTestCollection && (
+                <BottomLeftCardIcons
+                  card={card}
+                  cardType={cardType}
+                  record={record}
+                />
+              )}
+            {/* onClick placed here so it's separate from hotspot click */}
+            <StyledGridCardInner
+              onClick={this.handleClick}
+              hasOverflow={record.isData || record.isLegend || record.isText}
+              filter={card.filter}
+              forceFilter={!this.hasCover}
+              isText={record.isText}
+              visibleOverflow={
+                record.isReportTypeRecord ||
+                record.isCreativeDifferenceChartCover
+              }
+            >
+              {showRestore && (
+                <StyledTopRightActions
+                  color={this.actionsColor}
+                  zoomLevel={zoomLevel}
+                >
+                  <NamedActionButton onClick={this.handleRestore}>
+                    <RestoreIcon />
+                    Restore
+                  </NamedActionButton>
+                </StyledTopRightActions>
+              )}
+              {card.isLoadingPlaceholder && <CardLoader />}
+              {this.renderCover}
+            </StyledGridCardInner>
+            {record.isCreativeDifferenceChartCover && (
+              <BottomRightActionHolder onClick={this.defaultHandleClick}>
+                <TextButton fontSizeEm={0.75} color={v.colors.black}>
+                  More…
+                </TextButton>
+              </BottomRightActionHolder>
+            )}
+            <CollectionCardsTagEditorModal
+              cards={this.cardsForTagging}
+              canEdit={this.canEditCard}
+              open={tagEditorOpen}
+            />
+          </Fragment>
+        </ThemeProvider>
       )
     }
 

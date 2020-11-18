@@ -39,6 +39,7 @@ const IconHolder = styled.div`
 `
 
 export const StyledGridCardPrivate = styled.div`
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   background: ${props => props.backgroundColor};
   text-align: center;
   color: ${v.colors.collectionCover};
@@ -70,6 +71,7 @@ export const highlightedCardCss = css`
 
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.unclickable) return 'auto'
@@ -279,6 +281,7 @@ StyledCardWrapper.defaultProps = {
 }
 
 export const StyledGridCardInner = styled.div`
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   position: relative;
   height: 100%;
   ${props =>
