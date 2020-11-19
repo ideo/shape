@@ -151,12 +151,10 @@ const captureGlobalKeypress = e => {
       card.API_archive()
       break
     case 'Escape':
+      uiStore.deselectCards()
       if (uiStore.movingCardIds.length && !uiStore.dragging) {
         uiStore.closeMoveMenu()
       }
-      // if (uiStore.editingName.length) {
-      //   uiStore.clearEditingName()
-      // }
       // save on esc happens only when user clicks the title textarea
       const { editingCardCover } = uiStore
       if (editingCardCover) {
