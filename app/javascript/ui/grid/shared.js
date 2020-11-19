@@ -96,6 +96,14 @@ export const StyledGridCard = styled.div`
   `};
 
   ${props =>
+    props.blocked &&
+    `
+    &:before {
+      background: ${v.colors.alert}
+    }
+  `}
+
+  ${props =>
     props.collaboratorColor &&
     `
     box-shadow: 0 0 0 3px ${props.collaboratorColor};

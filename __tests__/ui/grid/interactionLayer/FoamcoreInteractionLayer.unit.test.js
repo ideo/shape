@@ -160,12 +160,12 @@ describe('FoamcoreInteractionLayer', () => {
 
   describe('resizing', () => {
     beforeEach(() => {
-      const placeholderSpot = {
+      const resizeSpot = {
         row: 1,
         col: 1,
       }
       const uiStore = fakeUiStore
-      uiStore.placeholderSpot = placeholderSpot
+      uiStore.resizeSpot = resizeSpot
       uiStore.droppingFilesCount = 0
       props = {
         collection: fakeCollection,

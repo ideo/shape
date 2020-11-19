@@ -236,3 +236,21 @@ export const calculateOpenSpotMatrix = ({
 
   return openSpotMatrix
 }
+
+/*
+ * Calculates inner matrix from the supplied matrix based on a range of rows and cols
+ */
+export const calculateMatrixFromRange = (
+  collection,
+  { minRow, maxRow, minCol, maxCol }
+) => {
+  const { cardMatrix } = collection
+  const rowRange = _.range(minRow, maxRow)
+  const colRange = _.range(minCol, maxCol)
+
+  return _.map(rowRange, row =>
+    _.map(colRange, col => {
+      return cardMatrix[row][col]
+    })
+  )
+}

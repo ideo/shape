@@ -245,7 +245,7 @@ describe('FoamcoreGrid', () => {
     beforeEach(() => {
       component.resizing = false
       cardId = cards[0].id
-      component.throttledSetResizeSpot = jest.fn().mockReturnValue()
+      component.throttledsetResizeSpot = jest.fn().mockReturnValue()
       component.onResize(cardId, { width: 2, height: 1 })
     })
 
@@ -254,7 +254,7 @@ describe('FoamcoreGrid', () => {
     })
 
     it('should call to set the resize spot with dimensions and position', () => {
-      expect(component.throttledSetResizeSpot).toHaveBeenCalledWith({
+      expect(component.throttledsetResizeSpot).toHaveBeenCalledWith({
         row: cards[0].row,
         col: cards[0].col,
         width: 2,
@@ -265,7 +265,7 @@ describe('FoamcoreGrid', () => {
 
   describe('resizeCard', () => {
     beforeEach(() => {
-      props.uiStore.placeholderSpot = { width: 2, height: 2 }
+      props.uiStore.resizeSpot = { width: 2, height: 2 }
     })
 
     it('calls collection.API_batchUpdateCardsWithUndo', () => {

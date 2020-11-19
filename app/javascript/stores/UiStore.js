@@ -190,7 +190,7 @@ export default class UiStore {
   draggingFromMDL = false
   dragGridSpot = observable.map({})
   @observable
-  placeholderSpot = { ...v.placeholderDefaults }
+  resizeSpot = { ...v.placeholderDefaults }
   @observable
   // track if you are dragging/moving more cards than visible
   movingCardsOverflow = false
@@ -268,6 +268,7 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
     hidden: false,
+    blockedSpots: null,
   }
   @observable
   placeholderPosition = {
@@ -1895,15 +1896,15 @@ export default class UiStore {
   }
 
   @action
-  setPlaceholderSpot(placeholderSpot = this.placeholderDefaults) {
-    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
-      const { row, col, width, height, type, hidden } = placeholderSpot
-      this.placeholderSpot.row = row
-      this.placeholderSpot.col = col
-      this.placeholderSpot.width = width
-      this.placeholderSpot.height = height
-      this.placeholderSpot.type = type
-      this.placeholderSpot.hidden = hidden
+  setResizeSpot(resizeSpot = this.placeholderDefaults) {
+    if (!objectsEqual(this.resizeSpot, resizeSpot)) {
+      const { row, col, width, height, type, blockedSpots } = resizeSpot
+      this.resizeSpot.row = row
+      this.resizeSpot.col = col
+      this.resizeSpot.width = width
+      this.resizeSpot.height = height
+      this.resizeSpot.type = type
+      this.resizeSpot.blockedSpots = blockedSpots
     }
   }
 

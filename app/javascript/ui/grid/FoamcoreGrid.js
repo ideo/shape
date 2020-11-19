@@ -10,6 +10,7 @@ import {
   calculateRowsCols,
   findClosestOpenSpot,
   findTopLeftCard,
+  calculateMatrixFromRange,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
@@ -469,28 +470,61 @@ class FoamcoreGrid extends React.Component {
         this.resizing = true
       })
     }
-    const {
-      collection: { collection_cards },
-    } = this.props
+    const { collection } = this.props
+    const { collection_cards } = collection
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    if (!positionedCard) return null
+    if (!positionedCard || !collection) return
 
-    const { row, col, isSection } = positionedCard
+    const { id, row, col, isSection } = positionedCard
     const { width, height } = newSize
+
+    let blockedSpots = null
+    if (row && col && isSection) {
+      const resizingToCol = col + newSize.width
+      const resizingToRow = row + newSize.height
+      blockedSpots = new Map()
+
+      // calculate resize matrix from card matrix
+      const resizeMatrix = calculateMatrixFromRange(collection, {
+        minRow: row,
+        maxRow: resizingToRow,
+        minCol: col,
+        maxCol: resizingToCol,
+      })
+
+      for (const row of resizeMatrix) {
+        for (const spot of row) {
+          if (
+            !!spot &&
+            spot.id !== id &&
+            !spot.isSection &&
+            !blockedSpots.has(`${spot.id}`)
+          ) {
+            blockedSpots.set(`${spot.id}`, {
+              row: spot.row,
+              col: spot.col,
+              width: spot.width,
+              height: spot.height,
+            })
+          }
+        }
+      }
+    }
+
     this.throttledSetResizeSpot({
       col,
       row,
       height,
       width,
-      hidden: isSection,
+      blockedSpots,
     })
   }
 
   resizeCard = card => {
     let undoMessage
     const { collection, trackCollectionUpdated, uiStore } = this.props
-    let { height, width } = uiStore.placeholderSpot
+    let { height, width } = uiStore.resizeSpot
     // Some double-checking validations
     // TODO: allow sections to be as big as you want?
     const maxHeight = this.calcEdgeRow(card)
@@ -659,7 +693,7 @@ class FoamcoreGrid extends React.Component {
     this.dragging = false
     this.resizing = false
     this.draggingCardMasterPosition = {}
-    uiStore.setPlaceholderSpot()
+    uiStore.setResizeSpot()
     if (!keepMDLOpen) {
       uiStore.setMovingCards([])
     }
@@ -907,15 +941,15 @@ class FoamcoreGrid extends React.Component {
     return _.compact(dragMap)
   }
 
-  setResizeSpot({ row, col, width, height, hidden = false }) {
+  setResizeSpot({ row, col, width, height, blockedSpots = null }) {
     const { uiStore } = this.props
-    uiStore.setPlaceholderSpot({
+    uiStore.setResizeSpot({
       row,
       col,
       width,
       height,
       type: 'resize',
-      hidden,
+      blockedSpots,
     })
   }
 
