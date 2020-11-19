@@ -234,7 +234,7 @@ Rails.application.routes.draw do
             post ':business_unit_id/clone', action: :clone
           end
         end
-        resources :proxy, only: %i[index]
+        resources :proxy, only: %i[index update]
       end
     end
   end
