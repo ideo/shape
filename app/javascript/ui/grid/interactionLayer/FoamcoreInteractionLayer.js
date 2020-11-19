@@ -21,9 +21,8 @@ const DragLayerWrapper = styled.div`
   position: relative;
   height: 100%;
   width: 100%;
-  z-index: ${v.zIndex.gridCardTop};
   /* z-index < MovableGridCard default */
-  z-index: 0;
+  z-index: ${props => props.zIndex};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -317,7 +316,6 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     const card = new CollectionCard(attrs, apiStore)
-    console.log('creating new section at', row, col)
     card.API_create()
   }
 
@@ -873,14 +871,15 @@ class FoamcoreInteractionLayer extends React.Component {
           // continue iteration
           return true
         }
-        // find two cards together UNLESS the card on the right isPinnedAndLocked
+        // find two cards together UNLESS the card on the right isPinnedAndLocked/isSection
+        const canBumpNextCard =
+          !cardMatrix[row][col].isPinnedAndLocked &&
+          !cardMatrix[row][col].isSection
         const twoCardsTogether =
           col > 0 &&
-          !cardMatrix[row][col].isPinnedAndLocked &&
-          !cardMatrix[row][col].isSection &&
           cardMatrix[row][col - 1] &&
           cardMatrix[row][col - 1] !== cardMatrix[row][col]
-        if (col === 0 || twoCardsTogether) {
+        if (canBumpNextCard && (col === 0 || twoCardsTogether)) {
           hotEdges.push(
             <FoamcoreHotEdge
               key={`hotspot-${row}:${col}`}
@@ -961,15 +960,20 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
+    const { hoveringRowCol } = this
     const { resizing, uiStore } = this.props
 
     if (resizing) {
       return this.renderInnerDragLayer
     }
 
+    // put it behind MovableGridCard unless we have an open HTC
+    const zIndex = hoveringRowCol.row !== null ? v.zIndex.gridCardTop : 0
+
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
+        zIndex={zIndex}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseMove={this.onCursorMove('mouse')}

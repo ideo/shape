@@ -17,6 +17,7 @@ const Container = styled.div`
   height: 100%;
   position: relative;
   width: 100%;
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
 
   ${props =>
     props.isTouchDevice &&

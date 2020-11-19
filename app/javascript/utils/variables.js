@@ -31,6 +31,7 @@ export const MAX_CARD_H = 2
 // sections can stretch to 16x16 (or taller?)
 export const MAX_SECTION_W = 16
 export const MAX_SECTION_H = 16
+export const SECTION_BORDER = 4
 
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
 import { hexToRgba } from '~/utils/colorUtils'
-import v from '~/utils/variables'
+import v, { SECTION_BORDER } from '~/utils/variables'
 import Truncator from 'react-truncator'
 
 const Container = styled.div`
@@ -39,6 +39,7 @@ const IconHolder = styled.div`
 `
 
 export const StyledGridCardPrivate = styled.div`
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   background: ${props => props.backgroundColor};
   text-align: center;
   color: ${v.colors.collectionCover};
@@ -70,6 +71,7 @@ export const highlightedCardCss = css`
 
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.unclickable) return 'auto'
@@ -158,13 +160,14 @@ export const hideOnHoverCss = css`
 `
 
 const SECTION_THICKNESS = 100
-const SECTION_BORDER = '4px solid black'
+const SECTION_BORDER_STYLE = `${SECTION_BORDER}px solid black`
 
 export const SectionCardWrapper = styled.div`
   height: 100%;
   width: 100%;
   background: ${props => props.backgroundColor};
   .sectionInner {
+    border-radius: ${props => props.theme.zoomLevel * 2}px;
     position: absolute;
     cursor: grab;
     ${props =>
@@ -182,6 +185,7 @@ export const SectionCardWrapper = styled.div`
     position: relative;
     top: 40px;
     left: 174px;
+    width: 60%;
   }
 `
 
@@ -196,28 +200,28 @@ SectionCardWrapper.defaultProps = {
 }
 
 export const SectionTop = styled.div`
-  border-top: ${SECTION_BORDER};
+  border-top: ${SECTION_BORDER_STYLE};
   width: 100%;
   height: ${SECTION_THICKNESS}px;
   top: 0;
   left: 0;
 `
 export const SectionBottom = styled.div`
-  border-bottom: ${SECTION_BORDER};
+  border-bottom: ${SECTION_BORDER_STYLE};
   width: 100%;
   height: ${SECTION_THICKNESS}px;
   bottom: 0;
   left: 0;
 `
 export const SectionLeft = styled.div`
-  border-left: ${SECTION_BORDER};
+  border-left: ${SECTION_BORDER_STYLE};
   height: 100%;
   width: ${SECTION_THICKNESS}px;
   top: 0;
   left: 0;
 `
 export const SectionRight = styled.div`
-  border-right: ${SECTION_BORDER};
+  border-right: ${SECTION_BORDER_STYLE};
   height: 100%;
   width: ${SECTION_THICKNESS}px;
   top: 0;
@@ -295,6 +299,7 @@ StyledCardWrapper.defaultProps = {
 }
 
 export const StyledGridCardInner = styled.div`
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
   position: relative;
   height: 100%;
   ${props =>

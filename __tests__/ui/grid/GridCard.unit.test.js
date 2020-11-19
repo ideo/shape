@@ -39,7 +39,6 @@ describe('GridCard', () => {
     describe('as viewer', () => {
       beforeEach(() => {
         props.record.can_edit = false
-        uiStore.setCardPosition = jest.fn()
         rerender()
       })
 
@@ -77,16 +76,6 @@ describe('GridCard', () => {
       it('renders selection circle without hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
-      })
-
-      it('sets the card ref and calls uiStore.setCardPosition', () => {
-        const rect = {}
-        const fakeRef = { getBoundingClientRect: () => rect }
-        component.setCardRef(fakeRef)
-        expect(uiStore.setCardPosition).toHaveBeenCalledWith(
-          props.card.id,
-          rect
-        )
       })
     })
 
@@ -308,8 +297,8 @@ describe('GridCard', () => {
 
   describe('when selected', () => {
     beforeEach(() => {
-      props.hoveringOver = false
-      uiStore.selectCardId(props.card.id)
+      // simulate getter function
+      props.card.isSelected = true
       rerender()
     })
 
@@ -417,6 +406,7 @@ describe('GridCard', () => {
       beforeEach(() => {
         uiStore.editingCardCover = null
         uiStore.selectedArea.minX = 10
+        uiStore.selectedArea.maxX = 20
         rerender()
       })
 

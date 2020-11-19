@@ -5,7 +5,6 @@ import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection, fakeItemCard } from '#/mocks/data'
-import v from '~/utils/variables'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('../../../app/javascript/stores/jsonApi/CollectionCard')
@@ -183,25 +182,10 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('coordinatesForPosition', () => {
-    it('should calculate the appropriate coordinates', () => {
-      const { gridW, gutter } = v.defaultGridSettings
-      const zoom = component.relativeZoomLevel
-      let x = (gridW + gutter) / zoom
-      const y = 0
-      let width = 1
-      expect(component.coordinatesForPosition({ x, y, width })).toEqual({
-        col: 1,
-        outsideDraggableArea: false,
-        row: 0,
-      })
-      x = (16 * (gridW + gutter)) / zoom
-      width = 4
-      expect(component.coordinatesForPosition({ x, y, width })).toEqual({
-        // this will get bumped back to 12 (where it fits)
-        col: 12,
-        outsideDraggableArea: true,
-        row: 0,
-      })
+    it('should call uiStore function', () => {
+      const params = { x: 10, y: 20, width: 2 }
+      component.coordinatesForPosition(params)
+      expect(props.uiStore.coordinatesForPosition).toHaveBeenCalledWith(params)
     })
   })
 
