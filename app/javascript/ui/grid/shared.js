@@ -180,12 +180,21 @@ export const SectionCardWrapper = styled.div`
   }
 
   .styled-name {
+    cursor: text;
     /* just relative to .sectionInner this should be on top */
     z-index: 10;
     position: relative;
     top: 40px;
     left: 174px;
-    width: 60%;
+    width: 74%;
+    .input__name {
+      background: ${v.colors.commonLight};
+    }
+
+    .editable-name-heading {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 `
 
