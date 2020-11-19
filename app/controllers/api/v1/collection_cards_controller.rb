@@ -580,7 +580,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def create_notification(card, action)
     # Only notify for archiving of collections (and not link cards)
-    return if card.link?
+    return if card.link? || card.section?
 
     from_id = @from_collection&.id
     to_id = @to_collection&.id
