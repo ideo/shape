@@ -368,6 +368,7 @@ class MovableGridCard extends React.Component {
   }
 
   renderEmpty = () => {
+    const { zoomLevel } = this.props
     const { currentlyZooming } = uiStore
     const transition = currentlyZooming ? 'none' : cardCSSTransition
     return (
@@ -376,6 +377,7 @@ class MovableGridCard extends React.Component {
           // this was set to always visible...
           visible={this.props.card.visible}
           card={this.props.card}
+          zoomLevel={zoomLevel}
         />
       </PositionedGridCard>
     )
@@ -608,7 +610,7 @@ class MovableGridCard extends React.Component {
       blankContentToolIsOpen,
     } = uiStore
 
-    let _zIndex = 1
+    let _zIndex = v.zIndex.gridCard
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
     let disableDragging =

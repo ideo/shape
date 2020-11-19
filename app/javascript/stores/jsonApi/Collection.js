@@ -309,6 +309,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const matrix = this.cardMatrix
     const cardIds = []
     _.each(rowRange, row => {
+      if (!matrix[row]) return
       _.each(colRange, col => {
         const card = matrix[row][col]
         if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)

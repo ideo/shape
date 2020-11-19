@@ -28,6 +28,8 @@ export const FOAMCORE_CLICK_LAYER = 'foamcoreClickLayer'
 export const MAX_CARD_W = 4
 export const MAX_CARD_H = 2
 
+export const SECTION_BORDER = 4
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',

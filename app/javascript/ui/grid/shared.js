@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
 import { hexToRgba } from '~/utils/colorUtils'
-import v from '~/utils/variables'
+import v, { SECTION_BORDER } from '~/utils/variables'
 import Truncator from 'react-truncator'
 
 const Container = styled.div`
@@ -152,7 +152,7 @@ export const hideOnHoverCss = css`
 `
 
 const SECTION_THICKNESS = 100
-const SECTION_BORDER = '4px solid black'
+const SECTION_BORDER_STYLE = `${SECTION_BORDER}px solid black`
 
 export const SectionCardWrapper = styled.div`
   height: 100%;
@@ -183,28 +183,28 @@ export const SectionCardWrapper = styled.div`
   }
 `
 export const SectionTop = styled.div`
-  border-top: ${SECTION_BORDER};
+  border-top: ${SECTION_BORDER_STYLE};
   width: 100%;
   height: ${SECTION_THICKNESS}px;
   top: 0;
   left: 0;
 `
 export const SectionBottom = styled.div`
-  border-bottom: ${SECTION_BORDER};
+  border-bottom: ${SECTION_BORDER_STYLE};
   width: 100%;
   height: ${SECTION_THICKNESS}px;
   bottom: 0;
   left: 0;
 `
 export const SectionLeft = styled.div`
-  border-left: ${SECTION_BORDER};
+  border-left: ${SECTION_BORDER_STYLE};
   height: 100%;
   width: ${SECTION_THICKNESS}px;
   top: 0;
   left: 0;
 `
 export const SectionRight = styled.div`
-  border-right: ${SECTION_BORDER};
+  border-right: ${SECTION_BORDER_STYLE};
   height: 100%;
   width: ${SECTION_THICKNESS}px;
   top: 0;
