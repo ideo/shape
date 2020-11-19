@@ -803,8 +803,13 @@ class MovableGridCard extends React.Component {
 
       let backgroundColor = null
 
-      if (resizing) {
+      const { resizeSpot } = uiStore
+      const { blocked } = resizeSpot
+
+      if (resizing && !blocked) {
         backgroundColor = `${hexToRgba(v.colors.primaryLight, 0.2)}`
+      } else if (blocked) {
+        backgroundColor = `${hexToRgba(v.colors.alert, 0.2)}`
       }
 
       renderedCard = (

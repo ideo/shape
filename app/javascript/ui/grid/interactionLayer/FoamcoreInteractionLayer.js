@@ -717,10 +717,9 @@ class FoamcoreInteractionLayer extends React.Component {
   get renderResizeSpot() {
     const { uiStore } = this.props
     const { resizeSpot } = uiStore
-    const { row, col, width, height, blockedSpots } = resizeSpot
+    const { row, col, width, height, hidden } = resizeSpot
 
-    // render blocked spots instead of resize spot when they exist; ie: resizing section cards
-    if (!_.isEmpty(blockedSpots)) return this.renderResizeBlockedSpots
+    if (hidden) return null
 
     if (row !== null && col !== null) {
       return this.positionBlank({
@@ -734,33 +733,6 @@ class FoamcoreInteractionLayer extends React.Component {
       })
     }
     return null
-  }
-
-  get renderResizeBlockedSpots() {
-    const { uiStore } = this.props
-    const { resizeSpot } = uiStore
-    const { blockedSpots } = resizeSpot
-
-    if (blockedSpots.size <= 0) return null
-
-    const resizeBlockedSpots = []
-
-    blockedSpots.forEach(spot => {
-      resizeBlockedSpots.push(
-        this.positionBlank({
-          position: {
-            row: spot.row,
-            col: spot.col,
-            width: spot.width,
-            height: spot.height,
-          },
-          interactionType: 'resize',
-          blocked: true,
-        })
-      )
-    })
-
-    return resizeBlockedSpots
   }
 
   get renderDropSpots() {

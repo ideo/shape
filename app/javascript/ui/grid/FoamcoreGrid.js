@@ -476,37 +476,41 @@ class FoamcoreGrid extends React.Component {
 
     if (!positionedCard || !collection) return
 
-    const { id, row, col, isSection } = positionedCard
+    const {
+      id,
+      row,
+      col,
+      width: cardWidth,
+      height: cardHeight,
+      isSection,
+    } = positionedCard
     const { width, height } = newSize
 
-    let blockedSpots = null
-    if (row && col && isSection) {
-      const resizingToCol = col + newSize.width
-      const resizingToRow = row + newSize.height
-      blockedSpots = new Map()
+    let blocked = false
+    // only marked as blocked when enlarging a section card
+    if ((row && col && isSection && width > cardWidth) || height > cardHeight) {
+      const enlargingToCol = col + width
+      const enlargingToRow = row + height
 
       // calculate resize matrix from card matrix
       const resizeMatrix = calculateMatrixFromRange(collection, {
         minRow: row,
-        maxRow: resizingToRow,
+        maxRow: enlargingToRow,
         minCol: col,
-        maxCol: resizingToCol,
+        maxCol: enlargingToCol,
       })
-
       for (const row of resizeMatrix) {
+        if (blocked) break
         for (const spot of row) {
           if (
             !!spot &&
             spot.id !== id &&
             !spot.isSection &&
-            !blockedSpots.has(`${spot.id}`)
+            (spot.row >= row + cardHeight - 1 ||
+              spot.col >= col + cardWidth - 1)
           ) {
-            blockedSpots.set(`${spot.id}`, {
-              row: spot.row,
-              col: spot.col,
-              width: spot.width,
-              height: spot.height,
-            })
+            blocked = true
+            break
           }
         }
       }
@@ -517,7 +521,8 @@ class FoamcoreGrid extends React.Component {
       row,
       height,
       width,
-      blockedSpots,
+      hidden: isSection,
+      blocked,
     })
   }
 
@@ -941,7 +946,7 @@ class FoamcoreGrid extends React.Component {
     return _.compact(dragMap)
   }
 
-  setResizeSpot({ row, col, width, height, blockedSpots = null }) {
+  setResizeSpot({ row, col, width, height, hidden = false, blocked = false }) {
     const { uiStore } = this.props
     uiStore.setResizeSpot({
       row,
@@ -949,7 +954,8 @@ class FoamcoreGrid extends React.Component {
       width,
       height,
       type: 'resize',
-      blockedSpots,
+      hidden,
+      blocked,
     })
   }
 

@@ -269,7 +269,7 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
     hidden: false,
-    blockedSpots: null,
+    blocked: null,
   }
   @observable
   placeholderPosition = {
@@ -1903,13 +1903,14 @@ export default class UiStore {
   @action
   setResizeSpot(resizeSpot = this.placeholderDefaults) {
     if (!objectsEqual(this.resizeSpot, resizeSpot)) {
-      const { row, col, width, height, type, blockedSpots } = resizeSpot
+      const { row, col, width, height, type, hidden, blocked } = resizeSpot
       this.resizeSpot.row = row
       this.resizeSpot.col = col
       this.resizeSpot.width = width
       this.resizeSpot.height = height
       this.resizeSpot.type = type
-      this.resizeSpot.blockedSpots = blockedSpots
+      this.resizeSpot.hidden = hidden
+      this.resizeSpot.blocked = blocked
     }
   }
 
