@@ -61,5 +61,23 @@ class CollectionCard
     def can_view?(*args)
       parent.can_view?(*args)
     end
+
+    def cards_in_section(collection: parent)
+      t = CollectionCard.arel_table
+      collection
+        .collection_cards
+        .where(
+          t[:row].gt(row),
+        )
+        .where(
+          t[:row].lt(row + height - 1),
+        )
+        .where(
+          t[:col].gt(col),
+        )
+        .where(
+          t[:col].lt(col + width - 1),
+        )
+    end
   end
 end
