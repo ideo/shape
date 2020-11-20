@@ -22,9 +22,8 @@ const DragLayerWrapper = styled.div`
   position: relative;
   height: 100%;
   width: 100%;
-  z-index: ${v.zIndex.gridCardTop};
   /* z-index < MovableGridCard default */
-  z-index: 0;
+  z-index: ${props => props.zIndex};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -1067,6 +1066,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
+    const { hoveringRowCol } = this
     const { resizing, uiStore } = this.props
     const { isCreatingSection } = uiStore
 
@@ -1074,9 +1074,13 @@ class FoamcoreInteractionLayer extends React.Component {
       return this.renderInnerDragLayer
     }
 
+    // put it behind MovableGridCard unless we have an open HTC
+    const zIndex = hoveringRowCol.row !== null ? v.zIndex.gridCardTop : 0
+
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
+        zIndex={zIndex}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseDown={this.handleMouseDownSelection}

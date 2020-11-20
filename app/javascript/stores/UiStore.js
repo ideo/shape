@@ -12,6 +12,7 @@ import v, {
   FOAMCORE_INTERACTION_LAYER,
   ACTIVITY_LOG_PAGE_KEY,
   COLLECTION_CHANNEL_NAME,
+  SECTION_BORDER,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
@@ -470,6 +471,11 @@ export default class UiStore {
   setEditingName(nameKey) {
     if (this.editingName.includes(nameKey)) return
     this.editingName.push(nameKey)
+  }
+
+  @action
+  clearEditingName() {
+    this.editingName = []
   }
 
   @action
@@ -1976,13 +1982,12 @@ export default class UiStore {
     }
 
     if (isSection) {
-      // sections are positioned in (x,y) by half a card, and adjusted to be smaller by a full card amount
-      // TODO: sections should actually overlap the gutter so this should adjust slightly
+      // sections are positioned in (x,y) by half a card, and adjusted to be smaller by a full card amount.
       _.assign(pos, {
         x: (col * (gridW + gutter) + gridW / 2) / relativeZoomLevel,
         y: (row * (gridH + gutter) + gridH / 2) / relativeZoomLevel,
-        w: (width - 1) * (gridW + gutter) - gutter,
-        h: (height - 1) * (gridH + gutter) - gutter,
+        w: (width - 1) * (gridW + gutter) + SECTION_BORDER,
+        h: (height - 1) * (gridH + gutter) + SECTION_BORDER,
       })
     }
 

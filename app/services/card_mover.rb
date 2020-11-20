@@ -193,6 +193,11 @@ class CardMover < SimpleService
     # these only apply for moving actions
     return unless move?
 
+    if @to_collection.num_columns < 16 && @moving_cards.any?(&:section?)
+      @errors << 'You can\'t move a section into a normal collection.'
+      return true
+    end
+
     # Not allowed to move between organizations
     if @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
@@ -224,7 +229,7 @@ class CardMover < SimpleService
     return unless move?
 
     @moving_cards.each do |card|
-      next if card.link? || card.placeholder?
+      next if card.link? || card.placeholder? || card.section? || card.record.nil?
       # private records remain private, do not alter their permissions
       next if card.record.private?
 

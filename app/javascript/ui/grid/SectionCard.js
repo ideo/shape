@@ -43,11 +43,13 @@ class SectionCard extends React.Component {
         onMouseMove={this.onMouseMove}
       >
         <EditableName
+          inline
           name={section_name || ''}
+          placeholder={!section_name ? 'Section Title' : ''}
           updateNameHandler={this.updateSectionName}
           canEdit={can_edit_parent}
           fontSize={'3.5rem'}
-          fieldName="sectionName"
+          fieldName={`sectionName-${card.id}`}
         />
         <SectionTop className="sectionInner" />
         <SectionLeft className="sectionInner" />

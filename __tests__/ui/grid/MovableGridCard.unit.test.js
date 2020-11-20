@@ -33,6 +33,7 @@ uiStore.apiStore = {
 
 const rerender = () => {
   wrapper = shallow(<MovableGridCard {...props} />)
+  component = wrapper.instance()
 }
 
 describe('MovableGridCard', () => {
@@ -165,11 +166,6 @@ describe('MovableGridCard', () => {
   })
 
   describe('handleDrag', () => {
-    beforeEach(() => {
-      rerender()
-      component = wrapper.instance()
-    })
-
     it('should initiate uiStore.drag, but not call other drag functions until >10 px movement', () => {
       const pageX = 0
       const pageY = 10
@@ -191,33 +187,6 @@ describe('MovableGridCard', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
         expect(uiStore.reselectOnlyMovableCards).toHaveBeenCalled()
         expect(uiStore.startDragging).toHaveBeenCalledWith(props.card.id)
-      })
-    })
-  })
-
-  describe('componentDidUpdate', () => {
-    beforeEach(() => {
-      component.finishPreloading = jest.fn()
-    })
-
-    it('should call finishPreloading', () => {
-      wrapper.setState({ preloading: true })
-      expect(component.finishPreloading).toHaveBeenCalled()
-    })
-
-    describe('with private card', () => {
-      beforeEach(() => {
-        props.card = {
-          ...fakeItemCard,
-          isPrivate: true,
-        }
-        wrapper.setProps({ props })
-        rerender()
-      })
-
-      it('should call finishPreloading', () => {
-        wrapper.setState({ preloading: false })
-        expect(component.finishPreloading).toHaveBeenCalled()
       })
     })
   })
