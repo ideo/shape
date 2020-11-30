@@ -471,10 +471,12 @@ class FoamcoreGrid extends React.Component {
       })
     }
     const { collection } = this.props
+    if (!collection) return
     const { collection_cards } = collection
+
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    if (!positionedCard || !collection) return
+    if (!positionedCard) return
 
     const {
       id,
@@ -487,30 +489,38 @@ class FoamcoreGrid extends React.Component {
     const { width, height } = newSize
 
     let blocked = false
-    // only marked as blocked when enlarging a section card
-    if ((row && col && isSection && width > cardWidth) || height > cardHeight) {
-      const enlargingToCol = col + width
-      const enlargingToRow = row + height
 
-      // calculate resize matrix from card matrix
-      const resizeMatrix = calculateMatrixFromRange(collection, {
-        minRow: row,
-        maxRow: enlargingToRow,
-        minCol: col,
-        maxCol: enlargingToCol,
-      })
-      for (const row of resizeMatrix) {
-        if (blocked) break
-        for (const spot of row) {
-          if (
-            !!spot &&
-            spot.id !== id &&
-            !spot.isSection &&
-            (spot.row >= row + cardHeight - 1 ||
-              spot.col >= col + cardWidth - 1)
-          ) {
-            blocked = true
-            break
+    if (isSection) {
+      if (width < 3 || height < 3) {
+        // block resizing for sections smaller than 3x3
+        blocked = true
+      } else if (width > cardWidth || height > cardHeight) {
+        // block when enarging sections to occupied spots
+        const enlargingToCol = col + width
+        const enlargingToRow = row + height
+
+        // calculate resize matrix from card matrix
+        const resizeMatrix = calculateMatrixFromRange(collection, {
+          minRow: row,
+          maxRow: enlargingToRow,
+          minCol: col,
+          maxCol: enlargingToCol,
+        })
+
+        // go through each spot in resize matrix to check if it's occupied
+        for (const row of resizeMatrix) {
+          if (blocked) break
+          for (const spot of row) {
+            if (
+              !!spot &&
+              spot.id !== id &&
+              !spot.isSection &&
+              (spot.row >= row + cardHeight - 1 ||
+                spot.col >= col + cardWidth - 1)
+            ) {
+              blocked = true
+              break
+            }
           }
         }
       }
@@ -529,7 +539,16 @@ class FoamcoreGrid extends React.Component {
   resizeCard = card => {
     let undoMessage
     const { collection, trackCollectionUpdated, uiStore } = this.props
-    let { height, width } = uiStore.resizeSpot
+    const { resizeSpot } = uiStore
+    const { blocked } = resizeSpot
+
+    // ensure cards whose spot is being blocked don't get resized
+    if (blocked) {
+      this.resetCardPositions({ keepMDLOpen: true })
+      return
+    }
+
+    let { height, width } = resizeSpot
     // Some double-checking validations
     // TODO: allow sections to be as big as you want?
     const maxHeight = this.calcEdgeRow(card)

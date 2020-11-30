@@ -229,7 +229,7 @@ describe('FoamcoreGrid', () => {
     beforeEach(() => {
       component.resizing = false
       cardId = cards[0].id
-      component.throttledsetResizeSpot = jest.fn().mockReturnValue()
+      component.throttledSetResizeSpot = jest.fn().mockReturnValue()
       component.onResize(cardId, { width: 2, height: 1 })
     })
 
@@ -238,18 +238,19 @@ describe('FoamcoreGrid', () => {
     })
 
     it('should call to set the resize spot with dimensions and position', () => {
-      expect(component.throttledsetResizeSpot).toHaveBeenCalledWith({
+      expect(component.throttledSetResizeSpot).toHaveBeenCalledWith({
         row: cards[0].row,
         col: cards[0].col,
         width: 2,
         height: 1,
+        blocked: false,
       })
     })
   })
 
   describe('resizeCard', () => {
     beforeEach(() => {
-      props.uiStore.resizeSpot = { width: 2, height: 2 }
+      props.uiStore.resizeSpot = { width: 2, height: 2, blocked: false }
     })
 
     it('calls collection.API_batchUpdateCardsWithUndo', () => {
@@ -273,6 +274,24 @@ describe('FoamcoreGrid', () => {
       component.resetCardPositions = jest.fn()
       component.resizeCard(cards[0])
       expect(component.resetCardPositions).toHaveBeenCalled()
+    })
+
+    describe('with blocked spot', () => {
+      beforeEach(() => {
+        props.uiStore.resizeSpot = { width: 2, height: 2, blocked: true }
+      })
+      it('calls resetCardPositions', () => {
+        component.resetCardPositions = jest.fn()
+        component.resizeCard(cards[0])
+        expect(component.resetCardPositions).toHaveBeenCalled()
+      })
+
+      it('does not call collection.API_batchUpdateCardsWithUndo', () => {
+        component.resizeCard(cards[0])
+        expect(
+          props.collection.API_batchUpdateCardsWithUndo
+        ).not.toHaveBeenCalled()
+      })
     })
   })
 

@@ -248,9 +248,11 @@ export const calculateMatrixFromRange = (
   const rowRange = _.range(minRow, maxRow)
   const colRange = _.range(minCol, maxCol)
 
-  return _.map(rowRange, row =>
-    _.map(colRange, col => {
-      return cardMatrix[row][col]
+  const matrix = _.map(rowRange, row => {
+    return _.map(colRange, col => {
+      return cardMatrix[row] && cardMatrix[row][col]
     })
-  )
+  })
+
+  return matrix
 }
