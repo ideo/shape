@@ -291,6 +291,7 @@ class FoamcoreInteractionLayer extends React.Component {
       data,
       template,
     })
+
     const { parent_collection_card } = res.data
     const cardRes = await apiStore.fetch(
       'collection_cards',

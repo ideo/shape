@@ -1114,10 +1114,10 @@ export default class UiStore {
         this.selectedCardIds.remove(parentSectionCard.id)
       }
       this.selectedCardIds.remove(cardId)
+      this.broadcastCardSelection([...this.selectedCardIds])
     } else {
-      this.selectedCardIds.push(cardId)
+      this.reselectCardIds(_.uniq([...this.selectedCardIds, cardId]))
     }
-    this.broadcastCardSelection([...this.selectedCardIds])
   }
 
   @action
@@ -1197,6 +1197,7 @@ export default class UiStore {
           _.includes(cardIds, card.id) &&
           (card.link ||
             (card.record && card.record.can_edit) ||
+            (card.isSection && card.can_edit_parent) ||
             (card.isBctPlaceholder && card.can_edit_parent))
       )
     const filteredCardIds = _.map(filteredCards, 'id')

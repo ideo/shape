@@ -813,7 +813,11 @@ class MovableGridCard extends React.Component {
       }
 
       renderedCard = (
-        <SectionCard card={card} backgroundColor={backgroundColor} />
+        <SectionCard
+          card={card}
+          zoomLevel={zoomLevel}
+          backgroundColor={backgroundColor}
+        />
       )
     }
 

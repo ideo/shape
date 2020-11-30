@@ -377,6 +377,17 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Sharing' })
     }
 
+    if (card.isSection) {
+      items = _.reject(items, { name: 'Link' })
+      items = _.reject(items, { name: 'Replace' })
+      items = _.reject(items, { name: 'Sub. Box Settings' })
+      items = _.reject(items, { name: 'Add to My Collection' })
+      items = _.reject(items, { name: 'Sharing' })
+      items = _.reject(items, { name: 'Download' })
+      items = _.reject(items, { name: 'Comment' })
+      items = _.reject(items, { name: 'Tags' })
+    }
+
     return items
   }
 

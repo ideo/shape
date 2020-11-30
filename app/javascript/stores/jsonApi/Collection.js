@@ -293,6 +293,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     minMaxCorners = null,
   } = {}) {
     let minMax = minMaxCorners
+    const forSection = firstCardId && firstCardId === lastCardId
 
     if (!minMaxCorners && firstCardId) {
       const cards = this.collection_cards.filter(
@@ -312,7 +313,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       if (!matrix[row]) return
       _.each(colRange, col => {
         const card = matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+        if (
+          card &&
+          !_.includes(cardIds, card.id) &&
+          (!forSection || !card.isSection)
+        ) {
+          cardIds.push(card.id)
+        }
       })
     })
 
