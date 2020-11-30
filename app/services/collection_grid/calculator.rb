@@ -459,6 +459,8 @@ module CollectionGrid
     end
 
     def self.columns_sticking_out_of(card, above_card)
+      return [] if above_card.nil?
+
       max_card_col = card.col + card.width - 1
       card_inhabited_cols = *(card.col..max_card_col)
 
