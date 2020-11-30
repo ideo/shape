@@ -185,6 +185,7 @@ describe('UiStore', () => {
       cardIdsBetween: jest.fn().mockReturnValue(['100']),
     }
     beforeEach(() => {
+      uiStore.deselectCards()
       uiStore.setViewingRecord(collection)
     })
 
@@ -195,7 +196,6 @@ describe('UiStore', () => {
 
     it('should deselect the parent section if cardId is deselected', () => {
       uiStore.toggleSelectedCardId('99')
-      uiStore.toggleSelectedCardId('100')
       expect(uiStore.isSelected('99')).toBe(true)
       expect(uiStore.isSelected('100')).toBe(true)
       // now deselect
