@@ -110,10 +110,10 @@ class GridCardEmptyHotspot extends React.Component {
 
 GridCardEmptyHotspot.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject,
-  onCreateContent: PropTypes.func.isRequired,
+  onCreateContent: PropTypes.func,
   card: MobxPropTypes.objectOrObservableObject,
   zoomLevel: PropTypes.number.isRequired,
-  onCloseHtc: PropTypes.func.isRequired,
+  onCloseHtc: PropTypes.func,
   visible: PropTypes.bool,
   interactionType: PropTypes.string,
   emptyRow: PropTypes.bool,
@@ -124,6 +124,8 @@ GridCardEmptyHotspot.propTypes = {
 }
 GridCardEmptyHotspot.defaultProps = {
   parent: null,
+  onCreateContent: null,
+  onCloseHtc: null,
   visible: true,
   card: null,
   interactionType: 'drag',

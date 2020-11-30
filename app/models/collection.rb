@@ -168,6 +168,13 @@ class Collection < ApplicationRecord
            foreign_key: :parent_id,
            inverse_of: :parent
 
+  # sections within this collection
+  has_many :section_collection_cards,
+           -> { active.ordered },
+           class_name: 'CollectionCard::Section',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
   has_many :hidden_collection_cards,
            -> { active.hidden },
            class_name: 'CollectionCard::Primary',

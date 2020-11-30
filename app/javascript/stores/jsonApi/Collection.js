@@ -186,7 +186,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   cardIdsBetween(firstCardId, lastCardId) {
     if (this.isBoard && this.viewMode !== 'list') {
-      return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
+      return this.cardIdsBetweenByColRow({ firstCardId, lastCardId })
     }
     // For all other collection types, find cards by order
     return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
@@ -227,6 +227,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get cardMatrix() {
+    return this.calculateCardMatrix()
+  }
+
+  get cardMatrixForDraggingSections() {
+    return this.calculateCardMatrix({ forSections: true })
+  }
+
+  calculateCardMatrix = ({ forSections = false } = {}) => {
     if (this.collection_cards.length === 0) return [[]]
 
     // Get maximum dimensions of our card matrix
@@ -241,13 +249,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(this.collection_cards, card => {
       // Create a range with the min and max row and column that this card occupies
       // range does not include last value, so increment max by 1
-      const rows = _.range(card.row, card.maxRow + 1)
-      const cols = _.range(card.col, card.maxCol + 1)
+      let rows = _.range(card.row, card.maxRow + 1)
+      let cols = _.range(card.col, card.maxCol + 1)
+      if (forSections && card.isSection) {
+        // only treat the inner part of the section as being filled
+        rows = _.range(card.row + 1, card.maxRow)
+        cols = _.range(card.col + 1, card.maxCol)
+      }
 
       // Iterate over each to populate the matrix
-      _.each(rows, row => {
-        _.each(cols, col => {
-          matrix[row][col] = card
+      _.each(rows, (row, rIdx) => {
+        _.each(cols, (col, cIdx) => {
+          if (!forSections && card.isSection) {
+            const midRow = rIdx > 0 && rIdx < rows.length - 1
+            const midCol = cIdx > 0 && cIdx < cols.length - 1
+            if (rIdx === 0 || rIdx === rows.length - 1 || (midRow && !midCol)) {
+              matrix[row][col] = card
+            }
+          } else {
+            matrix[row][col] = card
+          }
         })
       })
     })
@@ -259,18 +280,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // keeping in mind a card's area needs to contribute to width/height
     ({
       minRow: _.min(cards.map(card => card.row)),
-      maxRow: _.max(cards.map(card => card.maxRow)),
+      maxRow: _.max(cards.map(card => card.maxRowWithSections)),
       minCol: _.min(cards.map(card => card.col)),
-      maxCol: _.max(cards.map(card => card.maxCol)),
+      maxCol: _.max(cards.map(card => card.maxColWithSections)),
     })
 
   // Find all cards that are between these two card ids,
   // using the card row & col
-  cardIdsBetweenByColRow(firstCardId, lastCardId) {
-    const cards = this.collection_cards.filter(
-      card => card.id === firstCardId || card.id === lastCardId
-    )
-    const minMax = this.minMaxRowColForCards(cards)
+  cardIdsBetweenByColRow({
+    firstCardId = null,
+    lastCardId = null,
+    minMaxCorners = null,
+  } = {}) {
+    let minMax = minMaxCorners
+    const forSection = firstCardId && firstCardId === lastCardId
+
+    if (!minMaxCorners && firstCardId) {
+      const cards = this.collection_cards.filter(
+        card => card.id === firstCardId || card.id === lastCardId
+      )
+      minMax = this.minMaxRowColForCards(cards)
+    }
+    // range has to add 1; e.g. _.range(0, 1) === [0]
     const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
     const colRange = _.range(minMax.minCol, minMax.maxCol + 1)
 
@@ -279,9 +310,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const matrix = this.cardMatrix
     const cardIds = []
     _.each(rowRange, row => {
+      if (!matrix[row]) return
       _.each(colRange, col => {
         const card = matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+        if (
+          card &&
+          !_.includes(cardIds, card.id) &&
+          (!forSection || !card.isSection)
+        ) {
+          cardIds.push(card.id)
+        }
       })
     })
 
@@ -2040,8 +2078,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get styledTheme() {
-    const { fontColor } = this
+    const { fontColor, uiStore } = this
     const theme = {
+      zoomLevel: uiStore.relativeZoomLevel,
       // can probably deprecate this once we fully migrate 4WFC?
       useResponsiveText: !this.isBoard,
     }

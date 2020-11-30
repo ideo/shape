@@ -18,9 +18,11 @@ import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
+  position: relative;
   height: 100%;
   width: 100%;
-  z-index: ${v.zIndex.gridCardTop};
+  /* z-index < MovableGridCard default */
+  z-index: ${props => props.zIndex};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -301,6 +303,22 @@ class FoamcoreInteractionLayer extends React.Component {
     })
   }
 
+  createSection = async ({ col, row, height = 3, width = 3 } = {}) => {
+    const { collection, apiStore } = this.props
+    const attrs = {
+      col,
+      row,
+      width,
+      height,
+      section_name: 'New Section',
+      card_type: 'section',
+      parent_id: collection.id,
+    }
+
+    const card = new CollectionCard(attrs, apiStore)
+    card.API_create()
+  }
+
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
@@ -338,10 +356,14 @@ class FoamcoreInteractionLayer extends React.Component {
     this.throttledOnCursorMove('mouse')(e)
   }
 
+  @action
   onCursorMove = type => ev => {
-    const { hasSelectedArea } = this
+    const { coordinatesForPosition, uiStore } = this.props
+    const { hasSelectedArea } = uiStore
+    const rect = uiStore.foamcoreBoundingRectangle
+
     if (hasSelectedArea || !ev || !ev.target) {
-      // ignore these interactions when you're already dragging a selection square or don't have a target
+      // ignore these interactions when you don't have a target
       return
     }
 
@@ -349,6 +371,7 @@ class FoamcoreInteractionLayer extends React.Component {
       `.${FOAMCORE_INTERACTION_LAYER}`
     )
     const childOfCardMenu = !!ev.target.closest('.card-menu')
+    // ignore interactionLayer when hovering over a CardMenu
     if (
       (ev.target.id !== FOAMCORE_INTERACTION_LAYER &&
         !childOfInteractionLayer) ||
@@ -358,9 +381,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
-    const { coordinatesForPosition, uiStore } = this.props
 
-    const rect = uiStore.foamcoreBoundingRectangle
     let { clientX, clientY, target } = ev
     // TouchEnd doesn't give you a clientX, have to get it from start event
     if (type === 'touch') {
@@ -371,6 +392,13 @@ class FoamcoreInteractionLayer extends React.Component {
       target = touchClickEv.target
     }
 
+    const rawCoords = {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    }
+
+    const coords = coordinatesForPosition(rawCoords)
+    const { row, col } = coords
     const { classList } = target
     if (
       (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) &&
@@ -380,22 +408,19 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    const rawCoords = {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    }
-    const coords = coordinatesForPosition(rawCoords)
     const { cardMatrix } = this.props.collection
-    const { row, col } = coords
 
     // ev.preventDefault()
     // ev.stopPropagation()
     const { blankContentToolState } = uiStore
     // If there's a card already there don't render a positioned blank card
-    const cardOrBctOpenAtThisSpot =
-      (cardMatrix[row] && cardMatrix[row][col]) ||
-      (blankContentToolState.row === row && blankContentToolState.col === col)
-    if (cardOrBctOpenAtThisSpot) {
+    const cardAtThisSpot = cardMatrix[row] && cardMatrix[row][col]
+    const bctAtThisSpot =
+      blankContentToolState.row === row && blankContentToolState.col === col
+    if (cardAtThisSpot || bctAtThisSpot) {
+      if (cardAtThisSpot && cardAtThisSpot.isSection) {
+        uiStore.update('hoveringOverSection', null)
+      }
       this.resetHoveringRowCol()
     } else {
       this.repositionBlankCard({ row, col })
@@ -411,6 +436,12 @@ class FoamcoreInteractionLayer extends React.Component {
     if (contentType === 'useTemplate') {
       this.createTemplateInstance({
         ...opts,
+        row,
+        col,
+      })
+      return
+    } else if (contentType === 'section') {
+      this.createSection({
         row,
         col,
       })
@@ -790,13 +821,15 @@ class FoamcoreInteractionLayer extends React.Component {
           // continue iteration
           return true
         }
-        // find two cards together UNLESS the card on the right isPinnedAndLocked
+        // find two cards together UNLESS the card on the right isPinnedAndLocked/isSection
+        const canBumpNextCard =
+          !cardMatrix[row][col].isPinnedAndLocked &&
+          !cardMatrix[row][col].isSection
         const twoCardsTogether =
           col > 0 &&
-          !cardMatrix[row][col].isPinnedAndLocked &&
           cardMatrix[row][col - 1] &&
           cardMatrix[row][col - 1] !== cardMatrix[row][col]
-        if (col === 0 || twoCardsTogether) {
+        if (canBumpNextCard && (col === 0 || twoCardsTogether)) {
           hotEdges.push(
             <FoamcoreHotEdge
               key={`hotspot-${row}:${col}`}
@@ -826,11 +859,6 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     return <div>{hotEdges}</div>
-  }
-
-  get hasSelectedArea() {
-    const { minX, maxX } = this.props.uiStore.selectedArea
-    return minX && maxX && maxX > minX
   }
 
   get renderBct() {
@@ -872,15 +900,20 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
+    const { hoveringRowCol } = this
     const { resizing, uiStore } = this.props
 
     if (resizing) {
       return this.renderInnerDragLayer
     }
 
+    // put it behind MovableGridCard unless we have an open HTC
+    const zIndex = hoveringRowCol.row !== null ? v.zIndex.gridCardTop : 0
+
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
+        zIndex={zIndex}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseMove={this.onCursorMove('mouse')}

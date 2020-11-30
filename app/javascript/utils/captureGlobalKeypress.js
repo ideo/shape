@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { runInAction } from 'mobx'
 import { apiStore, uiStore, undoStore } from '~/stores'
 import { quillSelectors } from '~/utils/variables'
 
@@ -24,24 +25,27 @@ export const handleMouseDownSelection = e => {
   const { isEditingText } = uiStore
   const outsideQuillMouseDown = !quillEditorClick(e) && isEditingText
   if (emptySpaceMouseDown) {
-    if (outsideQuillMouseDown) {
-      uiStore.setCommentingOnRecord(null)
-      // we need a tiny delay so that the highlight gets properly unset
-      // before kicking out of the textEditingItem
-      setTimeout(() => {
-        uiStore.clearTextEditingCard()
-      })
-    }
-    // if we clicked an empty space...
-    if (!e.shiftKey) {
-      // Shift click should not deselect cards in case you want to drag select more.
-      uiStore.deselectCards()
-    }
-    uiStore.onEmptySpaceClick(e)
-    uiStore.closeBlankContentTool()
-    uiStore.closeCardMenu()
-    uiStore.setEditingCardCover(null)
-    uiStore.closeTouchActionMenu()
+    runInAction(() => {
+      if (outsideQuillMouseDown) {
+        uiStore.setCommentingOnRecord(null)
+        // we need a tiny delay so that the highlight gets properly unset
+        // before kicking out of the textEditingItem
+        setTimeout(() => {
+          uiStore.clearTextEditingCard()
+        })
+      }
+      // if we clicked an empty space...
+      if (!e.shiftKey) {
+        // Shift click should not deselect cards in case you want to drag select more.
+        uiStore.deselectCards()
+      }
+      uiStore.onEmptySpaceClick(e)
+      uiStore.closeBlankContentTool()
+      uiStore.closeCardMenu()
+      uiStore.setEditingCardCover(null)
+      uiStore.closeTouchActionMenu()
+      uiStore.clearEditingName()
+    })
     return 'emptySpace'
   }
   if (onHotCell) {
@@ -101,7 +105,7 @@ const captureGlobalKeypress = e => {
       break
     // CTRL+C: Duplicate
     case 'KeyC':
-      if (noCardsSelected) {
+      if (noCardsSelected || shiftKey) {
         return false
       }
       uiStore.openMoveMenu({
@@ -147,6 +151,7 @@ const captureGlobalKeypress = e => {
       card.API_archive()
       break
     case 'Escape':
+      uiStore.deselectCards()
       if (uiStore.movingCardIds.length && !uiStore.dragging) {
         uiStore.closeMoveMenu()
       }

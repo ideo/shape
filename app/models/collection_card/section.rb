@@ -48,21 +48,36 @@
 #
 
 class CollectionCard
-  class Link < CollectionCard
+  class Section < CollectionCard
     archivable
     after_archive :after_archive_card
     after_unarchive :after_unarchive_card
 
-    belongs_to :collection,
-               optional: true,
-               inverse_of: :cards_linked_to_this_collection
-    belongs_to :item,
-               optional: true,
-               inverse_of: :cards_linked_to_this_item
+    # delegates roles to the parent collection
+    def can_edit?(*args)
+      parent.can_edit_content?(*args)
+    end
 
-    def can_edit?(user_or_group)
-      # you can edit (meaning remove) a link card as long as you can content edit the parent collection
-      parent.can_edit_content?(user_or_group)
+    def can_view?(*args)
+      parent.can_view?(*args)
+    end
+
+    def cards_in_section(collection: parent)
+      t = CollectionCard.arel_table
+      collection
+        .collection_cards
+        .where(
+          t[:row].gt(row),
+        )
+        .where(
+          t[:row].lt(row + height - 1),
+        )
+        .where(
+          t[:col].gt(col),
+        )
+        .where(
+          t[:col].lt(col + width - 1),
+        )
     end
   end
 end

@@ -12,6 +12,7 @@ import v, {
   FOAMCORE_INTERACTION_LAYER,
   ACTIVITY_LOG_PAGE_KEY,
   COLLECTION_CHANNEL_NAME,
+  SECTION_BORDER,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
@@ -229,12 +230,16 @@ export default class UiStore {
   @observable
   dragCardMaster = null
   @observable
-  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+  selectedArea = {
+    minX: null,
+    maxX: null,
+    minY: null,
+    maxY: null,
+  }
   @observable
   selectedAreaShifted = false
   @observable
   selectedAreaEnabled = false
-  cardPositions = []
   @observable
   linkedBreadcrumbTrail = []
   @observable
@@ -269,7 +274,7 @@ export default class UiStore {
     ...this.placeholderDefaults,
   }
   @observable
-  hoveringOverDataItem = false
+  hoveringOverSection = null
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
@@ -312,18 +317,19 @@ export default class UiStore {
   startDragging(cardId) {
     this.dragging = true
     this.draggingFromMDL = false
-    if (
-      this.selectedCardIds.length > 0 &&
-      this.selectedCardIds.indexOf(cardId.toString()) > -1
-    ) {
-      this.multiMoveCardIds = [...this.selectedCardIds]
-    } else if (_.includes(cardId, '-mdlPlaceholder')) {
+    if (_.includes(cardId, '-mdlPlaceholder')) {
       this.draggingFromMDL = true
       this.multiMoveCardIds = [...this.movingCardIds]
     } else {
-      // just select the one dragging card
-      this.reselectCardIds([cardId])
-      this.multiMoveCardIds = [cardId]
+      if (
+        this.selectedCardIds.length === 0 ||
+        this.selectedCardIds.indexOf(cardId.toString()) === -1
+      ) {
+        // if the dragging card is not already selected, select it.
+        // this will also pick up any cards inside the selected section
+        this.reselectCardIds([cardId])
+      }
+      this.multiMoveCardIds = [...this.selectedCardIds]
     }
     this.dragCardMaster = cardId
   }
@@ -383,76 +389,76 @@ export default class UiStore {
 
   @action
   setSelectedArea(selectedArea, { shifted = false } = {}) {
-    const { viewingCollection } = this
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
 
-    if (viewingCollection && viewingCollection.isBoard) {
-      this.selectCardsWithinSelectedArea()
+    // ----
+    const { viewingCollection } = this
+    if (!viewingCollection || !viewingCollection.isBoard) {
+      return
     }
-  }
 
-  @action
-  resetCardPositions() {
-    this.cardPositions = []
-  }
+    const { minX, minY, maxX, maxY } = selectedArea
+    const rect = this.foamcoreBoundingRectangle
+    const scrollTop = window.pageYOffset || 0
+    const scrollLeft = window.pageXOffset || 0
 
-  @action
-  removeCardPositions(cardIds = []) {
-    _.each(cardIds, cardId => {
-      const idx = _.findIndex(this.cardPositions, { cardId })
-      if (idx > 0) {
-        this.cardPositions.splice(idx, 1)
-      }
+    const top = rect.top + scrollTop
+    const left = rect.left + scrollLeft
+
+    const minRawCoords = {
+      x: minX - left,
+      y: minY - top,
+    }
+    const maxRawCoords = {
+      x: maxX - left,
+      y: maxY - top,
+    }
+    const minCoords = this.coordinatesForPosition(minRawCoords)
+    const maxCoords = this.coordinatesForPosition(maxRawCoords)
+
+    this.selectCardsWithinSelectedArea({
+      minRow: minCoords.row,
+      minCol: minCoords.col,
+      maxRow: maxCoords.row,
+      maxCol: maxCoords.col,
     })
   }
 
-  @action
-  setCardPosition(cardId, { top, right, bottom, left } = {}) {
-    const idx = _.findIndex(this.cardPositions, { cardId })
-    const data = { cardId, position: { top, right, bottom, left } }
-    if (idx >= 0) {
-      this.cardPositions[idx] = data
-      return
-    }
-    this.cardPositions.push(data)
+  @computed
+  get hasSelectedArea() {
+    const { minX, maxX } = this.selectedArea
+    return minX && maxX && maxX > minX
   }
 
   @action
-  selectCardsWithinSelectedArea() {
-    const { minX, minY, maxX, maxY } = this.selectedArea
+  resetSelectedArea() {
+    this.selectedArea = {
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    }
+  }
+
+  @action
+  selectCardsWithinSelectedArea(minMaxCorners) {
     const { selectedCardIds, selectedAreaShifted, viewingCollection } = this
-    const viewingCardIds = viewingCollection.cardIds
     let newSelectedCardIds = []
 
-    if (minY === null || minX === null) {
+    if (minMaxCorners.minRow === null || minMaxCorners.minCol === null) {
       // or select none??
       return
     }
 
-    const scrollTop = window.pageYOffset
-    const scrollLeft = window.pageXOffset
-
-    newSelectedCardIds = _.map(
-      _.filter(this.cardPositions, pos => {
-        const { top, right, bottom, left } = pos.position
-        // make sure this card hasn't been removed e.g. archived
-        if (!_.includes(viewingCardIds, pos.cardId)) {
-          return false
-        }
-        return !(
-          right + scrollLeft < minX ||
-          left + scrollLeft > maxX ||
-          bottom + scrollTop < minY ||
-          top + scrollTop > maxY
-        )
-      }),
-      'cardId'
-    )
+    newSelectedCardIds = viewingCollection.cardIdsBetweenByColRow({
+      minMaxCorners,
+    })
 
     if (selectedAreaShifted) {
       newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
     }
+
     if (!_.isEqual(newSelectedCardIds, [...selectedCardIds])) {
       this.reselectCardIds(newSelectedCardIds)
     }
@@ -462,6 +468,11 @@ export default class UiStore {
   setEditingName(nameKey) {
     if (this.editingName.includes(nameKey)) return
     this.editingName.push(nameKey)
+  }
+
+  @action
+  clearEditingName() {
+    this.editingName = []
   }
 
   @action
@@ -1096,11 +1107,42 @@ export default class UiStore {
   @action
   toggleSelectedCardId(cardId) {
     if (this.isSelected(cardId)) {
+      const parentSectionCard = this.parentSection(cardId)
+      if (parentSectionCard && this.isSelected(parentSectionCard.id)) {
+        this.selectedCardIds.remove(parentSectionCard.id)
+      }
       this.selectedCardIds.remove(cardId)
     } else {
-      this.selectedCardIds.push(cardId)
+      this.reselectCardIds(_.uniq([...this.selectedCardIds, cardId]))
     }
     this.broadcastCardSelection([...this.selectedCardIds])
+  }
+
+  @action
+  reselectCardIds(cardIds = []) {
+    let newSelected = cardIds
+
+    // select all cards inside of any selected sections
+    const { viewingCollection } = this
+    if (viewingCollection) {
+      // look up section cards in the collection, filtering ones that are selected
+      const selectedSections = viewingCollection.collection_cards.filter(
+        cc => cc.isSection && _.includes(cardIds, cc.id)
+      )
+      _.each(selectedSections, section => {
+        // combine newSelected with cards in the section
+        newSelected = _.reverse(
+          _.uniq(_.concat(newSelected, this.cardIdsInSection(section.id)))
+        )
+      })
+    }
+
+    if (_.isEqual([...this.selectedCardIds], newSelected)) {
+      return
+    }
+
+    this.selectedCardIds.replace(newSelected)
+    this.broadcastCardSelection([...newSelected])
   }
 
   // For certain actions we want to force a toggle on
@@ -1110,12 +1152,6 @@ export default class UiStore {
       // always put the newly selected card at the end
       _.reject(this.selectedCardIds, i => i === cardId).concat(cardId)
     )
-  }
-
-  @action
-  reselectCardIds(cardIds) {
-    this.selectedCardIds.replace(cardIds)
-    this.broadcastCardSelection([...cardIds])
   }
 
   @action
@@ -1159,6 +1195,7 @@ export default class UiStore {
           _.includes(cardIds, card.id) &&
           (card.link ||
             (card.record && card.record.can_edit) ||
+            (card.isSection && card.can_edit_parent) ||
             (card.isBctPlaceholder && card.can_edit_parent))
       )
     const filteredCardIds = _.map(filteredCards, 'id')
@@ -1295,7 +1332,7 @@ export default class UiStore {
     const selected = [...this.selectedCardIds]
     const lastSelectedCardId = _.last(selected)
 
-    if (!lastSelectedCardId) return this.selectedCardIds.replace([cardId])
+    if (!lastSelectedCardId) return this.reselectCardIds([cardId])
     if (lastSelectedCardId === cardId) return this.selectedCardIds
 
     // Get cardIds that are between this card and the last selected card
@@ -1315,8 +1352,25 @@ export default class UiStore {
     if (_.isEmpty(_.difference(newSelected, selected))) {
       newSelected = _.difference(selected, cardIdsBetween)
     }
+    return this.reselectCardIds(newSelected)
+  }
 
-    return this.selectedCardIds.replace(newSelected)
+  @action
+  cardIdsInSection(cardId) {
+    // Get cardIds that are between this card and the last selected card
+    return this.viewingCollection.cardIdsBetween(
+      // get everything between the corners of the section
+      cardId,
+      cardId
+    )
+  }
+
+  parentSection(cardId) {
+    return _.first(
+      this.viewingCollection.collection_cards.filter(
+        cc => cc.isSection && _.includes(this.cardIdsInSection(cc.id), cardId)
+      )
+    )
   }
 
   isSelected(cardId) {
@@ -1886,7 +1940,13 @@ export default class UiStore {
     return gridWidth
   }
 
-  positionForCoordinates({ col, row, width = 1, height = 1 }) {
+  positionForCoordinates({
+    col,
+    row,
+    width = 1,
+    height = 1,
+    isSection = false,
+  }) {
     const { gridW, gridH, gutter } = v.defaultGridSettings
     const { relativeZoomLevel } = this
     const pos = {
@@ -1895,6 +1955,17 @@ export default class UiStore {
       w: width * (gridW + gutter) - gutter,
       h: height * (gridH + gutter) - gutter,
     }
+
+    if (isSection) {
+      // sections are positioned in (x,y) by half a card, and adjusted to be smaller by a full card amount.
+      _.assign(pos, {
+        x: (col * (gridW + gutter) + gridW / 2) / relativeZoomLevel,
+        y: (row * (gridH + gutter) + gridH / 2) / relativeZoomLevel,
+        w: (width - 1) * (gridW + gutter) + SECTION_BORDER,
+        h: (height - 1) * (gridH + gutter) + SECTION_BORDER,
+      })
+    }
+
     // TODO: why sometimes NaN? zoomLevel divide by 0??
     if (_.isNaN(pos.x)) {
       pos.x = 0
@@ -1908,6 +1979,26 @@ export default class UiStore {
       width: pos.w,
       height: pos.h,
     }
+  }
+
+  coordinatesForPosition(position) {
+    const collection = this.viewingCollection
+    const { gridW, gridH, gutter } = v.defaultGridSettings
+    const { relativeZoomLevel } = this
+    const { x, y } = position
+    const width = position.width || 1
+
+    let col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
+    let row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
+    if (row < 0) {
+      row = 0
+    }
+    // even though we restrict coordinates to being within the grid,
+    // we want to know if horizontalScroll should be disabled based on unmodified col
+    const outsideDraggableArea = col >= collection.num_columns || col < 0
+
+    col = _.clamp(col, 0, collection.num_columns - width)
+    return { col, row, outsideDraggableArea }
   }
 
   createRoles = (entities, roleName, opts = {}, record) => {

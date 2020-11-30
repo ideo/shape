@@ -91,11 +91,13 @@ module CollectionGrid
       collection:,
       drag_positions: {},
       moving_cards: [],
+      for_section: false,
       debug: false
     )
       return [] if collection.collection_cards.none? && drag_positions.empty?
 
-      # TODO: memoize?
+      moving_section_card = for_section || moving_cards.all?(&:section?)
+
       # omit moving cards from our matrix
       cards = collection.collection_cards.visible.where.not(id: moving_cards.pluck(:id)).order(created_at: :desc)
       if drag_positions.present?
@@ -110,9 +112,23 @@ module CollectionGrid
       cards.each do |card|
         rows = (card.row..card_max_row(card))
         cols = (card.col..card_max_col(card))
-        rows.each do |row|
-          cols.each do |col|
-            matrix[row][col] = card
+
+        if moving_section_card && card.section?
+          rows = (card.row + 1..card_max_row(card) - 1)
+          cols = (card.col + 1..card_max_col(card) - 1)
+        end
+
+        rows.each_with_index do |row, r_idx|
+          cols.each_with_index do |col, c_idx|
+            if !moving_section_card && card.section?
+              mid_row = r_idx.positive? && r_idx < rows.count - 1
+              mid_col = c_idx.positive? && c_idx < cols.count - 1
+              if r_idx.zero? || r_idx == rows.count - 1 || (mid_row && !mid_col)
+                matrix[row][col] = card
+              end
+            else
+              matrix[row][col] = card
+            end
           end
         end
       end
@@ -211,21 +227,24 @@ module CollectionGrid
         master_card: master_card,
         moving_cards: moving_cards,
       )
-      open_spot_matrix = calculate_open_spot_matrix(
-        collection: collection,
-        moving_cards: moving_cards,
-      )
-
       master_position = Mashie.new(
         row: row,
         col: col,
-        height: master_card.height,
-        width: master_card.width,
       )
+
+      # NOTE: we pull the inner-section cards out and move those separately
+      card_ids_in_sections = moving_cards.map do |card|
+        next unless card.section?
+
+        card.cards_in_section.pluck(:id)
+      end.compact.flatten
 
       drag_positions = {}
       drag_map.each_with_index do |mapped, i|
         card = mapped.card
+        # these get moved with their section (see section_cards loop down below)
+        next if card_ids_in_sections.include?(card.id)
+
         position = Mashie.new(
           # id is mostly just helpful for debugging output
           id: "drag-#{i}",
@@ -234,6 +253,13 @@ module CollectionGrid
           col: [mapped.col + master_position.col, 0].max,
           width: card.width,
           height: card.height,
+        )
+
+        open_spot_matrix = calculate_open_spot_matrix(
+          collection: collection,
+          moving_cards: moving_cards,
+          drag_positions: drag_positions,
+          for_section: card.section?,
         )
 
         open_spot = find_closest_open_spot(
@@ -252,16 +278,21 @@ module CollectionGrid
         # drag_positions tracks what we have "placed" so far
         drag_positions[card_id] = position
 
+        row_diff = position.row - card.row
+        col_diff = position.col - card.col
+        if card.section?
+          # now we deal with these since they weren't technically part of moving_cards
+          moving_cards.select { |c| card.cards_in_section.include?(c) }.each do |section_card|
+            section_card.parent = collection
+            section_card.row += row_diff
+            section_card.col += col_diff
+          end
+        end
         # now actually move the card (to be persisted in wrapping services)
-        card.parent = collection
+        # have to do this *after* checking section logic
         card.row = position.row
         card.col = position.col
-
-        open_spot_matrix = calculate_open_spot_matrix(
-          collection: collection,
-          moving_cards: moving_cards,
-          drag_positions: drag_positions,
-        )
+        card.parent = collection
       end
 
       moving_cards
@@ -395,12 +426,14 @@ module CollectionGrid
     def self.calculate_open_spot_matrix(
       collection:,
       moving_cards: [],
-      drag_positions: {}
+      drag_positions: {},
+      for_section: false
     )
       card_matrix = board_matrix(
         collection: collection,
         drag_positions: drag_positions,
         moving_cards: moving_cards,
+        for_section: for_section,
       )
       open_spot_matrix = [[]]
 
@@ -426,6 +459,8 @@ module CollectionGrid
     end
 
     def self.columns_sticking_out_of(card, above_card)
+      return [] if above_card.nil?
+
       max_card_col = card.col + card.width - 1
       card_inhabited_cols = *(card.col..max_card_col)
 

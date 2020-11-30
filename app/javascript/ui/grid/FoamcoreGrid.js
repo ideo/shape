@@ -15,7 +15,11 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
-import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+import v, {
+  MAX_CARD_W,
+  MAX_CARD_H,
+  FOAMCORE_GRID_BOUNDARY,
+} from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
@@ -31,8 +35,6 @@ function getMapKey({ col, row }) {
   return `${col},${row}`
 }
 
-const MAX_CARD_W = 4
-const MAX_CARD_H = 2
 const LOAD_INITIAL_ROWS = 300
 
 // needs to be an observer to observe changes to the collection + items
@@ -65,7 +67,7 @@ class FoamcoreGrid extends React.Component {
 
   constructor(props) {
     super(props)
-    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 15)
+    this.throttledSetDraggedOnSpots = _.throttle(this.setDraggedOnSpots, 100)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
   }
@@ -266,7 +268,9 @@ class FoamcoreGrid extends React.Component {
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     const visRows = _.get(uiStore, 'visibleRows.num', 1)
-    let maxRows = collection.max_row_index + 1
+    let maxRows = (
+      _.maxBy(collection.collection_cards, 'maxRow') || { maxRow: 1 }
+    ).maxRow
     if (collection.isSplitLevelBottom) {
       maxRows += 1
     } else if (!collection.isSplitLevel) {
@@ -319,36 +323,27 @@ class FoamcoreGrid extends React.Component {
 
   // Finds row and column from an x,y coordinate
   coordinatesForPosition = position => {
-    const { collection } = this.props
-    const { x, y } = position
-    let width = 1
-    if (position.width && !this.hoveringOverCollection) {
+    const { uiStore } = this.props
+    if (this.hoveringOverCollection) {
       // if we're hovering over a collection we leave the virtual width at 1
       // so that we can still drag wide cards over 1x1 collections
-      width = position.width
+      position.width = 1
     }
-    const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel } = this
-
-    let col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
-    let row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
-    if (row < 0) {
-      row = 0
-    }
-    // even though we restrict coordinates to being within the grid,
-    // we want to know if horizontalScroll should be disabled based on unmodified col
-    const outsideDraggableArea = col >= collection.num_columns || col < 0
-
-    col = _.clamp(col, 0, collection.num_columns - width)
-    return { col, row, outsideDraggableArea }
+    return uiStore.coordinatesForPosition(position)
   }
 
   findOverlap(card) {
     const { collection, uiStore } = this.props
     const { row, col, height, width } = card
+    // the actual CollectionCard is tucked into the card object
+    const collectionCard = card.card || {}
+    const { isSection } = collectionCard
     let h = 1
     let w = 1
-    const { cardMatrix } = collection
+
+    const cardMatrix = isSection
+      ? collection.cardMatrixForDraggingSections
+      : collection.cardMatrix
 
     while (h <= height) {
       while (w <= width) {
@@ -447,7 +442,7 @@ class FoamcoreGrid extends React.Component {
     } else {
       this.disableHorizontalScroll = false
     }
-    this.debouncedSetDraggedOnSpots(
+    this.throttledSetDraggedOnSpots(
       { card, ...cardCoords, ...cardDims },
       dragPosition
     )
@@ -489,6 +484,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, trackCollectionUpdated, uiStore } = this.props
     let { height, width } = uiStore.placeholderSpot
     // Some double-checking validations
+    // TODO: allow sections to be as big as you want?
     const maxHeight = this.calcEdgeRow(card)
     const maxWidth = this.calcEdgeCol(card)
     if (height > maxHeight) height = maxHeight
@@ -914,10 +910,13 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  findFilledSpot({ col, row }, cardId = null) {
+  findFilledSpot({ col, row, isSection }, cardId = null) {
     if (!_.isNumber(col) || _.isNaN(col)) return null
     const { collection, uiStore } = this.props
-    const filledRow = collection.cardMatrix[row]
+    const cardMatrix = isSection
+      ? collection.cardMatrixForDraggingSections
+      : collection.cardMatrix
+    const filledRow = cardMatrix[row]
     const foundCard = filledRow ? filledRow[col] : null
     if (foundCard) {
       if (
@@ -931,14 +930,24 @@ class FoamcoreGrid extends React.Component {
     return false
   }
 
-  calcEdgeCol({ id, col, row, width, height }) {
+  calcEdgeCol({ id, col, row, width, height, isSection }) {
     // start from outer column (e.g. width=1, col=0: start at col 1)
     let tempCol = col + width
     let tempRow = row
-    while (tempCol < col + MAX_CARD_W) {
+    let max = MAX_CARD_W
+
+    if (isSection) {
+      const { collection } = this.props
+      max = collection.num_columns
+    }
+
+    while (tempCol < col + max) {
       tempRow = row
       while (tempRow < row + height) {
-        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow, isSection },
+          id
+        )
         if (filled) {
           return tempCol - col
         }
@@ -946,16 +955,27 @@ class FoamcoreGrid extends React.Component {
       }
       tempCol += 1
     }
-    return MAX_CARD_W
+    return max
   }
 
-  calcEdgeRow({ id, col, row, width, height }) {
+  calcEdgeRow({ id, col, row, width, height, isSection }) {
     let tempRow = row + height
     let tempCol = col
-    while (tempRow < row + MAX_CARD_H) {
+    let max = MAX_CARD_H
+
+    if (isSection) {
+      const { collection } = this.props
+      // max height for a section = 16?
+      max = collection.num_columns
+    }
+
+    while (tempRow < row + max) {
       tempCol = col
       while (tempCol < col + width) {
-        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow, isSection },
+          id
+        )
         if (filled) {
           return tempRow - row
         }
@@ -963,7 +983,7 @@ class FoamcoreGrid extends React.Component {
       }
       tempRow += 1
     }
-    return MAX_CARD_H
+    return max
   }
 
   positionCard(card) {

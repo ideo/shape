@@ -17,6 +17,7 @@ const Container = styled.div`
   height: 100%;
   position: relative;
   width: 100%;
+  border-radius: ${props => props.theme.zoomLevel * 2}px;
 
   ${props =>
     props.isTouchDevice &&
@@ -175,13 +176,19 @@ class HotCell extends React.Component {
   }
 
   get collectionTypes() {
-    return [
+    const { isFourWideBoard } = this.props
+    let types = [
       { name: 'collection', description: 'Create Collection' },
       { name: 'foamcoreBoard', description: 'Create Foamcore Board' },
       { name: 'searchCollection', description: 'Create Search Collection' },
       { name: 'submissionBox', description: 'Create Submission Box' },
+      { name: 'section', description: 'Create Section' },
       { name: 'testCollection', description: 'Get Feedback' },
     ]
+    if (isFourWideBoard) {
+      types = _.reject(types, t => t.name === 'section')
+    }
+    return types
   }
 
   get textTypes() {
@@ -255,7 +262,13 @@ class HotCell extends React.Component {
       HOT_CELL_DEFAULT_COLLECTION_TYPE
     )
     if (collectionType) {
-      return this.collectionTypes.find(type => type.name === collectionType)
+      const chosenType = this.collectionTypes.find(
+        type => type.name === collectionType
+      )
+      if (chosenType) {
+        // e.g. might be "section" which is not available in 4WFC, so it is not found
+        return chosenType
+      }
     }
     return this.collectionTypes[0]
   }

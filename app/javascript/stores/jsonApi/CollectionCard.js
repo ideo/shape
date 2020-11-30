@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable, runInAction } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import queryString from 'query-string'
 
 import {
@@ -36,6 +36,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     'hidden',
     'filter',
     'section_type',
+    'section_name',
     'cover_card_id',
     'cover',
   ]
@@ -82,11 +83,29 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     return this.row + this.height - 1
   }
 
+  get maxRowWithSections() {
+    const { maxRow } = this
+    if (!this.isSection || maxRow === 0) {
+      return maxRow
+    }
+    // section corner is 1 row up
+    return maxRow - 1
+  }
+
   // For cards that are positioned using row/col,
   // this is the col that they extend to
   get maxCol() {
     if (this.col === undefined || this.width === undefined) return 0
     return this.col + this.width - 1
+  }
+
+  get maxColWithSections() {
+    const { maxCol } = this
+    if (!this.isSection || maxCol === 0) {
+      return maxCol
+    }
+    // section corner is 1 row up
+    return maxCol - 1
   }
 
   get isTestCollection() {
@@ -142,6 +161,10 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
 
   get isLinkCard() {
     return this.type === COLLECTION_CARD_TYPES.LINK
+  }
+
+  get isSection() {
+    return this.type === COLLECTION_CARD_TYPES.SECTION
   }
 
   get subtitle() {
@@ -449,8 +472,9 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     )
   }
 
+  @computed
   get isSelected() {
-    return this.uiStore.selectedCardIds.indexOf(this.id) > -1
+    return this.uiStore.isSelected(this.id)
   }
 
   get isMDLPlaceholder() {
@@ -558,6 +582,9 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
             prompt,
             onToggleSnoozeDialog,
           } = collection.confirmEditOptions)
+        } else if (this.isSection) {
+          prompt =
+            'All contents in this Section will be deleted. You can undo with ‘CTRL+Z’. Would you like to continue?'
         } else {
           prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {

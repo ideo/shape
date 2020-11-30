@@ -6,6 +6,7 @@ import { ReferenceType, updateModelId } from 'datx'
 // or else you run into a circular dependency issue
 import { apiStore } from '~/stores'
 import Collection, { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
+import { COLLECTION_CARD_TYPES } from '~/utils/variables'
 import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
@@ -188,16 +189,18 @@ describe('Collection', () => {
 
   describe('board collection', () => {
     let cardIds
+    const mapRow = row => _.map(row, cc => (cc ? cc.id : null))
     beforeEach(() => {
       /*
         Using real collection cards and API store,
         as the mocked store did not function correctly
 
         Cards are in position (number is card index):
-        0 0 - 1
-        - - 2 2
-        - - - 3
-        - - - 3
+        3 is a Section
+        0 0 - 1 - - - -
+        - - 2 2 3 3 3 3
+        - - - 4 3 - - 3
+        - - - 4 3 3 3 3
       */
       collection.num_columns = 16
       collection.type = 'Collection::Board'
@@ -205,6 +208,13 @@ describe('Collection', () => {
         { col: 0, row: 0, height: 1, width: 2 },
         { col: 3, row: 0, height: 1, width: 1 },
         { col: 2, row: 1, height: 1, width: 2 },
+        {
+          col: 4,
+          row: 1,
+          height: 3,
+          width: 4,
+          class_type: COLLECTION_CARD_TYPES.SECTION,
+        },
         { col: 3, row: 2, height: 2, width: 1 },
       ]
       collection.addReference('collection_cards', collCardAttrs, {
@@ -215,51 +225,158 @@ describe('Collection', () => {
     })
 
     describe('cardMatrix', () => {
-      it('returns array of arrays', () => {
+      it('returns array of arrays with card locations and section borders', () => {
         const matrix = collection.cardMatrix
 
-        expect(matrix[0][0].id).toEqual(cardIds[0])
-        expect(matrix[0][1].id).toEqual(cardIds[0])
-        expect(matrix[0][2]).toEqual(undefined)
-        expect(matrix[0][3].id).toEqual(cardIds[1])
+        let row = mapRow(matrix[0])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            cardIds[0],
+            cardIds[0],
+            null,
+            cardIds[1],
+            null,
+            null,
+          ])
+        )
 
-        expect(matrix[1][0]).toEqual(undefined)
-        expect(matrix[1][1]).toEqual(undefined)
-        expect(matrix[1][2].id).toEqual(cardIds[2])
-        expect(matrix[1][3].id).toEqual(cardIds[2])
+        row = mapRow(matrix[1])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            null,
+            null,
+            cardIds[2],
+            cardIds[2],
+            cardIds[3],
+            cardIds[3],
+            cardIds[3],
+            cardIds[3],
+            null,
+          ])
+        )
 
-        expect(matrix[2][0]).toEqual(undefined)
-        expect(matrix[2][1]).toEqual(undefined)
-        expect(matrix[2][2]).toEqual(undefined)
-        expect(matrix[2][3].id).toEqual(cardIds[3])
+        row = mapRow(matrix[2])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            null,
+            null,
+            null,
+            cardIds[4],
+            cardIds[3],
+            null,
+            null,
+            cardIds[3],
+            null,
+          ])
+        )
 
-        expect(matrix[3][0]).toEqual(undefined)
-        expect(matrix[3][1]).toEqual(undefined)
-        expect(matrix[3][2]).toEqual(undefined)
-        expect(matrix[3][3].id).toEqual(cardIds[3])
+        row = mapRow(matrix[3])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            null,
+            null,
+            null,
+            cardIds[4],
+            cardIds[3],
+            cardIds[3],
+            cardIds[3],
+            cardIds[3],
+            null,
+          ])
+        )
+      })
+    })
+
+    describe('cardMatrixForDraggingSections', () => {
+      it('returns array of arrays with card locations and filled section inner', () => {
+        /*
+          Using real collection cards and API store,
+          as the mocked store did not function correctly
+
+          Cards are in position (number is card index):
+          3 is a Section (now just showing the middle of the section)
+          0 0 - 1 - - - -
+          - - 2 2 - - - -
+          - - - 4 - 3 3 -
+          - - - 4 - - - -
+        */
+
+        const matrix = collection.cardMatrixForDraggingSections
+
+        let row = mapRow(matrix[2])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            null,
+            null,
+            null,
+            cardIds[4],
+            null,
+            cardIds[3],
+            cardIds[3],
+            null,
+            null,
+          ])
+        )
+
+        row = mapRow(matrix[3])
+        expect(row).toEqual(
+          expect.arrayContaining([
+            null,
+            null,
+            null,
+            cardIds[4],
+            null,
+            null,
+            null,
+            null,
+            null,
+          ])
+        )
       })
     })
 
     describe('cardIdsBetweenByColRow', () => {
+      /*
+        0 0 - 1 - - - -
+        - - 2 2 3 3 3 3
+        - - - 4 3 - - 3
+        - - - 4 3 3 3 3
+      */
+
       it('returns cards in rectangular area from two cards', () => {
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[1])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[1],
+          })
         ).toEqual([cardIds[0], cardIds[1]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[2], cardIds[3])
-        ).toEqual([cardIds[2], cardIds[3]])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[2],
+            lastCardId: cardIds[4],
+          })
+        ).toEqual([cardIds[2], cardIds[4]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[2])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[2],
+          })
         ).toEqual([cardIds[0], cardIds[1], cardIds[2]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[3])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[3],
+          })
         ).toEqual(cardIds)
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[3], cardIds[0])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[3],
+            lastCardId: cardIds[0],
+          })
         ).toEqual(cardIds)
       })
     })

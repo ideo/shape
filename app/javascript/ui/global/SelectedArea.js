@@ -1,9 +1,6 @@
-// import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
-// import SearchIcon from '~/ui/icons/SearchIcon'
-// import CloseIcon from '~/ui/icons/CloseIcon'
 
 const SelectedAreaSquare = styled.div.attrs(({ coords }) => ({
   style: {

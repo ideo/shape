@@ -53,7 +53,6 @@ const fakeUiStore = {
   openCardMenu: jest.fn(),
   closeMoveMenu: jest.fn(),
   resetSelectionAndBCT: jest.fn(),
-  resetCardPositions: jest.fn(),
   rolesMenuOpen: false,
   isLoading: false,
   dismissedMoveHelper: false,
@@ -152,6 +151,7 @@ const fakeUiStore = {
   clearTempTextCardItems: jest.fn(),
   setTextEditingCard: jest.fn(),
   positionForCoordinates: jest.fn().mockReturnValue({ x:0, y:0, xPos: 0, yPos: 0, width: 1, height: 1 }),
+  coordinatesForPosition: jest.fn().mockReturnValue({ row: 0, col: 0 }),
   dragGridSpot: new Map(),
   droppingFilesCount: 0,
   foamcoreBoundingRectangle: {

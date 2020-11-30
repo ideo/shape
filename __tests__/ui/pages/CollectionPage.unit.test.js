@@ -116,10 +116,6 @@ describe('CollectionPage', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
       })
 
-      it('should reset card positions', () => {
-        expect(uiStore.resetCardPositions).toHaveBeenCalled()
-      })
-
       it('should setupCommentThreadAndMenusForPage', () => {
         expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
           collection

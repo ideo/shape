@@ -25,6 +25,11 @@ export const FOAMCORE_GRID_BOUNDARY = 'foamcoreGridBoundary'
 export const FOAMCORE_INTERACTION_LAYER = 'foamcoreInteractionLayer'
 export const FOAMCORE_CLICK_LAYER = 'foamcoreClickLayer'
 
+export const MAX_CARD_W = 4
+export const MAX_CARD_H = 2
+
+export const SECTION_BORDER = 4
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -49,6 +54,7 @@ export const COLLECTION_CARD_TYPES = {
   PRIMARY: 'CollectionCard::Primary',
   LINK: 'CollectionCard::Link',
   PLACEHOLDER: 'CollectionCard::Placeholder',
+  SECTION: 'CollectionCard::Section',
 }
 
 export const DATASET_CHART_TYPES = {

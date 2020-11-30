@@ -92,6 +92,8 @@ const nameToIcon = {
   template: TemplateIcon,
   useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
+  // TODO: section icon
+  section: TemplateIcon,
   text: TextIcon,
   video: VideoIcon,
 }
@@ -286,6 +288,7 @@ HotCellQuadrant.defaultProps = {
   subTypes: null,
   displayName: false,
   currentMenuOpen: false,
+  opts: null,
 }
 
 export default HotCellQuadrant

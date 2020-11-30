@@ -6,7 +6,11 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+import v, {
+  MAX_CARD_W,
+  MAX_CARD_H,
+  FOAMCORE_GRID_BOUNDARY,
+} from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -17,6 +21,7 @@ import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspo
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
+import SectionCard from '~/ui/grid/SectionCard'
 
 const GridCardPreload = styled.div`
   width: 100%;
@@ -51,7 +56,7 @@ const bounceAnim = props => css`
 `
 
 const InnerCardWrapper = styled.div.attrs(
-  ({ width, height, transition, transform, zoomLevel, animatedBounce }) => ({
+  ({ width, height, transition, transform, animatedBounce }) => ({
     style: {
       transition,
       transform,
@@ -104,26 +109,18 @@ class MovableGridCard extends React.Component {
   }
 
   componentDidMount() {
-    const { card } = this.props
-    const { record } = card
     if (!this.state.preloading) {
-      return
-    }
-    if (this.state.preloading && _.isEmpty(record) && !card.isPrivate) {
-      // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
     this.finishPreloading()
   }
 
   componentDidUpdate(prevProps) {
-    const { card } = this.props
-    const { record } = card
-    if ((this.state.preloading && !_.isEmpty(record)) || card.isPrivate) {
-      this.finishPreloading()
-    }
     if (this.state.dragging || this.unmounted) {
       return
+    }
+    if (this.state.preloading) {
+      this.finishPreloading()
     }
     const { xPos, yPos } = this.props.position
     if (xPos === this.state.x && yPos === this.state.y) {
@@ -141,6 +138,18 @@ class MovableGridCard extends React.Component {
   }
 
   finishPreloading() {
+    const { card } = this.props
+    const { record } = card
+    if (
+      this.state.preloading &&
+      _.isEmpty(record) &&
+      !card.isSection &&
+      !card.isPrivate
+    ) {
+      // when we've just loaded the initial layout (no card.record), preserve the preloading state
+      return
+    }
+
     setTimeout(() => {
       if (this.unmounted) return
       // after a slight delay, turn preloading off and render the actual GridCard
@@ -304,29 +313,29 @@ class MovableGridCard extends React.Component {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { isBoardCollection, zoomLevel } = this.props
+    const { card, parent, zoomLevel } = this.props
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
       uiStore.setEditingCardCover(null)
     }
-    const gridSettings = isBoardCollection
-      ? v.defaultGridSettings
-      : uiStore.gridSettings
-    const { cols } = gridSettings
+    const gridSettings = v.defaultGridSettings
+    const { num_columns } = parent
     const gridW = gridSettings.gridW / zoomLevel
     const gridH = gridSettings.gridH / zoomLevel
-    const { card } = this.props
     const pad = 0.75
     const newSize = {
       // pad by some so that as you resize it doesn't immediately jump sizes
       width: card.width + Math.floor(delta.width / gridW + pad),
       height: card.height + Math.floor(delta.height / gridH + pad),
     }
-    // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
-    newSize.width = Math.max(Math.min(newSize.width, cols), 1)
-    // always max out height at 2
-    newSize.height = Math.max(Math.min(newSize.height, 2), 1)
+    // sections can stretch to 16x16 (or taller?)
+    const maxWidth = card.isSection ? num_columns : MAX_CARD_W
+    const maxHeight = card.isSection ? num_columns : MAX_CARD_H
+    // for normal cards, max out width at 4
+    newSize.width = Math.max(Math.min(newSize.width, maxWidth), 1)
+    // for normal cards, max out height at 2
+    newSize.height = Math.max(Math.min(newSize.height, maxHeight), 1)
     this.props.onResize(this.props.card.id, newSize)
     pageBoundsScroller.setScrolling(false)
     this.setState({
@@ -359,6 +368,7 @@ class MovableGridCard extends React.Component {
   }
 
   renderEmpty = () => {
+    const { zoomLevel } = this.props
     const { currentlyZooming } = uiStore
     const transition = currentlyZooming ? 'none' : cardCSSTransition
     return (
@@ -367,6 +377,7 @@ class MovableGridCard extends React.Component {
           // this was set to always visible...
           visible={this.props.card.visible}
           card={this.props.card}
+          zoomLevel={zoomLevel}
         />
       </PositionedGridCard>
     )
@@ -491,8 +502,7 @@ class MovableGridCard extends React.Component {
       card,
       cardType,
       record,
-      position: { xPos },
-      position: { yPos },
+      position: { xPos, yPos },
       canEditCollection,
       isUserCollection,
       isSharedCollection,
@@ -506,8 +516,7 @@ class MovableGridCard extends React.Component {
     } = this.props
 
     let {
-      position: { height },
-      position: { width },
+      position: { height, width },
     } = this.props
 
     const {
@@ -538,10 +547,7 @@ class MovableGridCard extends React.Component {
       return this.renderPagination()
     }
 
-    const gridSettings = isBoardCollection
-      ? v.defaultGridSettings
-      : uiStore.gridSettings
-    const { gridW, gridH, cols, gutter } = gridSettings
+    const { gridW, gridH, cols, gutter } = v.defaultGridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...
     // resize placeholder should determine if it's overlapping an empty spot or not
     const minWidth = (gridW * 0.8) / zoomLevel
@@ -604,7 +610,7 @@ class MovableGridCard extends React.Component {
       blankContentToolIsOpen,
     } = uiStore
 
-    let _zIndex = 1
+    let _zIndex = v.zIndex.gridCard
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
     let disableDragging =
@@ -686,6 +692,7 @@ class MovableGridCard extends React.Component {
     const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
+    const resizeHandleComponent = () => this.renderResizeIcon(menuOpen)
 
     const enableResizing =
       canEditCollection &&
@@ -735,7 +742,7 @@ class MovableGridCard extends React.Component {
       },
       extendsProps: {
         handleComponent: {
-          bottomRight: () => this.renderResizeIcon(menuOpen),
+          bottomRight: resizeHandleComponent,
         },
       },
       style: {
@@ -753,6 +760,38 @@ class MovableGridCard extends React.Component {
       },
     }
 
+    let renderedCard = (
+      <GridCard
+        {...cardProps}
+        draggingMultiple={draggingMultiple}
+        hoveringOver={hoveringOverRight}
+        zoomLevel={zoomLevel}
+      />
+    )
+
+    if (card.isSection) {
+      // TODO: figure out resize math and UI for handle that works for 3 new corners
+      // _.assign(rndProps.enableResizing, {
+      //   bottomLeft: enableResizing,
+      //   topLeft: enableResizing,
+      //   topRight: enableResizing,
+      // })
+      // _.assign(rndProps.extendsProps.handleComponent, {
+      //   bottomLeft: resizeHandleComponent,
+      //   topLeft: resizeHandleComponent,
+      //   topRight: resizeHandleComponent,
+      // })
+      rndProps.dragHandleClassName = '.sectionInner'
+      if (
+        uiStore.hoveringOverSection &&
+        uiStore.hoveringOverSection === card.id
+      ) {
+        // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
+        _zIndex = -1
+      }
+      renderedCard = <SectionCard card={card} zoomLevel={zoomLevel} />
+    }
+
     return (
       <StyledCardWrapper
         className={touchDeviceClass}
@@ -766,8 +805,8 @@ class MovableGridCard extends React.Component {
         // for mdlPlaceholder
         maxWidth={card.maxWidth}
         maxHeight={card.maxHeight}
-        width={card.maxWidth * v.defaultGridSettings.gridW}
-        height={card.maxHeight * v.defaultGridSettings.gridH}
+        width={card.maxWidth * gridW}
+        height={card.maxHeight * gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
         // <-----
       >
@@ -782,14 +821,7 @@ class MovableGridCard extends React.Component {
           >
             {/* During preload we just render a gray square to simplify initial render */}
             {preloading && <GridCardPreload zoomLevel={zoomLevel} />}
-            {!preloading && (
-              <GridCard
-                {...cardProps}
-                draggingMultiple={draggingMultiple}
-                hoveringOver={hoveringOverRight}
-                zoomLevel={zoomLevel}
-              />
-            )}
+            {!preloading && renderedCard}
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>
