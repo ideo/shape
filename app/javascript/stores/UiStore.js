@@ -1112,10 +1112,10 @@ export default class UiStore {
         this.selectedCardIds.remove(parentSectionCard.id)
       }
       this.selectedCardIds.remove(cardId)
+      this.broadcastCardSelection([...this.selectedCardIds])
     } else {
       this.reselectCardIds(_.uniq([...this.selectedCardIds, cardId]))
     }
-    this.broadcastCardSelection([...this.selectedCardIds])
   }
 
   @action

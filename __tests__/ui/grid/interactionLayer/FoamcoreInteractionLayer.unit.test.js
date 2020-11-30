@@ -83,6 +83,11 @@ describe('FoamcoreInteractionLayer', () => {
         const opts = {
           templateId: 4,
         }
+        props.apiStore.createTemplateInstance = jest
+          .fn()
+          .mockReturnValue(
+            Promise.resolve({ data: { parent_collection_card: { id: '101' } } })
+          )
         component.onCreateBct({ row, col }, 'useTemplate', opts)
       })
 
@@ -90,12 +95,11 @@ describe('FoamcoreInteractionLayer', () => {
         expect(component.hoveringRowCol).toEqual({ row: null, col: null })
       })
 
-      it('should set the loading cell', () => {
-        expect(component.loadingCell).toEqual({ row: 1, col: 1 })
+      it('should reset the loading cell', () => {
+        expect(component.loadingCell).toEqual(null)
       })
 
       it('should call apiStore.createTemplateInstance with params and template', () => {
-        expect(props.apiStore.createTemplateInstance).toHaveBeenCalled()
         expect(props.apiStore.createTemplateInstance).toHaveBeenCalledWith({
           data: {
             parent_id: fakeCollection.id,
