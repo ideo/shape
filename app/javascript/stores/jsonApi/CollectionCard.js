@@ -36,6 +36,7 @@ class CollectionCard extends TitleAndCoverEditingMixin(BaseRecord) {
     'hidden',
     'filter',
     'section_type',
+    'section_name',
     'cover_card_id',
     'cover',
   ]

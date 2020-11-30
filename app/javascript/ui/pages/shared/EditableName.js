@@ -78,7 +78,7 @@ class EditableName extends React.Component {
   }
 
   onNameFieldKeypress = e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === 'Escape') {
       this.stopEditingName()
     }
   }
@@ -174,10 +174,9 @@ class EditableName extends React.Component {
             placeholder={placeholder}
             maxLength={v.maxTitleLength}
             className="input__name"
-            // style={{ fontSize: editFontSize }}
             value={this.name}
             onChange={this.onNameChange}
-            onKeyPress={this.onNameFieldKeypress}
+            onKeyDown={this.onNameFieldKeypress}
             data-cy={`EditableNameInput-${fieldName}`}
           />
           <ClickWrapper clickHandlers={clickHandlers} />

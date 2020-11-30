@@ -24,8 +24,9 @@ import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import SectionCard from '~/ui/grid/SectionCard'
 
 const GridCardPreload = styled.div`
-  height: 100%;
   width: 100%;
+  height: 100%;
+  border-radius: ${props => props.zoomLevel * 2}px;
   background: ${v.colors.commonMediumTint};
 `
 
@@ -139,7 +140,12 @@ class MovableGridCard extends React.Component {
   finishPreloading() {
     const { card } = this.props
     const { record } = card
-    if (this.state.preloading && _.isEmpty(record) && !card.isSection) {
+    if (
+      this.state.preloading &&
+      _.isEmpty(record) &&
+      !card.isSection &&
+      !card.isPrivate
+    ) {
       // when we've just loaded the initial layout (no card.record), preserve the preloading state
       return
     }
@@ -362,6 +368,7 @@ class MovableGridCard extends React.Component {
   }
 
   renderEmpty = () => {
+    const { zoomLevel } = this.props
     const { currentlyZooming } = uiStore
     const transition = currentlyZooming ? 'none' : cardCSSTransition
     return (
@@ -370,6 +377,7 @@ class MovableGridCard extends React.Component {
           // this was set to always visible...
           visible={this.props.card.visible}
           card={this.props.card}
+          zoomLevel={zoomLevel}
         />
       </PositionedGridCard>
     )
@@ -602,7 +610,7 @@ class MovableGridCard extends React.Component {
       blankContentToolIsOpen,
     } = uiStore
 
-    let _zIndex = 1
+    let _zIndex = v.zIndex.gridCard
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
     let disableDragging =
@@ -812,7 +820,7 @@ class MovableGridCard extends React.Component {
             zoomLevel={zoomLevel}
           >
             {/* During preload we just render a gray square to simplify initial render */}
-            {preloading && <GridCardPreload />}
+            {preloading && <GridCardPreload zoomLevel={zoomLevel} />}
             {!preloading && renderedCard}
           </InnerCardWrapper>
         </Rnd>

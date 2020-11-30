@@ -189,12 +189,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return this.cardIdsBetweenByColRow({ firstCardId, lastCardId })
     }
     // For all other collection types, find cards by order
-    return this.cardIdsBetweenByOrder({ firstCardId, lastCardId })
+    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
   }
 
   // Find all cards that are between these two card ids,
   // using the card order
-  cardIdsBetweenByOrder({ firstCardId, lastCardId }) {
+  cardIdsBetweenByOrder(firstCardId, lastCardId) {
     const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
     const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
     const cardIdsBetween = [...this.cardIds]
@@ -293,6 +293,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     minMaxCorners = null,
   } = {}) {
     let minMax = minMaxCorners
+    const forSection = firstCardId && firstCardId === lastCardId
 
     if (!minMaxCorners && firstCardId) {
       const cards = this.collection_cards.filter(
@@ -309,9 +310,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const matrix = this.cardMatrix
     const cardIds = []
     _.each(rowRange, row => {
+      if (!matrix[row]) return
       _.each(colRange, col => {
         const card = matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+        if (
+          card &&
+          !_.includes(cardIds, card.id) &&
+          (!forSection || !card.isSection)
+        ) {
+          cardIds.push(card.id)
+        }
       })
     })
 
@@ -2070,8 +2078,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get styledTheme() {
-    const { fontColor } = this
+    const { fontColor, uiStore } = this
     const theme = {
+      zoomLevel: uiStore.relativeZoomLevel,
       // can probably deprecate this once we fully migrate 4WFC?
       useResponsiveText: !this.isBoard,
     }

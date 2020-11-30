@@ -14,6 +14,8 @@ let uiStore
 const fakeCollection = {
   id: '123',
   isCollection: true,
+  isBoard: true,
+  num_columns: 4,
   parent_collection_card: {},
   setCollaborators: jest.fn(),
 }
@@ -319,16 +321,7 @@ describe('UiStore', () => {
       maxY: 200,
     }
     beforeEach(() => {
-      uiStore.setSelectedArea(coords)
-      // cardPositions determines where each card is placed on the grid
-      // gets called in GridCard when it sets the ref
-      uiStore.setCardPosition('1', { top: 0, right: 100, bottom: 100, left: 0 })
-      uiStore.setCardPosition('2', {
-        top: 300,
-        right: 100,
-        bottom: 500,
-        left: 0,
-      })
+      fakeCollection.cardIdsBetweenByColRow = jest.fn().mockReturnValue(['1'])
       uiStore.setViewingRecord({
         ...fakeCollection,
         collection_cards: [],
@@ -338,21 +331,22 @@ describe('UiStore', () => {
 
     it('selects cards in within the selectedArea', () => {
       expect(uiStore.selectedCardIds).toEqual([])
-      uiStore.selectCardsWithinSelectedArea()
+      uiStore.setSelectedArea(coords)
+      expect(fakeCollection.cardIdsBetweenByColRow).toHaveBeenCalledWith({
+        minMaxCorners: {
+          maxCol: 0,
+          maxRow: 0,
+          minCol: 0,
+          minRow: 0,
+        },
+      })
       expect(uiStore.selectedCardIds).toEqual(['1'])
     })
 
     it('adds to selection if shifted', () => {
       uiStore.reselectCardIds(['5'])
       uiStore.setSelectedArea(coords, { shifted: true })
-      uiStore.selectCardsWithinSelectedArea()
       expect(uiStore.selectedCardIds).toEqual(['1', '5'])
-    })
-
-    it('omits cards that are not in viewingCollection', () => {
-      uiStore.setViewingRecord({ ...fakeCollection, id: '999', cardIds: ['2'] })
-      uiStore.selectCardsWithinSelectedArea()
-      expect(uiStore.selectedCardIds).toEqual([])
     })
   })
 

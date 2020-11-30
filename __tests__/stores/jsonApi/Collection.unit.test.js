@@ -345,23 +345,38 @@ describe('Collection', () => {
 
       it('returns cards in rectangular area from two cards', () => {
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[1])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[1],
+          })
         ).toEqual([cardIds[0], cardIds[1]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[2], cardIds[4])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[2],
+            lastCardId: cardIds[4],
+          })
         ).toEqual([cardIds[2], cardIds[4]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[2])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[2],
+          })
         ).toEqual([cardIds[0], cardIds[1], cardIds[2]])
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[3])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[0],
+            lastCardId: cardIds[3],
+          })
         ).toEqual(cardIds)
 
         expect(
-          collection.cardIdsBetweenByColRow(cardIds[3], cardIds[0])
+          collection.cardIdsBetweenByColRow({
+            firstCardId: cardIds[3],
+            lastCardId: cardIds[0],
+          })
         ).toEqual(cardIds)
       })
     })

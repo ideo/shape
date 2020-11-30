@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, PropTypes as MobxPropTypes, observer } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { action, observable } from 'mobx'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -34,12 +34,21 @@ class SectionCard extends React.Component {
     }
   }
 
+  @action
   onOpenActionMenu = () => {
-    runInAction(() => (this.actionMenuOpen = true))
+    this.actionMenuOpen = true
   }
 
+  @action
   onCloseActionMenu = () => {
-    runInAction(() => (this.actionMenuOpen = false))
+    this.actionMenuOpen = false
+  }
+
+  @action
+  updateSectionName = name => {
+    const { card } = this.props
+    card.section_name = name
+    card.save()
   }
 
   render() {
@@ -56,11 +65,13 @@ class SectionCard extends React.Component {
         onMouseMove={this.onMouseMove}
       >
         <EditableName
-          name={section_name}
-          updateNameHandler={n => n}
+          inline
+          name={section_name || ''}
+          placeholder={!section_name ? 'Section Title' : ''}
+          updateNameHandler={this.updateSectionName}
           canEdit={can_edit_parent}
           fontSize={'3.5rem'}
-          fieldName="sectionName"
+          fieldName={`sectionName-${card.id}`}
         />
         <StyledTopRightActions
           color={this.actionsColor}

@@ -33,6 +33,7 @@ uiStore.apiStore = {
 
 const rerender = () => {
   wrapper = shallow(<MovableGridCard {...props} />)
+  component = wrapper.instance()
 }
 
 describe('MovableGridCard', () => {
@@ -165,11 +166,6 @@ describe('MovableGridCard', () => {
   })
 
   describe('handleDrag', () => {
-    beforeEach(() => {
-      rerender()
-      component = wrapper.instance()
-    })
-
     it('should initiate uiStore.drag, but not call other drag functions until >10 px movement', () => {
       const pageX = 0
       const pageY = 10

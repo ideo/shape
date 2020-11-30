@@ -28,6 +28,7 @@ describe('EditableName', () => {
     beforeEach(() => {
       props.fieldName = 'name'
       props.TypographyComponent = Heading2
+      props.onDoneEditing.mockClear()
       wrapper = shallow(<EditableName.wrappedComponent {...props} canEdit />)
       const fakeEvent = {
         stopPropagation: jest.fn(),
@@ -51,10 +52,19 @@ describe('EditableName', () => {
       expect(props.updateNameHandler).toHaveBeenCalledWith('Stellar Collection')
     })
 
-    it('saves and returns to read-only name when enter is pressed in input', () => {
+    it('saves and returns to read-only name when Enter is pressed in input', () => {
       expect(props.onDoneEditing).not.toHaveBeenCalled()
-      wrapper.find('AutosizeInput').simulate('keyPress', {
+      wrapper.find('AutosizeInput').simulate('keyDown', {
         key: 'Enter',
+      })
+      expect(props.uiStore.editingName).toEqual([])
+      expect(props.onDoneEditing).toHaveBeenCalled()
+    })
+
+    it('saves and returns to read-only name when Escape is pressed in input', () => {
+      expect(props.onDoneEditing).not.toHaveBeenCalled()
+      wrapper.find('AutosizeInput').simulate('keyDown', {
+        key: 'Escape',
       })
       expect(props.uiStore.editingName).toEqual([])
       expect(props.onDoneEditing).toHaveBeenCalled()
