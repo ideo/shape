@@ -494,32 +494,54 @@ class FoamcoreGrid extends React.Component {
       if (width < 3 || height < 3) {
         // block resizing for sections smaller than 3x3
         blocked = true
-      } else if (width > cardWidth || height > cardHeight) {
-        // block when enarging sections to occupied spots
-        const enlargingToCol = col + width
-        const enlargingToRow = row + height
+      } else if (width !== cardWidth || height !== cardHeight) {
+        // block when resizing sections to occupied spots
+        const resizingToCol = col + width
+        const resizingToRow = row + height
 
         // calculate resize matrix from card matrix
         const resizeMatrix = calculateMatrixFromRange(collection, {
           minRow: row,
-          maxRow: enlargingToRow,
+          maxRow: resizingToRow,
           minCol: col,
-          maxCol: enlargingToCol,
+          maxCol: resizingToCol,
         })
 
-        // go through each spot in resize matrix to check if it's occupied
-        for (const row of resizeMatrix) {
-          if (blocked) break
-          for (const spot of row) {
-            if (
-              !!spot &&
-              spot.id !== id &&
-              !spot.isSection &&
-              (spot.row >= row + cardHeight - 1 ||
-                spot.col >= col + cardWidth - 1)
-            ) {
-              blocked = true
-              break
+        if (width > cardWidth || height > cardHeight) {
+          // when enlarging rows boundary to height and width of card
+          for (const spotsArray of resizeMatrix) {
+            if (blocked) break
+            for (const spot of spotsArray) {
+              if (!spot) continue
+              if (
+                !!spot &&
+                spot.id !== id &&
+                !spot.isSection &&
+                (spot.row >= row + cardHeight - 1 ||
+                  spot.col >= col + cardWidth - 1)
+              ) {
+                // if a spot is found beyond the boundary block resizing
+                blocked = true
+                break
+              }
+            }
+          }
+        } else if (width < cardWidth || height < cardHeight) {
+          // when shrinking count set boundary to bottom right card's row and col inside the section
+          for (let i = resizeMatrix.length - 1; i > 0; i--) {
+            if (blocked) break
+            for (let j = resizeMatrix[0].length - 1; j > 0; j--) {
+              const spot = resizeMatrix[i][j]
+              if (
+                !!spot &&
+                spot.id !== id &&
+                !spot.isSection &&
+                (resizingToCol - 1 <= spot.col || resizingToRow - 1 <= spot.row)
+              ) {
+                // if a spot is inside the section boundary set by bottom right card, block resizing
+                blocked = true
+                break
+              }
             }
           }
         }
