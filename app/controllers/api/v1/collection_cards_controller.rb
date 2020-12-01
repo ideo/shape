@@ -8,6 +8,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   ]
   load_and_authorize_resource except: %i[
     index
+    ids
     move
     replace
     update_card_filter
@@ -15,6 +16,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   # this is skipped to enable viewable_by_anyone public capability, permissions are still checked via cancan
   skip_before_action :check_api_authentication!, only: %i[
     index
+    ids
   ]
   before_action :load_and_authorize_parent_collection, only: %i[
     create
