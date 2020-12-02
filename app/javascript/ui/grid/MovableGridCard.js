@@ -4,9 +4,11 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
-
+import { hexToRgba } from '~/utils/colorUtils'
 import { uiStore } from '~/stores'
 import v, {
+  MAX_SECTION_W,
+  MAX_SECTION_H,
   MAX_CARD_W,
   MAX_CARD_H,
   FOAMCORE_GRID_BOUNDARY,
@@ -197,6 +199,25 @@ class MovableGridCard extends React.Component {
     return null
   }
 
+  get rndMaxWidth() {
+    const { card, maxResizeCol } = this.props
+    const numColsForWidth = card.isSection ? MAX_SECTION_W : maxResizeCol
+    const { gridW, gutter } = v.defaultGridSettings
+    // need to always set Rnd maxWidth to full amount (e.g. don't divide by zoomLevel)
+    // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
+    numColsForWidth * (gridW + gutter)
+  }
+
+  get rndMaxHeight() {
+    const { card, maxResizeRow } = this.props
+    const numRowsForHeight = card.isSection ? MAX_SECTION_H : maxResizeRow
+    const useDefault = card.isSection ? false : true
+
+    uiStore.gridHeightFor(numRowsForHeight, {
+      useDefault,
+    })
+  }
+
   handleStart = (e, data) => {
     e.preventDefault()
     pageBoundsScroller.setScrolling(false)
@@ -313,14 +334,13 @@ class MovableGridCard extends React.Component {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { card, parent, zoomLevel } = this.props
+    const { card, zoomLevel } = this.props
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
       uiStore.setEditingCardCover(null)
     }
     const gridSettings = v.defaultGridSettings
-    const { num_columns } = parent
     const gridW = gridSettings.gridW / zoomLevel
     const gridH = gridSettings.gridH / zoomLevel
     const pad = 0.75
@@ -329,9 +349,8 @@ class MovableGridCard extends React.Component {
       width: card.width + Math.floor(delta.width / gridW + pad),
       height: card.height + Math.floor(delta.height / gridH + pad),
     }
-    // sections can stretch to 16x16 (or taller?)
-    const maxWidth = card.isSection ? num_columns : MAX_CARD_W
-    const maxHeight = card.isSection ? num_columns : MAX_CARD_H
+    const maxWidth = card.isSection ? MAX_SECTION_W : MAX_CARD_W
+    const maxHeight = card.isSection ? MAX_SECTION_H : MAX_CARD_H
     // for normal cards, max out width at 4
     newSize.width = Math.max(Math.min(newSize.width, maxWidth), 1)
     // for normal cards, max out height at 2
@@ -508,8 +527,6 @@ class MovableGridCard extends React.Component {
       isSharedCollection,
       isBoardCollection,
       lastPinnedCard,
-      maxResizeRow,
-      maxResizeCol,
       zoomLevel,
       showHotEdge,
       searchResult,
@@ -547,17 +564,11 @@ class MovableGridCard extends React.Component {
       return this.renderPagination()
     }
 
-    const { gridW, gridH, cols, gutter } = v.defaultGridSettings
+    const { gridW, gridH, cols } = v.defaultGridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...
     // resize placeholder should determine if it's overlapping an empty spot or not
     const minWidth = (gridW * 0.8) / zoomLevel
     const minHeight = (gridH * 0.8) / zoomLevel
-    // need to always set Rnd maxWidth to full amount (e.g. don't divide by zoomLevel)
-    // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
-    const maxWidth = maxResizeCol * (gridW + gutter)
-    const maxHeight = uiStore.gridHeightFor(maxResizeRow, {
-      useDefault: true,
-    })
 
     let xAdjust = 0
     let yAdjust = 0
@@ -717,8 +728,8 @@ class MovableGridCard extends React.Component {
       onResizeStop: this.handleStop('resize'),
       minWidth,
       minHeight,
-      maxWidth,
-      maxHeight,
+      maxWidth: this.rndMaxWidth,
+      maxHeight: this.rndMaxHeight,
       dragAxis: 'none',
       cancel: '.no-drag',
       size: {
@@ -789,8 +800,25 @@ class MovableGridCard extends React.Component {
         // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
         _zIndex = -1
       }
+
+      let backgroundColor = null
+
+      const { resizeSpot } = uiStore
+      const { blocked } = resizeSpot
+
+      if (resizing && !blocked) {
+        backgroundColor = `${hexToRgba(v.colors.primaryLight, 0.2)}`
+      } else if (blocked) {
+        backgroundColor = `${hexToRgba(v.colors.alert, 0.2)}`
+      }
+
       renderedCard = (
-        <SectionCard card={card} zoomLevel={zoomLevel} inMdl={mdlPlaceholder} />
+        <SectionCard
+          card={card}
+          zoomLevel={zoomLevel}
+          backgroundColor={backgroundColor}
+          inMdl={mdlPlaceholder}
+        />
       )
     }
 

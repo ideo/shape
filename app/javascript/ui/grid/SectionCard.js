@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { inject, PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import { action, observable } from 'mobx'
+import { inject, PropTypes as MobxPropTypes, observer } from 'mobx-react'
+import v from '~/utils/variables'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -53,7 +54,7 @@ class SectionCard extends React.Component {
   }
 
   render() {
-    const { card, inMdl, uiStore, zoomLevel } = this.props
+    const { card, uiStore, inMdl, zoomLevel, backgroundColor } = this.props
     const { section_name, can_edit_parent, isSelected } = card
 
     const cardWidth = uiStore.gridSettings.gridW / zoomLevel
@@ -64,6 +65,7 @@ class SectionCard extends React.Component {
         selected={isSelected}
         className="sectionCardWrapper"
         onMouseMove={this.onMouseMove}
+        backgroundColor={backgroundColor}
       >
         <EditableName
           inline
@@ -112,9 +114,15 @@ class SectionCard extends React.Component {
 
 SectionCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  backgroundColor: PropTypes.string,
   zoomLevel: PropTypes.number.isRequired,
   inMdl: PropTypes.bool.isRequired,
 }
+
+SectionCard.defaultProps = {
+  backgroundColor: v.colors.transparent,
+}
+
 SectionCard.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }

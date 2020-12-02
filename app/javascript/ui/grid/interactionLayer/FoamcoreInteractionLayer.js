@@ -543,11 +543,16 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  positionBlank = (
-    { row, col, width, height },
+  positionBlank = ({
+    position = {},
     interactionType = 'drag',
-    showDropzoneIcon = false
-  ) => {
+    showDropzoneIcon = false,
+    blocked = false,
+  }) => {
+    if (_.isEmpty(position)) return null
+
+    const { row, col, width, height } = position
+
     let emptyRow = false
     if (interactionType === 'hover') {
       const {
@@ -559,11 +564,16 @@ class FoamcoreInteractionLayer extends React.Component {
         !_.some(collection_cards, { row: row - 1, height: 2 })
     }
 
-    return this.renderBlankCard(
-      { row, col, width, height, emptyRow },
+    return this.renderBlankCard({
+      row,
+      col,
+      width,
+      height,
+      emptyRow,
       interactionType,
-      showDropzoneIcon
-    )
+      showDropzoneIcon,
+      blocked,
+    })
   }
 
   @action
@@ -576,24 +586,21 @@ class FoamcoreInteractionLayer extends React.Component {
     this.hoveringRowCol = { row, col }
   }
 
-  renderBlankCard = (
-    { row, col, width, height, emptyRow = false },
-    interactionType,
-    showDropzoneIcon
-  ) => {
-    const {
-      uiStore,
-      collection,
-      hasDragCollision,
-      relativeZoomLevel,
-    } = this.props
+  renderBlankCard = ({
+    row,
+    col,
+    width,
+    height,
+    emptyRow = false,
+    interactionType = 'hover',
+    showDropzoneIcon = false,
+    blocked = false,
+  }) => {
+    const { uiStore, collection, relativeZoomLevel } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
     const {
       blankContentToolState: { replacingId },
     } = uiStore
-
-    // could be drag or drag-overflow
-    const isDrag = _.includes(interactionType, 'drag')
 
     if (!interactionType) return null
 
@@ -609,7 +616,7 @@ class FoamcoreInteractionLayer extends React.Component {
         emptyRow={emptyRow}
         replacingId={replacingId}
         /* Why is this rendering on top of a collection? */
-        blocked={hasDragCollision && isDrag}
+        blocked={blocked}
         data-blank-type={interactionType}
         // this is to make it work the same as CollectionGrid BCT for cypress
         className={`StyledHotspot-${row}:${col}-BCT`}
@@ -654,7 +661,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   get renderDragSpots() {
-    const { hoveringOverCollection, uiStore } = this.props
+    const { hoveringOverCollection, uiStore, hasDragCollision } = this.props
     const { dragGridSpot, movingCardsOverflow } = uiStore
 
     if (!dragGridSpot.size || hoveringOverCollection) {
@@ -673,7 +680,14 @@ class FoamcoreInteractionLayer extends React.Component {
       if (movingCardsOverflow && atMaxRow) {
         placeholder.id = 'drag-overflow'
       }
-      return this.positionBlank(placeholder, placeholder.id)
+
+      return this.positionBlank({
+        position: {
+          ...placeholder,
+        },
+        interactionType: placeholder.id,
+        blocked: hasDragCollision,
+      })
     })
 
     return dragSpots
@@ -689,35 +703,35 @@ class FoamcoreInteractionLayer extends React.Component {
       col !== null &&
       (blankContentToolState.row !== row || blankContentToolState.col !== col)
     ) {
-      return this.positionBlank(
-        {
-          id: 'hover',
+      return this.positionBlank({
+        position: {
           row,
           col,
           width: 1,
           height: 1,
         },
-        'hover'
-      )
+        interactionType: 'hover',
+      })
     }
   }
 
   get renderResizeSpot() {
     const { uiStore } = this.props
-    const { placeholderSpot } = uiStore
-    const { row, col, width, height } = placeholderSpot
+    const { resizeSpot } = uiStore
+    const { row, col, width, height, hidden } = resizeSpot
+
+    if (hidden) return null
 
     if (row !== null && col !== null) {
-      return this.positionBlank(
-        {
-          id: 'resize',
+      return this.positionBlank({
+        position: {
           row,
           col,
           width,
           height,
         },
-        'resize'
-      )
+        interactionType: 'resize',
+      })
     }
     return null
   }
@@ -744,7 +758,15 @@ class FoamcoreInteractionLayer extends React.Component {
           height: 1,
         }
         positions.push(position)
-        blankCards.push(this.positionBlank(position, 'hover', showDropzoneIcon))
+        blankCards.push(
+          this.positionBlank({
+            position: {
+              ...position,
+            },
+            interactionType: 'hover',
+            showDropzoneIcon,
+          })
+        )
         takenSpots.push(position)
       }
     }
@@ -871,7 +893,10 @@ class FoamcoreInteractionLayer extends React.Component {
     if (blankContentToolIsOpen && collectionId === collection.id) {
       const interactionType =
         blankContentToolState.blankType === 'hotcell' ? 'hotcell' : 'bct'
-      return this.positionBlank({ ...blankContentToolState }, interactionType)
+      return this.positionBlank({
+        position: { ...blankContentToolState },
+        interactionType,
+      })
     }
 
     return null
@@ -885,7 +910,10 @@ class FoamcoreInteractionLayer extends React.Component {
     ) {
       return null
     }
-    return this.positionBlank({ ...this.loadingCell }, 'unrendered')
+    return this.positionBlank({
+      position: { ...this.loadingCell },
+      interactionType: 'unrendered',
+    })
   }
 
   get renderReplacing() {
@@ -897,7 +925,11 @@ class FoamcoreInteractionLayer extends React.Component {
       return null
     }
 
-    return this.positionBlank({ ...this.replacingCard }, 'unrendered', true)
+    return this.positionBlank({
+      position: { ...this.replacingCard },
+      interactionType: 'unrendered',
+      showDropzoneIcon: true,
+    })
   }
 
   render() {
