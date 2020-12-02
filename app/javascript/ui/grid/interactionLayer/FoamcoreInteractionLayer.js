@@ -311,7 +311,7 @@ class FoamcoreInteractionLayer extends React.Component {
       row,
       width,
       height,
-      section_name: 'New Section',
+      section_name: '',
       card_type: 'section',
       parent_id: collection.id,
     }
