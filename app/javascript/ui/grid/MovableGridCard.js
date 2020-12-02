@@ -838,7 +838,7 @@ class MovableGridCard extends React.Component {
         width={card.maxWidth * gridW}
         height={card.maxHeight * gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
-        isSection={true}
+        isSection={card.isSection}
         // <-----
       >
         <Rnd {...rndProps}>

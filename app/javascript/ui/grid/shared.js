@@ -268,6 +268,7 @@ const mdlPillPlaceholderCss = css`
       box-shadow: ${
         selectedMultiple ? `-15px 15px 0 0px ${colors.secondaryLight}` : 'none'
       };
+      background: ${isSection ? 'white' : 'inherit'};
       @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
         left: 5%;
         margin: 0;
