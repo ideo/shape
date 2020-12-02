@@ -20,6 +20,7 @@ import v, {
   MAX_CARD_W,
   MAX_CARD_H,
   FOAMCORE_GRID_BOUNDARY,
+  COLLECTION_CARD_TYPES,
 } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -1211,11 +1212,13 @@ class FoamcoreGrid extends React.Component {
     }
     const data = {
       cardType: 'mdlPlaceholder',
+      type: movingCard.type,
       originalId: movingCard.id,
       record: movingCard.record,
       width: movingCard.width,
       height: movingCard.height,
       position: uiStore.positionForCoordinates(movingCard),
+      isSection: movingCard.type === COLLECTION_CARD_TYPES.SECTION,
     }
     const placeholder = new CollectionCard(data, apiStore)
     apiStore.updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
