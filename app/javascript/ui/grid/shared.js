@@ -166,17 +166,19 @@ export const SectionCardWrapper = styled.div`
   height: 100%;
   width: 100%;
   background: ${props => props.backgroundColor};
+
+  ${props =>
+    props.selected &&
+    `
+  &:before {
+    ${highlightedCardCss}
+  }
+  `};
+
   .sectionInner {
     border-radius: ${props => props.theme.zoomLevel * 2}px;
     position: absolute;
     cursor: grab;
-    ${props =>
-      props.selected &&
-      `
-    &:before {
-      ${highlightedCardCss}
-    }
-    `};
   }
 
   .styled-name {
