@@ -58,12 +58,12 @@ class SectionCard extends React.Component {
 
     const cardWidth = uiStore.gridSettings.gridW / zoomLevel
     const smallCard = cardWidth < 160
-
     return (
       <SectionCardWrapper
         selected={isSelected}
         className="sectionCardWrapper"
         onMouseMove={this.onMouseMove}
+        inMdl={inMdl}
       >
         <EditableName
           inline

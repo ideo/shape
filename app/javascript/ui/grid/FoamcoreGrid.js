@@ -1126,6 +1126,7 @@ class FoamcoreGrid extends React.Component {
       record: movingCard.record,
       width: movingCard.width,
       height: movingCard.height,
+      section_name: movingCard.section_name,
       position: uiStore.positionForCoordinates(movingCard),
       isSection: movingCard.type === COLLECTION_CARD_TYPES.SECTION,
     }

@@ -159,7 +159,14 @@ export const SectionCardWrapper = styled.div`
   width: 100%;
 
   ${props =>
+    props.inMdl &&
+    `
+    background: white;
+  `}
+
+  ${props =>
     props.selected &&
+    !props.inMdl &&
     `
   &:before {
     ${highlightedCardCss}
@@ -261,18 +268,22 @@ const mdlPillPlaceholderCss = css`
   .show-on-hover {
     display: none;
   }
-  .react-draggable:before {
-    background: ${v.colors.primaryDark};
-    content: '';
-    height: 100%;
-    left: 0;
-    opacity: 0.45;
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    top: 0;
-    z-index: ${v.zIndex.gridCardTop};
-  }
+  ${props =>
+    !props.isSection &&
+    `
+    .react-draggable:before {
+      background: ${v.colors.primaryDark};
+      content: '';
+      height: 100%;
+      left: 0;
+      opacity: 0.45;
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+      top: 0;
+      z-index: ${v.zIndex.gridCardTop};
+    }
+  `}
 `
 
 export const StyledCardWrapper = styled.div`
