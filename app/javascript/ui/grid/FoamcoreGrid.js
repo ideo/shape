@@ -536,7 +536,8 @@ class FoamcoreGrid extends React.Component {
                 !!spot &&
                 spot.id !== id &&
                 !spot.isSection &&
-                (resizingToCol - 1 <= spot.col || resizingToRow - 1 <= spot.row)
+                (resizingToCol <= spot.col + spot.width ||
+                  resizingToRow <= spot.row + spot.height)
               ) {
                 // if a spot is inside the section boundary set by bottom right card, block resizing
                 blocked = true
