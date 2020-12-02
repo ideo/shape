@@ -789,7 +789,9 @@ class MovableGridCard extends React.Component {
         // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
         _zIndex = -1
       }
-      renderedCard = <SectionCard card={card} zoomLevel={zoomLevel} />
+      renderedCard = (
+        <SectionCard card={card} zoomLevel={zoomLevel} inMdl={mdlPlaceholder} />
+      )
     }
 
     return (
@@ -808,6 +810,7 @@ class MovableGridCard extends React.Component {
         width={card.maxWidth * gridW}
         height={card.maxHeight * gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
+        isSection={true}
         // <-----
       >
         <Rnd {...rndProps}>

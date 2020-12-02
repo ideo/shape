@@ -225,11 +225,18 @@ const mdlPillPlaceholderCss = css`
   position: fixed !important;
 
   ${props => {
-    const { width, height, maxWidth, maxHeight, selectedMultiple } = props
+    let { width, height } = props
+    const { isSection, maxWidth, maxHeight, selectedMultiple } = props
     const { cardTiltDegrees, colors } = v
     const shouldScaleSmaller = maxWidth >= 2 && maxHeight >= 2 // scale even smaller for 2x2, 2x3 or 2x4 ratio
     const scalarTransform = shouldScaleSmaller ? 0.25 : 0.4
     const marginLeft = width / maxWidth
+    const gridSettings = v.defaultGridSettings
+
+    if (isSection) {
+      width = gridSettings.gridW * 3
+      height = gridSettings.gridW * 2
+    }
 
     return `
       height: ${height}px;

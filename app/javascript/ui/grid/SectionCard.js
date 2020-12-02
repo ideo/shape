@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { inject, PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import { action, observable } from 'mobx'
@@ -52,7 +53,7 @@ class SectionCard extends React.Component {
   }
 
   render() {
-    const { card, uiStore, zoomLevel } = this.props
+    const { card, inMdl, uiStore, zoomLevel } = this.props
     const { section_name, can_edit_parent, isSelected } = card
 
     const cardWidth = uiStore.gridSettings.gridW / zoomLevel
@@ -96,10 +97,14 @@ class SectionCard extends React.Component {
             zoomLevel={zoomLevel}
           />
         </StyledTopRightActions>
-        <SectionTop className="sectionInner" />
-        <SectionLeft className="sectionInner" />
-        <SectionBottom className="sectionInner" />
-        <SectionRight className="sectionInner" />
+        {!inMdl && (
+          <Fragment>
+            <SectionTop className="sectionInner" />
+            <SectionLeft className="sectionInner" />
+            <SectionBottom className="sectionInner" />
+            <SectionRight className="sectionInner" />
+          </Fragment>
+        )}
       </SectionCardWrapper>
     )
   }
@@ -108,6 +113,7 @@ class SectionCard extends React.Component {
 SectionCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   zoomLevel: PropTypes.number.isRequired,
+  inMdl: PropTypes.bool.isRequired,
 }
 SectionCard.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
