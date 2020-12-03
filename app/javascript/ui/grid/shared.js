@@ -98,6 +98,14 @@ export const StyledGridCard = styled.div`
   `};
 
   ${props =>
+    props.blocked &&
+    `
+    &:before {
+      background: ${v.colors.alert}
+    }
+  `}
+
+  ${props =>
     props.collaboratorColor &&
     `
     box-shadow: 0 0 0 3px ${props.collaboratorColor};
@@ -157,6 +165,7 @@ const SECTION_BORDER_STYLE = `${SECTION_BORDER}px solid black`
 export const SectionCardWrapper = styled.div`
   height: 100%;
   width: 100%;
+  background: ${props => props.backgroundColor};
 
   ${props =>
     props.inMdl &&
@@ -177,8 +186,6 @@ export const SectionCardWrapper = styled.div`
     border-radius: ${props => props.theme.zoomLevel * 2}px;
     position: absolute;
     cursor: grab;
-    /* for debugging: */
-    /* background-color: rgba(130, 125, 185, 0.1); */
   }
 
   .styled-name {
@@ -199,6 +206,17 @@ export const SectionCardWrapper = styled.div`
     }
   }
 `
+
+SectionCardWrapper.propTypes = {
+  /* for debugging: */
+  /* backgroundColor: rgba(130, 125, 185, 0.1); */
+  backgroundColor: PropTypes.string,
+}
+
+SectionCardWrapper.defaultProps = {
+  backgroundColor: v.colors.transparent,
+}
+
 export const SectionTop = styled.div`
   border-top: ${SECTION_BORDER_STYLE};
   width: 100%;
@@ -257,6 +275,7 @@ const mdlPillPlaceholderCss = css`
       box-shadow: ${
         selectedMultiple ? `-15px 15px 0 0px ${colors.secondaryLight}` : 'none'
       };
+      background: ${isSection ? 'white' : 'inherit'};
       @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
         left: 5%;
         margin: 0;
