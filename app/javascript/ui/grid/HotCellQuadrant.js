@@ -14,6 +14,7 @@ import ReportIcon from '~/ui/icons/htc/ReportIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
+import SectionIcon from '~/ui/icons/htc/SectionIcon'
 import { Heading3, SmallHelperText } from '~/ui/global/styled/typography'
 import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
 import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
@@ -92,8 +93,7 @@ const nameToIcon = {
   template: TemplateIcon,
   useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
-  // TODO: section icon
-  section: TemplateIcon,
+  section: SectionIcon,
   text: TextIcon,
   video: VideoIcon,
 }
