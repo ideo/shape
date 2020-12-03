@@ -256,7 +256,7 @@ class CollectionCard < ApplicationRecord
     return cc unless cc.save
 
     # now that the card exists, we can recalculate the breadcrumb
-    cc.record.recalculate_breadcrumb! unless shallow || link?
+    cc.record.recalculate_breadcrumb! unless record.nil? || shallow || link?
     if placement != 'end' && placeholder.nil? && !parent.board_collection?
       cc.increment_card_orders!
     end

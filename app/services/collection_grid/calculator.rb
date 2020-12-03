@@ -236,14 +236,16 @@ module CollectionGrid
       card_ids_in_sections = moving_cards.map do |card|
         next unless card.section?
 
-        card.cards_in_section.pluck(:id)
+        card.cards_in_section(moving_cards: moving_cards).map { |cc| cc.id || cc.object_id }
       end.compact.flatten
 
       drag_positions = {}
       drag_map.each_with_index do |mapped, i|
         card = mapped.card
+        # object_id for unpersisted cards
+        card_id = card.id || card.object_id
         # these get moved with their section (see section_cards loop down below)
-        next if card_ids_in_sections.include?(card.id)
+        next if card_ids_in_sections.include?(card_id)
 
         position = Mashie.new(
           # id is mostly just helpful for debugging output
@@ -273,8 +275,6 @@ module CollectionGrid
         position.row = open_spot.row
         position.col = open_spot.col
 
-        # object_id for unpersisted cards
-        card_id = card.id || card.object_id
         # drag_positions tracks what we have "placed" so far
         drag_positions[card_id] = position
 
@@ -282,7 +282,7 @@ module CollectionGrid
         col_diff = position.col - card.col
         if card.section?
           # now we deal with these since they weren't technically part of moving_cards
-          moving_cards.select { |c| card.cards_in_section.include?(c) }.each do |section_card|
+          card.cards_in_section(moving_cards: moving_cards).each do |section_card|
             section_card.parent = collection
             section_card.row += row_diff
             section_card.col += col_diff

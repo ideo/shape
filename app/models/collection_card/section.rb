@@ -62,21 +62,30 @@ class CollectionCard
       parent.can_view?(*args)
     end
 
-    def cards_in_section(collection: parent)
+    def cards_in_section(moving_cards: nil)
+      max_row = row + height - 1
+      max_col = col + width - 1
+
+      if moving_cards.present?
+        return moving_cards.select do |cc|
+          cc.row > row && cc.row < max_row && cc.col > col && cc.col < max_col
+        end
+      end
+
       t = CollectionCard.arel_table
-      collection
+      parent
         .collection_cards
         .where(
           t[:row].gt(row),
         )
         .where(
-          t[:row].lt(row + height - 1),
+          t[:row].lt(max_row),
         )
         .where(
           t[:col].gt(col),
         )
         .where(
-          t[:col].lt(col + width - 1),
+          t[:col].lt(max_col),
         )
     end
   end

@@ -20,8 +20,9 @@ class ActivityAndNotificationForCardWorker
       to_collection = Collection.find(to_collection_id)
     end
     record = card.record
-    editors = record.editors
+    return if record.nil?
 
+    editors = record.editors
     ActivityAndNotificationBuilder.call(
       actor: actor,
       target: record,

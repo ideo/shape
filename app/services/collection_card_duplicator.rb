@@ -44,7 +44,7 @@ class CollectionCardDuplicator < SimpleService
 
   def filter_out_invalid_cards
     @cards = @cards.reject do |card|
-      card.record.is_a?(Collection::Global) || card.record.parent_collection_card.blank?
+      card.record.is_a?(Collection::Global) || (!card.section? && card.record.parent_collection_card.blank?)
     end
   end
 
@@ -125,8 +125,12 @@ class CollectionCardDuplicator < SimpleService
 
       # copy attributes from original, including item/collection_id which will
       # help us refer back to the originals when duplicating
-      dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
-      dup.type = 'CollectionCard::Placeholder'
+      dup = card.amoeba_dup
+
+      unless card.section?
+        dup = dup.becomes(CollectionCard::Placeholder)
+        dup.type = 'CollectionCard::Placeholder'
+      end
       unless @to_collection.master_template?
         dup.pinned = false
       end

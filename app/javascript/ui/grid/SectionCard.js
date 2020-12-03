@@ -63,7 +63,7 @@ class SectionCard extends React.Component {
       <SectionCardWrapper
         selected={isSelected}
         className="sectionCardWrapper"
-        onMouseMove={this.onMouseMove}
+        onMouseMove={inMdl ? null : this.onMouseMove}
         inMdl={inMdl}
         backgroundColor={backgroundColor}
       >
@@ -76,31 +76,31 @@ class SectionCard extends React.Component {
           fontSize={'3.5rem'}
           fieldName={`sectionName-${card.id}`}
         />
-        <StyledTopRightActions
-          color={this.actionsColor}
-          className="show-on-hover"
-          smallCard={smallCard}
-          zoomLevel={zoomLevel}
-        >
-          <CardActionHolder tooltipText="select">
-            <SelectionCircle cardId={card.id} />
-          </CardActionHolder>
-          <ActionMenu
-            canView
-            canEdit={card.can_edit_parent}
-            canReplace={false}
-            location="GridCard"
-            className="show-on-hover"
-            wrapperClassName="card-menu"
-            card={card}
-            menuOpen={this.actionMenuOpen}
-            onOpen={this.onOpenActionMenu}
-            onLeave={this.onCloseActionMenu}
-            zoomLevel={zoomLevel}
-          />
-        </StyledTopRightActions>
         {!inMdl && (
           <Fragment>
+            <StyledTopRightActions
+              color={this.actionsColor}
+              className="show-on-hover"
+              smallCard={smallCard}
+              zoomLevel={zoomLevel}
+            >
+              <CardActionHolder tooltipText="select">
+                <SelectionCircle cardId={card.id} />
+              </CardActionHolder>
+              <ActionMenu
+                canView
+                canEdit={card.can_edit_parent}
+                canReplace={false}
+                location="GridCard"
+                className="show-on-hover"
+                wrapperClassName="card-menu"
+                card={card}
+                menuOpen={this.actionMenuOpen}
+                onOpen={this.onOpenActionMenu}
+                onLeave={this.onCloseActionMenu}
+                zoomLevel={zoomLevel}
+              />
+            </StyledTopRightActions>
             <SectionTop className="sectionInner" />
             <SectionLeft className="sectionInner" />
             <SectionBottom className="sectionInner" />

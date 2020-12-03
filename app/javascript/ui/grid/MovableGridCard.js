@@ -781,35 +781,25 @@ class MovableGridCard extends React.Component {
     )
 
     if (card.isSection) {
-      // TODO: figure out resize math and UI for handle that works for 3 new corners
-      // _.assign(rndProps.enableResizing, {
-      //   bottomLeft: enableResizing,
-      //   topLeft: enableResizing,
-      //   topRight: enableResizing,
-      // })
-      // _.assign(rndProps.extendsProps.handleComponent, {
-      //   bottomLeft: resizeHandleComponent,
-      //   topLeft: resizeHandleComponent,
-      //   topRight: resizeHandleComponent,
-      // })
-      rndProps.dragHandleClassName = '.sectionInner'
-      if (
-        uiStore.hoveringOverSection &&
-        uiStore.hoveringOverSection === card.id
-      ) {
-        // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
-        _zIndex = -1
-      }
-
       let backgroundColor = null
+      if (!mdlPlaceholder) {
+        rndProps.dragHandleClassName = '.sectionInner'
+        if (
+          uiStore.hoveringOverSection &&
+          uiStore.hoveringOverSection === card.id
+        ) {
+          // hovering over the middle of the section means we place it behind foamcoreInteractionLayer
+          _zIndex = -1
+        }
 
-      const { resizeSpot } = uiStore
-      const { blocked } = resizeSpot
+        const { resizeSpot } = uiStore
+        const { blocked } = resizeSpot
 
-      if (resizing && !blocked) {
-        backgroundColor = `${hexToRgba(v.colors.primaryLight, 0.2)}`
-      } else if (blocked) {
-        backgroundColor = `${hexToRgba(v.colors.alert, 0.2)}`
+        if (resizing && !blocked) {
+          backgroundColor = `${hexToRgba(v.colors.primaryLight, 0.2)}`
+        } else if (blocked) {
+          backgroundColor = `${hexToRgba(v.colors.alert, 0.2)}`
+        }
       }
 
       renderedCard = (

@@ -19,7 +19,7 @@ class CollectionCardDuplicationWorker
     @synchronous = synchronous
     @system_collection = system_collection
     @building_template_instance = building_template_instance
-    @new_cards = duplicate_cards
+    @new_cards = duplicate_cards.compact
     return false if infinite_loop_detected?
 
     duplicate_legend_items
@@ -32,6 +32,9 @@ class CollectionCardDuplicationWorker
     @parent_collection.update(processing_status: :duplicating)
 
     cards_to_duplicate.map do |card|
+      # sections were already copied
+      next if card.section?
+
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
       source_card = card
@@ -85,7 +88,7 @@ class CollectionCardDuplicationWorker
       # If a system collection don't check if user can view
       if @building_template_instance || @system_collection
         true
-      elsif @for_user.present? && !card.record.can_view?(@for_user)
+      elsif @for_user.present? && !card.can_view?(@for_user)
         false
       else
         true
@@ -95,6 +98,9 @@ class CollectionCardDuplicationWorker
 
   def update_parent_collection_status
     @parent_collection.update(processing_status: nil)
+
+    pp "NOW BROADCASTING!! #{@new_cards.pluck(:id)}"
+
     # @for_user is omitted so the user can reload their placeholder cards into the new ones
     CollectionUpdateBroadcaster.new(@parent_collection).cards_updated(
       @new_cards.pluck(:id),
