@@ -147,18 +147,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
 
-    context 'with a normal collection in need of 4WFC migration' do
-      let(:collection) { create(:collection, num_cards: 2, num_columns: nil, add_viewers: [user]) }
-
-      it 'calls BoardMigrator service' do
-        expect(CollectionGrid::BoardMigrator).to receive(:call).with(
-          collection: an_instance_of(Collection),
-          async: true,
-        )
-        get(path)
-      end
-    end
-
     it 'has no editors' do
       get(path)
       roles = json['data']['relationships']['roles']['data']

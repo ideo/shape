@@ -76,6 +76,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   tempTextCard = null
   @observable
   newPersistedTextCard = null
+  @observable
+  lastInsertedRow = 0
 
   attributesForAPI = [
     'name',
@@ -2001,6 +2003,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
       this.applyRowUpdate({ row, action })
       uiStore.update('isTransparentLoading', false)
+
+      if (this.isSplitLevel) {
+        runInAction(() => {
+          // this is used to adjust the splitLevel top row height in FoamcoreGrid
+          const incr = action === ROW_ACTIONS.INSERT ? 1 : -1
+          this.lastInsertedRow = row + incr
+        })
+      }
 
       if (!pushUndo) {
         return

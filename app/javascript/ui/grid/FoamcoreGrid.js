@@ -265,16 +265,23 @@ class FoamcoreGrid extends React.Component {
     const { gridW, gridH, gutter } = this.gridSettings
     const { relativeZoomLevel } = this
     const { collection, uiStore } = this.props
+    const { lastInsertedRow } = collection
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     const visRows = _.get(uiStore, 'visibleRows.num', 1)
     let maxRows = (
-      _.maxBy(collection.collection_cards, 'maxRow') || { maxRow: 1 }
+      _.maxBy(collection.collection_cards, 'maxRow') || { maxRow: 0 }
     ).maxRow
+
     if (collection.isSplitLevelBottom) {
       maxRows += 1
-    } else if (!collection.isSplitLevel) {
+    } else if (collection.isSplitLevel) {
+      if (collection.canEdit) {
+        maxRows = lastInsertedRow > maxRows ? lastInsertedRow : maxRows
+      }
+      maxRows += 1
+    } else {
       // + 2x the visible number of rows
       // for padding to allow scrolling beyond the current cards
       maxRows += visRows * 2
@@ -282,6 +289,7 @@ class FoamcoreGrid extends React.Component {
         maxRows += 1
       }
     }
+
     const height = ((gridH + gutter) * maxRows) / relativeZoomLevel
     const width = ((gridW + gutter) * maxCols) / relativeZoomLevel
     return {

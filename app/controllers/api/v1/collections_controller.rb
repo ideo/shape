@@ -23,7 +23,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
-    check_4wfc_migration
 
     include = Collection.default_relationships_for_api
     if @collection.collection_type_challenge?
@@ -346,6 +345,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     @collection.reload
   end
 
+  # no longer used (used to be a fallback check in collections#show)
   def check_4wfc_migration
     return if @collection.board_collection?
 
