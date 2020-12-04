@@ -541,7 +541,10 @@ describe('FoamcoreGrid', () => {
   describe('totalGridSize', () => {
     beforeEach(() => {
       props.collection.isSplitLevel = false
+      props.collection.isSplitLevelBottom = false
       props.collection.max_row_index = 0
+      props.collection.lastInsertedRow = 0
+      props.collection.collection_cards = [{ id: '1', maxRow: 1 }]
       props.uiStore.visibleRows = { min: 0, max: 5, num: 5 }
       rerender()
     })
@@ -556,18 +559,19 @@ describe('FoamcoreGrid', () => {
       expect(height).toEqual(calculatedHeight)
     })
 
-    describe('for split-level collections', () => {
+    describe('for split-level collections, with canEdit true', () => {
       beforeEach(() => {
+        props.collection.canEdit = true
         props.collection.isSplitLevel = true
         rerender()
       })
 
-      it('should calculate the right height for non-split level collections', () => {
+      it('should calculate the right height', () => {
         const { height } = component.totalGridSize
         const { relativeZoomLevel } = component
         const { gridSettings } = component
         const { gridH, gutter } = gridSettings
-        const maxRows = props.collection.max_row_index + 1
+        const maxRows = props.collection.max_row_index + 2
         const calculatedHeight =
           ((gridH + gutter) * maxRows) / relativeZoomLevel
         expect(height).toEqual(calculatedHeight)
@@ -581,7 +585,7 @@ describe('FoamcoreGrid', () => {
         rerender()
       })
 
-      it('should calculate the right height for non-split level collections', () => {
+      it('should calculate the right height', () => {
         const { height } = component.totalGridSize
         const { relativeZoomLevel } = component
         const { gridSettings } = component
