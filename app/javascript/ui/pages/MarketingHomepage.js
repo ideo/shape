@@ -12,13 +12,13 @@ import {
   MarketingAlternateBtn,
   MarketingShapeLogo,
   MarketingVideoWrapper,
-  MarketingMainBtn,
+  // MarketingMainBtn,
   MarketingGradientTop,
 } from '~/ui/global/styled/marketing.js'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
-import { Pricing } from '~/ui/marketing/Pricing'
+// import { Pricing } from '~/ui/marketing/Pricing'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
 import { hasKeyValueParam } from '~/utils/paramUtils.js'
@@ -98,11 +98,11 @@ class MarketingPage extends React.Component {
 
             <Center>
               <MarketingHeroButtonContainer>
-                <a className="get-early-access-header" href="/sign_up">
+                {/* <a className="get-early-access-header" href="/sign_up">
                   <MarketingMainBtn>
                     {hero && hero.getStartedButton}
                   </MarketingMainBtn>
-                </a>
+                </a> */}
                 {hero && hero.videoUrl && (
                   <MarketingAlternateBtn
                     id="home-watch-video"
@@ -130,12 +130,12 @@ class MarketingPage extends React.Component {
             </Box>
           </MarketingFlex>
 
-          {this.state.content.pricing && (
+          {/* {this.state.content.pricing && (
             <Pricing
               pageName="shape"
               {...this.state.content.pricing.blocks[0]}
             />
-          )}
+          )} */}
         </MarketingBack>
 
         <PageFooter content={footer} />

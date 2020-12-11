@@ -11,7 +11,7 @@ const StyledBanner = styled.div`
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;
   padding: 20px;
-  margin: 10px 0;
+  margin: ${({ margin }) => margin};
 
   a {
     color: white;
@@ -30,8 +30,10 @@ const StyledAction = styled.div`
 
 class Banner extends React.Component {
   render() {
+    const { margin, color } = this.props
+
     return (
-      <StyledBanner color={this.props.color}>
+      <StyledBanner margin={margin} color={color}>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
             <Grid
@@ -55,12 +57,14 @@ class Banner extends React.Component {
 }
 
 Banner.propTypes = {
+  margin: PropTypes.string,
   color: PropTypes.oneOf(Object.values(v.colors)),
   leftComponent: PropTypes.object.isRequired,
   rightComponent: PropTypes.object.isRequired,
 }
 
 Banner.defaultProps = {
+  margin: '10px 0',
   color: v.colors.alert,
   leftComponent: () => null,
   rightComponent: () => null,

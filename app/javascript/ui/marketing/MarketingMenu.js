@@ -7,14 +7,14 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Drawer from '@material-ui/core/Drawer'
 import { Box } from 'reflexbox'
 import v from '~/utils/variables'
-import Logo from '~/ui/layout/Logo.js'
-import Hamburger from '~/ui/layout/Hamburger.js'
+import Logo from '~/ui/layout/Logo'
+import Hamburger from '~/ui/layout/Hamburger'
 import MenuDropdown from '~/ui/layout/MenuDropdown'
 import {
   MarketingFlex,
-  MarketingMainBtn,
   NavLink,
-} from '~/ui/global/styled/marketing.js'
+  // MarketingMainBtn,
+} from '~/ui/global/styled/marketing'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
 
@@ -127,10 +127,10 @@ const MobileMenuItem = styled(Box)`
   padding: 12px 0px;
 `
 
-const MobileMenuBtnItem = styled(MobileMenuItem)`
-  position: relative;
-  left: 24px;
-`
+// const MobileMenuBtnItem = styled(MobileMenuItem)`
+//   position: relative;
+//   left: 24px;
+// `
 
 const MobileLinks = ({ isHome }) => {
   return (
@@ -177,11 +177,11 @@ const MobileLinks = ({ isHome }) => {
         </MobileSubNavLink>
       </MobileMenuItem>
 
-      <MobileMenuItem>
+      {/* <MobileMenuItem>
         <NavLink align="left" href="/product/pricing">
           PRICING
         </NavLink>
-      </MobileMenuItem>
+      </MobileMenuItem> */}
 
       <MobileMenuItem>
         <NavLink align="left" onClick={handleScrollToFooter}>
@@ -195,7 +195,7 @@ const MobileLinks = ({ isHome }) => {
         </NavLink>
       </MobileMenuItem>
 
-      <MobileMenuBtnItem>
+      {/* <MobileMenuBtnItem>
         <MarketingMainBtn
           onClick={() => {
             window.location = `${process.env.BASE_HOST}/sign_up`
@@ -204,7 +204,7 @@ const MobileLinks = ({ isHome }) => {
         >
           SIGN UP
         </MarketingMainBtn>
-      </MobileMenuBtnItem>
+      </MobileMenuBtnItem> */}
     </MarketingFlex>
   )
 }
@@ -263,7 +263,7 @@ class MarketingMenu extends React.PureComponent {
                     isHome={isHome}
                     handleScrollToContent={() => handleScrollToContent(isHome)}
                   />
-                  <NavLink href="/product/pricing">Pricing</NavLink>
+                  {/* <NavLink href="/product/pricing">Pricing</NavLink> */}
                 </MarketingFlex>
               </Box>
 
@@ -279,14 +279,14 @@ class MarketingMenu extends React.PureComponent {
                 <MarketingFlex align="center" justify="flex-end">
                   <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                   <NavLink href="/login">Log in</NavLink>
-                  <MarketingMainBtn
+                  {/* <MarketingMainBtn
                     id="header-sign-up"
                     onClick={() => {
                       window.location = `${process.env.BASE_HOST}/sign_up`
                     }}
                   >
                     Sign up
-                  </MarketingMainBtn>
+                  </MarketingMainBtn> */}
                 </MarketingFlex>
               </Box>
             </MarketingFlex>

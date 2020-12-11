@@ -300,6 +300,7 @@ Rails.application.routes.draw do
   get '/earlychildhood', to: redirect('/collections/4764')
 
   # catch all marketing route request
+  get '/sunset', to: 'home#marketing', as: :sunset, constraints: ->(req) { req.format == :html || req.format == '*/*' }
   get '/product/*path', to: 'home#marketing', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }

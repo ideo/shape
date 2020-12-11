@@ -7,6 +7,8 @@ import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import MarketingHomepage from '~/ui/pages/MarketingHomepage'
 import MarketingProductPage from '~/ui/pages/MarketingProductPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import SunsetPage from '~/ui/pages/SunsetPage'
+import SunsetBanner from '~/ui/marketing/SunsetBanner'
 import CaptureUtmParams from '~/utils/googleAnalytics/CaptureUtmParams'
 import v from '~/utils/variables'
 
@@ -32,10 +34,12 @@ class MarketingRoutes extends React.Component {
     return (
       <ErrorBoundary>
         <CaptureUtmParams />
+        <SunsetBanner />
         <MuiThemeProvider theme={this.theme}>
           <Switch>
             <Route exact path="/" component={MarketingHomepage} />
             <Route exact path="/terms" component={TermsPage} />
+            <Route exact path="/sunset" component={SunsetPage} />
             <Route path="/product/:page" component={MarketingProductPage} />
           </Switch>
         </MuiThemeProvider>

@@ -24,7 +24,7 @@ import PageFooter from '~/ui/marketing/PageFooter.js'
 import v from '~/utils/variables'
 import styled from 'styled-components'
 
-const Subtitle = styled(DisplayText)`
+export const Subtitle = styled(DisplayText)`
   font-size: 18px;
   line-height: 25px;
   text-align: center;

@@ -20,11 +20,12 @@ class HomeController < ApplicationController
   def login; end
 
   def sign_up
-    @user_was_signed_in = false
-    return unless user_signed_in?
-
-    sign_out :user
-    @user_was_signed_in = true
+    # @user_was_signed_in = false
+    # return unless user_signed_in?
+    #
+    # sign_out :user
+    # @user_was_signed_in = true
+    redirect_to sunset_url
   end
 
   def sign_out_and_redirect
