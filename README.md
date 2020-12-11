@@ -1,3 +1,14 @@
+# NOTE: Shape is no longer supported by IDEO.
+_December 2020_
+
+We have made the difficult decision to wind down operations of the Shape product offering. As part of that, we are making this repo open source. Feel free to peruse the code and hopefully find something useful.
+
+Note that the API authentication uses Devise + OAuth so it should be easy to reconfigure, however the existing codebase is reliant on the IDEO Network Account, a now defunct SSO system. So if you were to truly spin up your own instance of Shape, you would need to overhaul the login system.
+
+Another disclaimer, there is a *lot* going on in here, including various features we were experimenting with, lots of heavy front-end components with draggable, movable, realtime-text-editing, firebase-powered commenting, and so on. Shape was very much in the stage of experimenting with its market fit, with a small team of engineers, so it's probably going to be difficult to set up a local environment without any assistance. However, it did have a fully passing test suite of both frontend (jest + cypress) and backend (rspec) tests, so it's not that it wasn't thorough or robust, just that it might be a little complicated with some messy code in some areas. That being said, have fun with it.
+
+---
+
 # Getting Started
 
 Here are the commands you can use to get started:
