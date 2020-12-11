@@ -40,9 +40,8 @@ describe HomeController, skip_frontend_render: true, type: :request do
     let(:redirect) { nil }
     let(:path) { "/sign_up?redirect=#{redirect}" }
 
-    it 'returns 200' do
-      get(path)
-      expect(response.status).to eq 200
+    it 'redirects to /sunset' do
+      expect(get(path)).to redirect_to(sunset_url)
     end
 
     context 'with no redirect' do
