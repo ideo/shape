@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
-
+import { Helmet } from 'react-helmet'
 import { Box } from 'reflexbox'
+
 import {
   MarketingBack,
   MarketingFlex,
@@ -15,6 +16,9 @@ class SunsetPage extends React.PureComponent {
   get sunsetContent() {
     return (
       <div>
+        <Helmet>
+          <meta name="robots" content="noindex" />
+        </Helmet>
         <MarketingFlex column align="center" justify="center" wrap w={1}>
           <Box w={0.75} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
             <MarketingH1Bold>
