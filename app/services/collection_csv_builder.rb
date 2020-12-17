@@ -91,6 +91,8 @@ class CollectionCSVBuilder < SimpleService
   end
 
   def url_for(obj)
+    return nil unless obj.present?
+
     frontend_url_for(obj, slug: org_slug)
   end
 
