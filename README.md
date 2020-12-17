@@ -193,3 +193,6 @@ It shouldn't take too long, although `Searchkick` will take longer to reindex re
 
 ### Styleguide
 To run and work on the styleguide, visit [it's documentation](https://github.com/ideo/shape/wiki/Styleguide)
+
+### License
+Shape is released under the [MIT License](https://opensource.org/licenses/MIT).
