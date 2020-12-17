@@ -118,10 +118,19 @@ class ActionMenu extends React.Component {
   downloadCard = () => {
     const { card } = this.props
     const { record } = card
+    if (record.isCollection) {
+      return this.downloadCsv()
+    }
     if (record.filestack_file) {
       Activity.trackActivity('downloaded', record)
       window.open(record.filestack_file.url, '_blank')
     }
+  }
+
+  downloadCsv = () => {
+    const { card } = this.props
+    const { record } = card
+    window.open(`/api/v1/collections/${record.id}/csv`, '_blank')
   }
 
   showRolesMenu = () => {
@@ -308,6 +317,11 @@ class ActionMenu extends React.Component {
         name: 'Print',
         iconRight: <PrintIcon />,
         onClick: this.printPage,
+      })
+      items.push({
+        name: 'Export',
+        iconRight: <DownloadIcon />,
+        onClick: this.downloadCsv,
       })
     }
 

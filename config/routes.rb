@@ -32,6 +32,7 @@ Rails.application.routes.draw do
           get 'phase_sub_collections'
           get 'next_available_submission_test'
           get 'challenge_phase_collections'
+          get 'csv'
           post 'clear_collection_cover'
           post 'clear_background_image'
           patch 'submit'
