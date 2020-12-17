@@ -2,13 +2,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image
-                                         challenge_submission_boxes next_available_submission_test insert_row remove_row]
+                                         challenge_submission_boxes next_available_submission_test insert_row remove_row csv]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
-  before_action :load_collection_with_roles, only: %i[show update]
+  before_action :load_collection_with_roles, only: %i[show update csv]
   before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover
                                                                 clear_background_image collection_challenge_setup]
   before_action :load_and_authorize_parent_challenge, only: %i[challenge_submission_boxes next_available_submission_test]
@@ -31,6 +31,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render_collection(
       include: include,
     )
+  end
+
+  before_action :load_and_authorize_collection_view, only: %i[csv]
+  def csv
+    csv_data = CollectionCSVBuilder.call(@collection)
+    filename = "#{@collection.id}-#{@collection.name.parameterize}-#{Date.today}.csv"
+
+    respond_to do |format|
+      format.any { send_data csv_data, filename: filename }
+    end
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
@@ -289,6 +299,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     log_organization_view_activity
     # TODO: we may want to log collection view for anonymous user
     log_collection_activity(:viewed)
+  end
+
+  def load_and_authorize_collection_view
+    @collection = Collection.find(params[:id])
+    authorize! :read, @collection
   end
 
   def load_and_authorize_template_and_parent

@@ -1,13 +1,13 @@
 module ApplicationHelper
   # NOTE: this is somewhat similar to RoutingStore.js by necessity
-  def frontend_url_for(obj, with_id: true)
+  def frontend_url_for(obj, with_id: true, slug: nil)
     return admin_root_url if obj == Role::SHAPE_ADMIN.to_s.titleize
 
-    "#{root_url.chomp('/')}#{frontend_path_for(obj, with_id: with_id)}"
+    "#{root_url.chomp('/')}#{frontend_path_for(obj, with_id: with_id, slug: slug)}"
   end
 
-  def frontend_path_for(obj, with_id: true)
-    slug = obj&.organization&.slug
+  def frontend_path_for(obj, with_id: true, slug: nil)
+    slug ||= obj&.organization&.slug
     url = ''
     url += "/#{slug}" if slug
     obj_id = with_id ? "/#{obj.id}" : ''
