@@ -51,6 +51,12 @@ class CollectionCSVBuilder < SimpleService
       @collection.collection_cards.find_each do |card|
         csv << card_row(card)
       end
+
+      next unless @collection.is_a?(Collection::SubmissionBox)
+
+      @collection.submissions_collection.collection_cards.find_each do |card|
+        csv << card_row(card)
+      end
     end
   end
 
