@@ -81,7 +81,9 @@ class Item
 
         text += t
       end
-      text = text.strip.gsub(/\n+/, splitter).gsub(/\s+/, ' ')
+      if splitter != "\n"
+        text = text.strip.gsub(/\n+/, splitter).gsub(/\s+/, ' ')
+      end
       CGI.unescapeHTML(text)
     end
 

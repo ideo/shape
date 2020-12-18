@@ -16,8 +16,9 @@ class CollectionCSVBuilder < SimpleService
         name
         created_by_name
         created_by_email
-        content
-        data_content
+        plain_content
+        html_content
+        quill_data
         col
         row
         height
@@ -73,6 +74,7 @@ class CollectionCSVBuilder < SimpleService
       card.name,
       record.try(:created_by)&.name,
       record.try(:created_by)&.email,
+      record.is_a?(Item::TextItem) ? record.plain_content(splitter: "\n") : nil,
       record.try(:content),
       record.try(:data_content),
       card.col,
