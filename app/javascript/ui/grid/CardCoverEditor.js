@@ -113,6 +113,8 @@ class CardCoverEditor extends React.Component {
   @observable
   cardTitle = ''
   @observable
+  cardUrl = ''
+  @observable
   hardcodedSubtitle = '' // overrides cover text set by text items
   @observable
   subtitleHidden = false
@@ -165,10 +167,15 @@ class CardCoverEditor extends React.Component {
         data.name = this.cardTitle
       }
 
+      if (record.isLink) {
+        data.url = this.cardUrl
+      }
+
       if (
         titleForComparison === this.cardTitle &&
         cardOrRecord.subtitle === this.hardcodedSubtitle &&
-        cardOrRecord.subtitleHidden === this.subtitleHidden
+        cardOrRecord.subtitleHidden === this.subtitleHidden &&
+        (!record.isLink || record.url === this.cardUrl)
       ) {
         return
       }
@@ -341,6 +348,11 @@ class CardCoverEditor extends React.Component {
   }
 
   @action
+  changeUrl = ev => {
+    this.cardUrl = ev.target.value
+  }
+
+  @action
   changeHardcodedSubtitle = ev => {
     this.hardcodedSubtitle = ev.target.value
   }
@@ -405,6 +417,7 @@ class CardCoverEditor extends React.Component {
       this.subtitleHidden = record.subtitleHidden
     } else if (record.isLink) {
       this.cardTitle = name || record.url
+      this.cardUrl = record.url
       this.hardcodedSubtitle = record.content
       this.subtitleHidden = record.subtitleHidden
     }
@@ -556,6 +569,23 @@ class CardCoverEditor extends React.Component {
     )
   }
 
+  renderEditUrlInput() {
+    return (
+      <div>
+        <TextareaAutosize
+          maxRows={3}
+          value={this.cardUrl}
+          placeholder="url"
+          onChange={this.changeUrl}
+          onKeyPress={this.handleInputKeyPress}
+          onClick={this.handleInputClick}
+          onKeyDown={this.handleInputKeyDown}
+          className="edit-cover-title"
+        />
+      </div>
+    )
+  }
+
   renderEditSubtitleInput() {
     // max length 144 matches StyledEditableName's max length
     return (
@@ -640,13 +670,22 @@ class CardCoverEditor extends React.Component {
                 />
                 <br />
                 {record.isLink && (
-                  <NamedActionButton
-                    noPadding
-                    marginBottom={20}
-                    onClick={this.handleRestore}
-                  >
-                    Restore
-                  </NamedActionButton>
+                  <Fragment>
+                    <MediumBreak />
+                    <h3>URL</h3>
+                    <StyledEditTitle>
+                      {this.renderEditUrlInput()}
+                    </StyledEditTitle>
+                    <MediumBreak />
+
+                    <NamedActionButton
+                      noPadding
+                      marginBottom={20}
+                      onClick={this.handleRestore}
+                    >
+                      Restore
+                    </NamedActionButton>
+                  </Fragment>
                 )}
               </Fragment>
             )}

@@ -11,6 +11,7 @@ const TitleAndCoverEditingMixin = superclass =>
       hardcodedTitle = '',
       hardcodedSubtitle = '',
       subtitleHidden = false,
+      url = '',
     }) {
       const previousName = this.name
       this.name = name
@@ -46,6 +47,8 @@ const TitleAndCoverEditingMixin = superclass =>
         if (hardcodedSubtitle !== this.content) {
           this.content = hardcodedSubtitle
         }
+        data.attributes.url = url
+        this.url = url
         data.attributes.content = hardcodedSubtitle
         data.attributes.subtitle_hidden = subtitleHidden
         this.subtitle_hidden = subtitleHidden
