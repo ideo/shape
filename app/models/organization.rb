@@ -417,6 +417,10 @@ class Organization < ApplicationRecord
             .map { |arr| arr[0].id }
   end
 
+  def active?
+    !deactivated?
+  end
+
   private
 
   def should_generate_new_friendly_id?
