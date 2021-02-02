@@ -16,6 +16,7 @@ class CollectionCSVBuilder < SimpleService
         name
         created_by_name
         created_by_email
+        created_at
         plain_content
         html_content
         quill_data
@@ -35,6 +36,7 @@ class CollectionCSVBuilder < SimpleService
         @collection.name,
         @collection.created_by&.name,
         @collection.created_by&.email,
+        @collection.created_at,
         nil,
         nil,
         nil,
@@ -54,6 +56,7 @@ class CollectionCSVBuilder < SimpleService
       end
 
       next unless @collection.is_a?(Collection::SubmissionBox)
+      next if @collection.submissions_collection.nil?
 
       @collection.submissions_collection.collection_cards.find_each do |card|
         csv << card_row(card)
@@ -74,6 +77,7 @@ class CollectionCSVBuilder < SimpleService
       card.name,
       record.try(:created_by)&.name,
       record.try(:created_by)&.email,
+      record.try(:created_at),
       record.is_a?(Item::TextItem) ? record.plain_content(splitter: "\n") : nil,
       record.try(:content),
       record.try(:data_content),
