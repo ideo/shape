@@ -42,11 +42,11 @@ class PageFooter extends React.PureComponent {
             style={{ maxWidth: '1000px' }}
           >
             <Box w={1 / 2} style={{ textAlign: 'left' }}>
-              <MarketingContent color="white">
+              {/* <MarketingContent color="white">
                 For general inquiries, reach us at:
               </MarketingContent>
 
-              {/* <InvertMarketingLinkMail
+              <InvertMarketingLinkMail
                 fontSize={18}
                 href="mailto:hello@shape.space"
               >
