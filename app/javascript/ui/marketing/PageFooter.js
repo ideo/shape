@@ -46,12 +46,12 @@ class PageFooter extends React.PureComponent {
                 For general inquiries, reach us at:
               </MarketingContent>
 
-              <InvertMarketingLinkMail
+              {/* <InvertMarketingLinkMail
                 fontSize={18}
                 href="mailto:hello@shape.space"
               >
                 hello@shape.space
-              </InvertMarketingLinkMail>
+              </InvertMarketingLinkMail> */}
 
               <MarketingContent color="white">
                 For technical support, contact:
@@ -59,9 +59,9 @@ class PageFooter extends React.PureComponent {
 
               <InvertMarketingLinkMail
                 fontSize={18}
-                href="mailto:help@shape.space"
+                href="mailto:support@shape-support.zendesk.com"
               >
-                help@shape.space
+                support@shape-support.zendesk.com
               </InvertMarketingLinkMail>
             </Box>
 
